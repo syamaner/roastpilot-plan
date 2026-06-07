@@ -15,6 +15,7 @@
 | D6 | MCP wiring | **Agent spawns `coffee-roaster-mcp` as stdio child process** | One systemd unit; agent restart ⇒ clean MCP restart into the recovery flow. Matches the published stdio transport (`config.py` hard-codes `TransportType = Literal["stdio"]`). |
 | D7 | Profiles | **Minimal static profile** | name, bean (origin/varietal/weight), charge guidance range (default 170–200 °C), initial heat/fan, target drop temp, target development %. No curve targets in M1. |
 | D8 | SPA scope (M1) | **Dashboard + roast detail + history** | Settings via config file; rating UI + cloud screens are M2. |
+| D15 | Safety verdict vocabulary & shared enums (7 Jun 2026, E1 review) | **Six typed verdicts: `ALLOW / CLAMP / REJECT / RECOVERY / FAULT / EMERGENCY_STOP`; `SafetyEvaluation.adjusted_heat/fan` nullable; `RoastPhase` lives in `models.py`; shared enums are plain `Enum`, never `StrEnum`** | Resolves the E1-review discrepancy: §5's schema column already said `recovery` while the kickoff's five-value list was an elision. RECOVERY signals "enter `operator_recovery_required`" as distinct from FAULT (acknowledge-and-stop). Nullable adjusted values per §5 schema — REJECT/RECOVERY/FAULT/E-STOP carry no adjusted command, and a fabricated 0 is indistinguishable from a clamp-to-zero in the decision trace. `RoastPhase` moved from `controller.py` to `models.py` (store/api/advisor all consume the phase vocabulary; importing from controller would cycle once the tick loop wires those modules) — controller re-exports it. Plain `Enum` (not `StrEnum`) so comparing a member to a raw string is a pyright strict error (`reportUnnecessaryComparison`), enforcing the never-string-compared invariant mechanically. |
 
 ## 2. Verified MCP Contract (ground truth, coffee-roaster-mcp v0.1.3)
 
@@ -90,7 +91,8 @@ Per orchestration plan § Implementation Modules, with refinements:
 
 ```text
 src/roastpilot_agent/
-├── controller.py     # RoastPhase enum, transition table, tick() loop, T0 debounce
+├── controller.py     # transition table, tick() loop, T0 debounce; re-exports
+│                     #   RoastPhase from models.py (its home per D15)
 ├── mcp_client.py     # Typed wrapper over the 13 tools; owns the MCP child process
 │                     #   (spawn, health, restart→recovery); Pydantic mirrors of
 │                     #   RoastSessionState / T0Status / FirstCrackStatus
@@ -101,7 +103,8 @@ src/roastpilot_agent/
 ├── api.py            # FastAPI: REST + SSE + static web/ mount; replay mode
 ├── replay.py         # ReplaySource: streams recorded exports through the real
 │                     #   SSE pipeline at 1×–60× (dev/demo/UI prototyping)
-├── models.py         # Shared Pydantic models & enums (incl. RoastProfile)
+├── models.py         # Shared Pydantic models & enums (RoastPhase per D15,
+│                     #   RoastProfile); plain Enum, never StrEnum (D15)
 └── config.py         # ControllerConfig, AdvisorConfig, SafetyLimits, AppConfig
 web/                  # Vite + React + TS SPA (built into the wheel)
 ```
