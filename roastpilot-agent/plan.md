@@ -416,7 +416,14 @@ not byproducts.
 ## 11. Remaining Open Items
 
 1. Exact OpenRouter model slug + structured-output settings — confirm at E8.
-2. `drop_beans` cooling behavior on real hardware — E12 verification story (§3).
+2. `drop_beans` cooling behavior on real hardware — **RESOLVED 7 Jun 2026**,
+   ahead of the E12 story: coffee-roaster-mcp's E7-S6 live Hottop roast
+   (branch `e7-s6-live-roast-validation`, session `c5707681…`, driver
+   `hottop_kn8828b_2k_plus`, live audio FC at confidence 0.907) shows
+   `beans_dropped` → `cooling_started` 0.37 ms apart with the drop payload
+   already reading `cooling_on: true, heat 0, fan 100` — drop+cooling is
+   atomic. The agent controller keeps its post-drop `start_cooling`
+   fallback as defense-in-depth, but the primary path is confirmed.
 3. Hatchling build-hook details for `web/dist` — resolve at E11 (fallback:
    commit built dist for the first release).
 4. SSE keep-alive/reconnect behavior on Safari/iOS (operator may use an iPad) —
