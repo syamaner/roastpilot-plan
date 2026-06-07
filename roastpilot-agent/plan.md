@@ -362,7 +362,7 @@ re-validates them against the installed `coffee-roaster-mcp` version.
 
 | Epic | Scope | Depends on |
 |---|---|---|
-| E1 Scaffold | pyproject (py3.11+), ruff/pyright/pytest gates, CI, README skeleton | — |
+| E1 Scaffold | pyproject (py3.11+), ruff/pyright/pytest gates, CI, README skeleton, **AGENTS.md** (canonical repo rules per D14, templated on coffee-roaster-mcp's) + one-line `CLAUDE.md` (`@AGENTS.md`), `.claude/agents/` sub-agents (§10), `docs/epics/` spec files | — |
 | E2 Models & config | enums, RoastProfile, ControllerConfig, AdvisorConfig, SafetyLimits, SafetyVerdict/Evaluation | E1 |
 | E3 Safety policy | full rule set + tests | E2 |
 | E4 Controller | state machine, tick loop, debounce, fake-MCP harness | E2, E3 |

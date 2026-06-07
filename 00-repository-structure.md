@@ -163,6 +163,26 @@ Recommendations to refine during per-repo drill-downs; defined as
   -only" wording, no "fully autonomous", no "production-ready" before
   end-to-end hardware validation, fixed-window ~2 s latency honesty).
 
+## Repository Conventions (all roastpilot repos)
+
+**D14 — Agent instructions live in `AGENTS.md` (7 June 2026).**
+
+- **`AGENTS.md` is the canonical agent-instruction file** in every repository
+  — the cross-tool standard read by Codex, Warp/Oz, Cursor, and others, and
+  already the convention in `coffee-roaster-mcp` and
+  `coffee-first-crack-detection`. Use the `coffee-roaster-mcp` AGENTS.md as
+  the structural template: rules, quality gates, one-PR-per-story, branch
+  naming `feature/{issue-number}-{slug}`, and the "registry → epic file →
+  issue" reading order.
+- **`CLAUDE.md` is a one-line import**: `@AGENTS.md` — nothing else. Claude
+  Code's native AGENTS.md fallback is not reliably documented (open issue
+  anthropics/claude-code#34235), so the import makes behavior explicit
+  without duplicating content. Never put rules in CLAUDE.md directly.
+- **Claude-specific assets** (sub-agents, skills) stay under `.claude/` —
+  they are tool extensions, not project rules.
+- New rules go into AGENTS.md; if a rule is Claude-only, it goes in a
+  `## Claude Code` section of AGENTS.md rather than a separate file.
+
 ## Drill-Down Plan Structure
 
 ```text
