@@ -88,6 +88,11 @@ idle for the next run; the table above leaves `complete` exit-less);
 development, cooling, complete, idle} plus the universal `faulted` —
 operator resume/cool/end only, and **`starting` is never a recovery target**
 (the start handshake must not re-run against a possibly-active roaster).
+E4-S4 addition: `roasting_pre_first_crack → cooling` is legal — the D16
+command×phase matrix deliberately allows an operator early-abort
+`drop_beans` during roasting, so the table must support the resulting
+state (found by safety review: the prior table made the abort drop fire
+hardware and then fail the phase transition).
 
 Verification story (M1): confirm on mock + hardware whether `drop_beans`
 engages cooling on the Hottop (orchestration plan treats `drop_beans` as
