@@ -388,10 +388,10 @@ re-validates them against the installed `coffee-roaster-mcp` version.
 | E6 Store | schema v1, recovery reads, tick commits | E2 |
 | E7 API | REST + SSE + operator action queue | E4, E6 |
 | E8 Advisor | interface + FakeAdvisor + OpenRouter impl + call-frequency policy | E2 |
-| E9 Vertical slice | 12-step mock milestone test; wire E4–E8 together | E4–E8 |
+| E9 Vertical slice | 12-step mock milestone test; wire E4–E8 together. **The first green run's decision trace is recorded as a demo asset the same day** (it is talk material, not just a test gate) | E4–E8 |
 | E10 SPA | scaffold, replay harness, dashboard, detail, history | E7 |
 | E11 Packaging | wheel incl. `web/dist`, systemd unit, deployment doc | E9, E10 |
-| E12 Validation & demo | supervised Hottop runs; record demo traces (≥1 CLAMP, ≥1 REJECT), MCP interaction trace, full-workflow screen capture | E11 |
+| E12 Validation & demo | supervised Hottop runs; record demo traces (≥1 CLAMP, ≥1 REJECT), MCP interaction trace, full-workflow screen capture. **Capture measured M1 metrics from the decision trace from E9's first run onward**: advisory acceptance rate (ALLOW/CLAMP/REJECT mix), operator interventions per roast, roasts completing without recovery — honest measured numbers for the talk (the banned determinism percentages' replacement) and the baseline M2's feedback loop is judged against | E11 |
 
 E12's outputs are the talk's demo plan artifacts — treat them as deliverables,
 not byproducts.
@@ -416,6 +416,10 @@ not byproducts.
 ## 11. Remaining Open Items
 
 1. Exact OpenRouter model slug + structured-output settings — confirm at E8.
+   **Resolution path (7 Jun product review): advisor bake-off** — replay the
+   same recorded roast context through 3–4 candidate slugs, compare
+   `RoastDecision` quality against the operator's roaster judgment; pick the
+   default, keep the comparison as talk material.
 2. `drop_beans` cooling behavior on real hardware — **RESOLVED 7 Jun 2026**,
    ahead of the E12 story: coffee-roaster-mcp's E7-S6 live Hottop roast
    (branch `e7-s6-live-roast-validation`, session `c5707681…`, driver
