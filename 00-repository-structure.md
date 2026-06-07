@@ -1,7 +1,7 @@
 # RoastPilot v2: Agreed Repository Structure
 
 **Status**: Agreed 6 June 2026
-**Supersedes**: `REPOSITORY_STRUCTURE.md`, `REPO_STRUCTURE_SUMMARY.md` (draft proposals)
+**Supersedes**: `archive/REPOSITORY_STRUCTURE.md`, `archive/REPO_STRUCTURE_SUMMARY.md` (draft proposals)
 **Companion**: `roastpilot-agent-orchestration-plan.md` remains the authoritative
 architecture/controller plan; this document settles only repository boundaries,
 naming, and stack decisions.
@@ -33,7 +33,7 @@ naming, and stack decisions.
 
 ## Discrepancies Resolved (vs. draft plans)
 
-1. **Tasting review UI placement.** Draft `REPOSITORY_STRUCTURE.md` put
+1. **Tasting review UI placement.** Draft `archive/REPOSITORY_STRUCTURE.md` put
    `TastingReview.tsx` in the device SPA while the orchestration plan put
    `ReviewUI` in the cloud plane. **Resolved**: the device SPA carries the
    *operator self-rating* only; the public roast page and taster review form
@@ -65,7 +65,7 @@ naming, and stack decisions.
   slice needs no hardware, microphone, or model download.
 - `mark_first_crack` (`mcp_server.py:665`) records its event with no payload;
   the Loop A source-marker change is a real (small) contract + test change in
-  `coffee-roaster-mcp`, as documented in `FINAL_CORRECTIONS_SUMMARY.md`.
+  `coffee-roaster-mcp`, as documented in `archive/FINAL_CORRECTIONS_SUMMARY.md`.
 - This repo (`coffee-roaster-agent-v2`) contains plans only — no code yet.
 
 ## Timeline Anchors
@@ -166,7 +166,7 @@ Recommendations to refine during per-repo drill-downs; defined as
 ## Drill-Down Plan Structure
 
 ```text
-agreed-plan/
+roastpilot-plan/  (repo root)
 ├── 00-repository-structure.md     # this document
 ├── roastpilot-agent/              # next: full component plan (M1 critical path)
 ├── roastpilot-cloud/              # then: Loop A data plane plan

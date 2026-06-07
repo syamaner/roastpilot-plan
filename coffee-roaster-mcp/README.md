@@ -21,7 +21,7 @@ auto-detected vs operator-override FC in exported logs.
 - **Release**: backward-compatible → patch/minor PyPI bump.
 
 This is a small but real contract + test change — not a one-line edit (see
-`FINAL_CORRECTIONS_SUMMARY.md`).
+`archive/FINAL_CORRECTIONS_SUMMARY.md`).
 
 ## Explicitly out of scope (Loop B backlog)
 

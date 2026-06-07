@@ -8,13 +8,13 @@ agent rebuild.
 
 | Path | What |
 |---|---|
-| `agreed-plan/00-repository-structure.md` | Repository structure decision record (D1–D4) |
-| `agreed-plan/roastpilot-agent/` | Agent harness component plan (M1), UI prompt pack, Figma Make prototypes + frozen screenshots |
-| `agreed-plan/roastpilot-cloud/` | Cloud data plane component plan (M2 / Loop A) |
-| `agreed-plan/coffee-roaster-mcp/` | Small Loop A contract change spec |
-| `agreed-plan/coffee-first-crack-detection/` | No-change note + Loop B backlog appendix |
-| `roastpilot-agent-orchestration-plan.md` | Authoritative architecture plan (controller, safety, advisor) |
-| `AGENT_HARNESS_ANALYSIS.md`, `USER_FEEDBACK_LEARNING.md`, … | Supporting analyses and draft-era documents (superseded where agreed-plan says so) |
+| [`00-repository-structure.md`](00-repository-structure.md) | Repository structure decision record (D1–D4), milestones, verified ground truth |
+| [`roastpilot-agent-orchestration-plan.md`](roastpilot-agent-orchestration-plan.md) | Authoritative architecture plan: controller, state machine, safety policy, advisor (its repo-structure section is superseded — banner inside) |
+| [`roastpilot-agent/`](roastpilot-agent/) | Agent harness component plan (M1, D5–D9, epics E1–E12), UI prompt pack, Figma Make prototypes + frozen screenshots |
+| [`roastpilot-cloud/`](roastpilot-cloud/) | Cloud data plane component plan (M2 / Loop A, D10–D13, epics C1–C7) |
+| [`coffee-roaster-mcp/`](coffee-roaster-mcp/) | Small Loop A contract change spec (FC override source marker) |
+| [`coffee-first-crack-detection/`](coffee-first-crack-detection/) | No-change note + Loop B backlog appendix |
+| [`archive/`](archive/) | Superseded draft-era documents (kept for history; see its README) |
 
 ## Related repositories
 
@@ -23,5 +23,10 @@ agent rebuild.
 - [`roastpilot-cloud`](https://github.com/syamaner/roastpilot-cloud) — roast sharing, tasting feedback, reference summaries (M2)
 - [`coffee-first-crack-detection`](https://github.com/syamaner/coffee-first-crack-detection) — ML pipeline (exists, Hugging Face)
 
-Cross-repo epics (LA-1 sync & sharing, LA-2 reference feedback loop) are
-tracked here; single-repo epics live in their home repositories.
+## Epic management
+
+Single-repo epics (E1–E12, C1–C7) live as spec files + issues in their home
+repositories. The two cross-repo epics — **LA-1** (roast sync & sharing) and
+**LA-2** (reference feedback loop) — are tracked here: spec files in this
+repo, epic tracking issues with cross-repo task lists, and one user-level
+GitHub Project ("RoastPilot") as the cross-repo view.

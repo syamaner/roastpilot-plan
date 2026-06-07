@@ -210,6 +210,6 @@ results; chosen over Gemini image sketches. The prompts above work unchanged.
   transitions, recovery modal, reconnect).
 - Check whether Figma's Dev Mode MCP server covers Make files — if so, coding
   agents can read the prototype directly instead of via exported code.
-- Keep every prototype export in `agreed-plan/roastpilot-agent/sketches/` with
+- Keep every prototype export in `roastpilot-agent/sketches/` (this repo) with
   the prompt + Make file link, so each E10 story has a traceable input
   artifact.

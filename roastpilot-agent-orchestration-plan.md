@@ -1627,8 +1627,15 @@ After the mock vertical slice:
 
 ## Repository Structure
 
+> **Superseded (6 June 2026)**: this section predates the agreed structure.
+> `00-repository-structure.md` is authoritative — 4 active repos, the device
+> SPA lives inside `roastpilot-agent` (no separate roastpilot-web repo), and
+> new repos are `github.com/syamaner/roastpilot-*`. The architecture and
+> controller sections of this document remain authoritative.
+
 RoastPilot uses a **multi-repo per deployment unit** strategy with clear ownership
-boundaries. See `REPOSITORY_STRUCTURE.md` for complete details.
+boundaries. See `00-repository-structure.md` for the agreed structure
+(draft details archived in `archive/REPOSITORY_STRUCTURE.md`).
 
 ### Repository Organization
 
@@ -1780,7 +1787,8 @@ github.com/roastpilot/coffee-first-crack-detection (Exists today as github.com/s
 github.com/roastpilot/coffee-roasting              (Legacy prototype - exists today as github.com/syamaner/coffee-roasting)
 ```
 
-See `REPOSITORY_STRUCTURE.md` and `REPO_STRUCTURE_SUMMARY.md` for:
+See `00-repository-structure.md` (agreed) and the archived drafts
+`archive/REPOSITORY_STRUCTURE.md` / `archive/REPO_STRUCTURE_SUMMARY.md` for:
 - Detailed repository contents and responsibilities
 - CI/CD pipeline configurations
 - Development workflow setup
