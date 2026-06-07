@@ -81,6 +81,14 @@ Agent phases are the operator-facing truth; MCP phases are inputs.
 | `faulted` | any (often `fault`) | safety verdict FAULT/E-STOP, MCP fault, unrecoverable error | operator acknowledgement |
 | `operator_recovery_required` | any | restart with possibly-active run; ambiguous MCP state; configured overrun severity | explicit operator action |
 
+E4-S1 refinements (7 Jun 2026, agreed at implementation): `complete → idle`
+is a legal controller reset edge (a long-running service needs to return to
+idle for the next run; the table above leaves `complete` exit-less);
+`operator_recovery_required` exits are {preheating, roasting_pre_first_crack,
+development, cooling, complete, idle} plus the universal `faulted` —
+operator resume/cool/end only, and **`starting` is never a recovery target**
+(the start handshake must not re-run against a possibly-active roaster).
+
 Verification story (M1): confirm on mock + hardware whether `drop_beans`
 engages cooling on the Hottop (orchestration plan treats `drop_beans` as
 drop+cooling; MCP records `cooling_started` as a separate event). The
