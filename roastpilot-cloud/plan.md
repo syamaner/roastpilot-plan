@@ -316,6 +316,12 @@ land as agent-repo stories alongside C3/C6.
 1. Vercel body limit vs real export sizes → measure at C3 (signed-URL
    fallback designed, §5).
 2. Rate-limit backend (Upstash vs Postgres counter) → pick at C5.
-3. `summary.json` field paths for FC temp → fix at C2 against a real MCP
-   export fixture.
+3. ~~`summary.json` field paths for FC temp~~ **Resolved 7 Jun 2026**
+   against real fixtures (coffee-roaster-mcp branch
+   `e7-s6-live-roast-validation`, two live-roast exports): `summary.json`
+   has **no** FC-temp field — derive it from the CSV/JSONL telemetry row at
+   `first_crack_at_utc`, as §7 anticipated. Also confirmed:
+   `summary.metrics` are **end-of-session snapshots** (e.g. negative RoR at
+   `complete`), so reference-summary aggregation must compute roast-level
+   values from telemetry rows, never from `summary.metrics`.
 4. OG image design → with prompt F at C4.

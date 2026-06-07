@@ -23,6 +23,14 @@ auto-detected vs operator-override FC in exported logs.
 This is a small but real contract + test change — not a one-line edit (see
 `archive/FINAL_CORRECTIONS_SUMMARY.md`).
 
+**Scope extension (7 Jun 2026, from live-roast evidence)**: the same
+ambiguity exists for `mark_beans_added` — auto-T0 events carry
+`source: "auto_t0"` (+ charge/drop metadata) but a manual `mark_beans_added`
+records an **empty payload** (verified in the 7 Jun live-roast exports,
+branch `e7-s6-live-roast-validation`, session 1 vs session 2). When making
+the FC source-marker change, add `{"source": "operator"}` to manual
+`beans_added` events in the same PR.
+
 ## Explicitly out of scope (Loop B backlog)
 
 Audio ring buffer, `get_audio_buffer()`, `operator_hint`/`capture_audio`
