@@ -16,6 +16,7 @@
 | D7 | Profiles | **Minimal static profile** | name, bean (origin/varietal/weight), charge guidance range (default 170–200 °C), initial heat/fan, target drop temp, target development %. No curve targets in M1. |
 | D8 | SPA scope (M1) | **Dashboard + roast detail + history** | Settings via config file; rating UI + cloud screens are M2. |
 | D15 | Safety verdict vocabulary & shared enums (7 Jun 2026, E1 review) | **Six typed verdicts: `ALLOW / CLAMP / REJECT / RECOVERY / FAULT / EMERGENCY_STOP`; `SafetyEvaluation.adjusted_heat/fan` nullable; `RoastPhase` lives in `models.py`; shared enums are plain `Enum`, never `StrEnum`** | Resolves the E1-review discrepancy: §5's schema column already said `recovery` while the kickoff's five-value list was an elision. RECOVERY signals "enter `operator_recovery_required`" as distinct from FAULT (acknowledge-and-stop). Nullable adjusted values per §5 schema — REJECT/RECOVERY/FAULT/E-STOP carry no adjusted command, and a fabricated 0 is indistinguishable from a clamp-to-zero in the decision trace. `RoastPhase` moved from `controller.py` to `models.py` (store/api/advisor all consume the phase vocabulary; importing from controller would cycle once the tick loop wires those modules) — controller re-exports it. Plain `Enum` (not `StrEnum`) so comparing a member to a raw string is a pyright strict error (`reportUnnecessaryComparison`), enforcing the never-string-compared invariant mechanically. |
+| D16 | Safety coverage completion (7 Jun 2026, post-E1 issue audit) | **Three orchestration-plan § Safety Policy items were dropped in this plan's §8 condensation and must be assigned: (1) invalid phase command attempts and (2) FC/T0 source validity → safety policy (E3, new story E3-S5); (3) operator timeout in operator-required states → controller (E4), with a cross-reference from E7's disconnect-handling story** | Audit of the E1-derived issues against the orchestration plan's 15-item first-layer safety list found these three unassigned in any epic. Ownership split keeps E3 = pure command/safety rules and E4 = state-machine behavior, consistent with the T0-debounce ownership already in E4. Invalid-phase = command×phase validity matrix (e.g. `set_heat` during `cooling` rejected); source validity = FC/T0 state transitions accepted only from MCP detection status or explicit operator action; operator timeout matters *only* in true operator-required states (manual confirmation, hold, recovery), per orchestration plan § Safety Policy. |
 
 ## 2. Verified MCP Contract (ground truth, coffee-roaster-mcp v0.1.3)
 
@@ -348,8 +349,8 @@ hardware-free):
 
 | Suite | Coverage |
 |---|---|
-| `test_controller.py` | transition table (valid path, invalid rejections), T0 debounce (incl. read-fault flapping per §2 note), tick scheduler drift/jitter, add-beans guidance emitted once |
-| `test_safety.py` | max bean/env temp, pre-T0 overrun → heat 0% + recovery/fault by severity, stale/missing telemetry, bounds, rate limits, unsafe drop rejection, e-stop |
+| `test_controller.py` | transition table (valid path, invalid rejections), T0 debounce (incl. read-fault flapping per §2 note), tick scheduler drift/jitter, add-beans guidance emitted once, operator-timeout policy in operator-required states (D16: timeout matters *only* in true operator-required states — manual confirmation, hold, recovery — never in normal phases) |
+| `test_safety.py` | max bean/env temp, pre-T0 overrun → heat 0% + recovery/fault by severity, stale/missing telemetry, bounds, rate limits, unsafe drop rejection, e-stop, **invalid phase command attempts** (command×phase validity matrix, D16), **FC/T0 source validity** (accept only MCP detection or explicit operator action, D16) |
 | `test_advisor.py` | FakeAdvisor fixtures: valid / malformed / unsafe / timeout / provider error; OpenRouter impl behind a recorded-response test double |
 | `test_mcp_client.py` | typed mirrors vs recorded `get_roast_state` payloads from real MCP (contract fixtures), child-process lifecycle, read/write failure paths |
 | `test_store.py` | schema migration, per-tick commit rows, restart recovery reads, completed-run immutability |
@@ -367,8 +368,8 @@ re-validates them against the installed `coffee-roaster-mcp` version.
 |---|---|---|
 | E1 Scaffold | pyproject (py3.11+), ruff/pyright/pytest gates, CI, README skeleton, **AGENTS.md** (canonical repo rules per D14, templated on coffee-roaster-mcp's) + one-line `CLAUDE.md` (`@AGENTS.md`), `.claude/agents/` sub-agents (§10), `docs/epics/` spec files | — |
 | E2 Models & config | enums, RoastProfile, ControllerConfig, AdvisorConfig, SafetyLimits, SafetyVerdict/Evaluation | E1 |
-| E3 Safety policy | full rule set + tests | E2 |
-| E4 Controller | state machine, tick loop, debounce, fake-MCP harness | E2, E3 |
+| E3 Safety policy | full rule set + tests, incl. invalid-phase-command and FC/T0 source-validity rules (D16) | E2 |
+| E4 Controller | state machine, tick loop, debounce, fake-MCP harness, operator-timeout policy in operator-required states (D16) | E2, E3 |
 | E5 MCP client | typed wrapper, subprocess lifecycle, contract fixtures | E2 |
 | E6 Store | schema v1, recovery reads, tick commits | E2 |
 | E7 API | REST + SSE + operator action queue | E4, E6 |
