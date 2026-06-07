@@ -72,8 +72,11 @@ naming, and stack decisions.
 
 - **8 June 2026**: AGNTCon/MCPCon CFP deadline (submission v4 ready).
 - **July 2026**: agent harness completion expected (per submission notes);
-  `roastpilot-agent` repo must be populated with real code + README before it
-  is referenced publicly (slides / edited submission).
+  definition of done pinned by **D17** (agent plan §1): E9 vertical slice
+  green + E10 dashboard usable + one supervised real-hardware roast. First
+  supervised hardware session targeted for **June**. `roastpilot-agent` repo
+  must be populated with real code + README before it is referenced publicly
+  (slides / edited submission) — satisfied 7 June 2026.
 - **17–18 September 2026**: talk. Recorded demo needs: FC detector probability
   trace, advisory decision trace with ≥1 CLAMP and ≥1 REJECT, MCP interaction
   trace, full roast workflow screen recording.
