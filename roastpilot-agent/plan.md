@@ -297,7 +297,11 @@ SPA renders only from these events + snapshots — never infers phase locally.
 ## 7. Device SPA (`web/`)
 
 Stack: Vite + React + TypeScript, Tailwind + shadcn/ui, **uPlot** for curves,
-TanStack Query (REST) + native `EventSource` (SSE).
+TanStack Query (REST) + native `EventSource` (SSE). **Playwright is a core E10
+capability, not a late test chore** — it backs the `ui-reviewer` visual review,
+the component/E2E tests, the screenshot baselines, and the E12 demo
+screen-recording rig; set it up early (S1+S2) against the replay harness, reusing
+the sketches' `playwright-core` + system-Chrome pattern (`sketches/capture.mjs`).
 
 Pages (D8):
 - **`/` Dashboard (live)** — the demo centerpiece:
