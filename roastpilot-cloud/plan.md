@@ -15,7 +15,7 @@ compete with the July harness deadline (00-repository-structure.md).
 | D10 | Auth | **Device token only** | The agent holds a long-lived bearer token (Vercel env secret, constant-time compare). Owner actions (visibility, view reviews, rating) flow device SPA → agent → cloud. **No login UI in M2.** Magic-link owner login is backlog if away-from-home management is ever needed. |
 | D11 | Review spam control | **Slug entropy + rate limit** | High-entropy unlisted slug (≥96 bits, base58) is the access control. Per-IP rate limit + honeypot field on the review form. Revocation = regenerate slug. Signed per-share tokens → backlog. |
 | D12 | Summary builds | **On write** | Recompute the affected (bean_origin, roast_level) summary inside the route handler after every roast upload and review submit — a single SQL upsert. No cron at this volume (a few roasts/week). |
-| D13 | Agent reference fetch | **Fetch at roast start + cached fallback** | `prepare_roast` queries `/api/references` with a short timeout, updates the local `reference_roasts` cache; any failure → use cache or proceed without. No background jobs; cloud outage never affects a roast. |
+| D13 | Agent reference fetch | **Fetch at roast start + cached fallback** | `prepare_roast` queries `/api/references` with a short timeout, updates the local `reference_roasts` cache; any failure → use cache or proceed without. No background jobs; cloud outage never affects a roast. **Loop semantics (M2):** references are rating-filtered *process* aggregates of ≥4-star roasts (FC/drop temp, development %, total time) — i.e. *reinforce the process of well-rated roasts*, **not** defect-driven correction. The tasting flavour axes (aroma/acidity/…) and any bitter/grassy signal are **not** propagated to the advisor in M2; defect-axis → adjustment is the `key_patterns` backlog path (§14.6). |
 
 ## 2. Scope
 
@@ -325,3 +325,21 @@ land as agent-repo stories alongside C3/C6.
    `complete`), so reference-summary aggregation must compute roast-level
    values from telemetry rows, never from `summary.metrics`.
 4. OG image design → with prompt F at C4.
+5. **Feedback-loop evaluation — undefined.** No way yet to tell whether
+   applying taster feedback made the *next* roast better vs merely
+   *different*. Signal available: the timestamped roast log (bean/env temp,
+   heat, fan) + the tasting reviews. Direction to pin at the cloud phase:
+   define "better" as a fixed per-roast rubric (overall stars = headline
+   metric); log each agent adjustment as a falsifiable hypothesis; evaluate
+   **paired, per origin** (roast N vs N+1 on the targeted axis); keep judging
+   **independent and ideally blind** (tasters, never the agent grading its own
+   homework); small N ⇒ directional, not statistically powered. No automated
+   metric in M2.
+6. **Defect-driven adjustment (bitter→stricter / grassy→longer) — out of M2
+   scope, decision pending.** The narrative loop ("if bitter, less heat + more
+   fan; if grassy, drop later") needs (a) a structured **development axis**
+   (grassy↔bitter) captured in `tasting_reviews`, (b) that axis aggregated into
+   `reference_roast_summaries`, and (c) `/api/references` surfacing it — none of
+   which M2 builds (`key_patterns` stays empty, §4). M2 ships the
+   rating-filtered *process* reference (D13: reinforce well-rated roasts);
+   pull-forward = a new D-number, not a tweak. Revisit at the cloud phase.
