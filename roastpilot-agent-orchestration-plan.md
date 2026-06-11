@@ -129,6 +129,48 @@ Cloud sync must never be required for active roast safety. If the cloud is down,
 the local controller continues the roast, stores all state locally, and retries
 sync later.
 
+### Advisory Harness — Outer / Inner Loop
+
+The runtime view of the same system, as two loops. The **outer loop** is the
+deterministic controller (1 s tick) that owns control; the **inner loop** is the
+LLM advice turn nested inside it. The advisor only ever hands typed data *out* to
+the controller — it never writes to hardware — and OpenRouter is the one remote
+hop in an otherwise-local device loop (config-swappable to native Anthropic, D18).
+
+```mermaid
+flowchart LR
+    HF["HuggingFace<br/>Finetuned Audio Classifier"]
+    OR["OpenRouter<br/>→ model (opus-4.8)"]
+    CLOUD["Cloud<br/>(taster ratings / references)"]
+    MIC["Microphone"]
+    ROAST["Roaster"]
+
+    subgraph PI["Raspberry Pi"]
+        MCP["MCP<br/>(roaster + mic)"]
+        UI["Local UI"]
+        subgraph Outer["OUTER LOOP — deterministic controller · 1s tick"]
+            CTRL["gather telemetry →<br/>safety clamp → apply command"]
+            subgraph Inner["INNER LOOP — LLM advice turn"]
+                ADV["PydanticAI<br/>build context · validate output"]
+            end
+            CTRL -->|"AdvisorContext"| ADV
+            ADV -->|"RoastDecision (typed)"| CTRL
+        end
+    end
+
+    HF -->|"download"| MCP
+    MCP -->|"telemetry + first-crack"| CTRL
+    CTRL -->|"clamped command"| MCP
+    ADV -->|"prompt + context"| OR
+    OR -->|"structured response"| ADV
+    MIC <--> MCP
+    ROAST <--> MCP
+    ROAST -->|"acoustic signal"| MIC
+    UI --> CTRL
+    CTRL -->|"Upload Roast data at roast end"| CLOUD
+    CLOUD -.->|"references at roast start"| CTRL
+```
+
 ## Runtime Flow
 
 The normal roast flow is:
