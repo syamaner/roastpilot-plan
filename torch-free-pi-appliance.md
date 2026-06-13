@@ -25,16 +25,29 @@ install plain PyPI wheels.
 Replace the torch feature extractor with a librosa one in the **ONNX inference path**,
 then drop torch.
 
-- [ ] Swap `ASTFeatureExtractor` mel filterbank → **`librosa.feature.melspectrogram`**
-  (match the AST config exactly: 16 kHz, 128 mel bins, the AST window/hop/`fmin`/`fmax`,
-  log-mel scaling, and AST's mean/std normalization). The ONNX model input must be
+- [ ] Swap the `ASTFeatureExtractor` mel front-end → a librosa one in **all 3 consumers**:
+  `src/coffee_first_crack/inference_onnx.py` (`_load_extractor` + `_predict_window`'s
+  `self._extractor(...)→input_values`), **`scripts/evaluate_onnx.py`** (the gate harness),
+  and `scripts/benchmark_onnx_pi.py`. **Exact parity recipe** (validated 13 Jun): read
+  `mean=-4.2677393, std=4.5689974, num_mel_bins=128, max_length=1024, sampling_rate=16000`
+  from the published `preprocessor_config.json`; **hardcode the AST spectrogram internals
+  that are NOT in that json** (they are `ASTFeatureExtractor` class defaults — confirmed in
+  the MCP's `_patch_ast_feature_extractor_for_numpy_only_runtime`): `frame_length=400,
+  hop_length=160, fft_length=512, power=2.0, center=False, preemphasis=0.97, log_mel="log",
+  mel_floor=1.192092955078125e-07, remove_dc_offset=True`. The ONNX `input_values` must be
   byte-for-byte the same shape/scale it trained on.
-- [ ] **ACCURACY GATE (hard):** re-run the **v2 test set (191 samples)** with the
-  librosa front-end; **preserve ≥ the recorded 96.86 % accuracy / 96.9 % precision**
-  (and the ≤1 false-positive behavior). A numeric diff of librosa-mel vs AST-mel on a
-  few windows is the first check; the test-set metrics are the gate. **Do not land the
-  swap if metrics regress** — tune the librosa params until they match, or stop and
-  escalate.
+- [ ] **ACCURACY GATE (hard) — and it must run through the NEW front-end.** Re-run
+  `scripts/evaluate_onnx.py` (the script that produced `results/v2_pi5_int8_4t_eval.json`)
+  on the **v2 test set (191 samples)** **using the librosa front-end** (not the old AST
+  one — else the gate validates the wrong path): **preserve ≥ 96.86 % accuracy / 96.9 %
+  precision** (and ≤1 false-positive). First check = numeric diff of librosa-mel vs AST-mel
+  `input_values` on a few windows. **Do not land if metrics regress** — tune or escalate.
+- [ ] **CROSS-REPO ARTIFACT CONTRACT — keep publishing `onnx/{int8,fp32}/preprocessor_config.json`.**
+  `export_onnx.py` emits it today (`feature_extractor.save_pretrained`); **both** this repo's
+  consumers **and** the MCP's `artifacts.py` (`INT8_FEATURE_EXTRACTOR_FILENAME =
+  onnx/int8/preprocessor_config.json`, a *required* resolve) read it for mean/std. Torch-free
+  does NOT remove this file — the librosa front-end reads its params from it. If a "cleanup"
+  drops it, Phase 2's artifact resolution breaks. (Surfaced 13 Jun validation.)
 - [ ] Remove **`torch`** + **`transformers`** from `requirements-pi.txt` (torchaudio /
   optimum are already excluded). Result: a torch-free Pi inference stack — `onnxruntime`,
   `librosa`, `soundfile`, `sounddevice`, `numpy`, `huggingface-hub`, `scikit-learn`,
@@ -46,10 +59,16 @@ then drop torch.
 
 ## Phase 2 — MCP server (`coffee-roaster-mcp`)  ⟵ gated on Phase 1
 
-- [ ] Consume the torch-free FC detection; update the MCP's Pi dependency set (drop
-  torch); ensure the live **audio → FC** pipeline (USB mic, ALSA/portaudio, 16 kHz mono,
-  10 s window / 7 s hop, threshold 0.90 + the ≥3-positive-in-30 s confirmation) runs
-  torch-free on a Pi 5.
+- [ ] Consume the torch-free FC detection; **drop `transformers`** from the MCP deps —
+  note (validated 13 Jun): `torch` is **not** a hard MCP dep (the MCP already forces a
+  numpy-only AST spectrogram via `detector.py:_patch_ast_feature_extractor_for_numpy_only_runtime`),
+  so for this repo the swap is **transformers-free**; replace the `ASTFeatureExtractor`
+  via the existing `feature_extractor_factory` seam with a librosa front-end matching that
+  patch's exact params (`frame_length=400, hop_length=160, fft_length=512, power=2.0,
+  center=False, preemphasis=0.97, log_mel, mel_floor=1.19e-07, remove_dc_offset=True` +
+  mel_filters + mean/std — NOT librosa defaults). Ensure the live **audio → FC** pipeline
+  (USB mic, ALSA/portaudio, 16 kHz mono, 10 s window / 7 s hop, threshold 0.90 + the
+  ≥3-positive-in-30 s confirmation) runs on a Pi 5.
 - [ ] Verify serial → Hottop + the audio pipeline coexist within the Pi 5's budget
   (FC at 2 threads "leaving cores for MCP + UI"); confirm no thermal throttle with the
   active cooler.
@@ -67,6 +86,14 @@ then drop torch.
   spawns MCP stdio child per D6, restart → recovery); enable **avahi/mDNS**.
 - [ ] **Bundled/offline model** — a roast never depends on a live HF pull (pinned
   revision; verify checksum at install).
+- [ ] **Bundled audio config matches the VALIDATED `pi_inference` profile** (gap surfaced
+  13 Jun validation). The installer's `coffee-roaster-mcp.yaml` must set
+  `first_crack.mode: audio` + `window_seconds: 10.0` / `overlap: 0.3` (7 s hop) /
+  `confidence_threshold: 0.90` / `min_positive_windows: 3` / `confirmation_window_seconds:
+  30.0` / `onnx_threads: 2`. The MCP **code defaults** (`window_seconds 1.0`, `overlap 0`,
+  `min_positive_windows 1`, `confirmation 20 s`) are NOT production — the model is trained
+  on **10 s** windows, so a default-config appliance ships *broken* detection. (Fix at the
+  bundled-config layer here, or align the MCP audio-mode defaults in Phase 2.)
 - [ ] **Deploy doc** — Pi 5 + 27 W PSU + active cooler prereqs, config (env: OpenRouter
   key, port), data location, upgrade (`pipx upgrade`), `journalctl` log access, the
   `http://roastpilot.local:<port>` access story.
