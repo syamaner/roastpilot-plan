@@ -447,4 +447,8 @@ not byproducts.
 3. Hatchling build-hook details for `web/dist` — resolve at E11 (fallback:
    commit built dist for the first release).
 4. SSE keep-alive/reconnect behavior on Safari/iOS (operator may use an iPad) —
-   test at E10.
+   **RESOLVED 13 Jun 2026 (#135):** validated on iPad + iPhone Safari (latest
+   iPadOS/iOS) against the live replay — connects/streams, heartbeat holds idle,
+   background/lock/wifi-blip reconnects and re-hydrates (incl. the #154 curve
+   backfill), and the safety invariant held (a UI disconnect produced GET-only
+   reads, no roaster action). The two-task E11 gate (D28) now has only #134 left.
