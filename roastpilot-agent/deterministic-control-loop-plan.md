@@ -187,30 +187,34 @@ the controller and on-demand (operator-gated, costs credits) for the LLM.
 
 ## 5. Sequencing (D35a — priority: get to a successful FIRST ROAST, operator 14 Jun)
 
-The priority is a successful first roast. The fastest + safest path is the **full
-deterministic controller** (the operator's proven n8n system ported), **LLM OFF**; the
-post-FC LLM is added only after a baseline roasts well. So the LLM path moves *after* the
-roast, not before it.
+The priority is a successful first roast. The roast design is **option c**: deterministic
+PRE-FC, and the **post-FC LLM control loop POST-FC** (it is part of the first roast, not a
+deferred add-on). The reason attempt 3 failed post-FC was missing context, not "an LLM
+cannot do this", so the build supplies the context the model lacked and gates it. The
+deterministic n8n thresholds become the post-FC **safety box / execute-or-not rules**, not
+a replacement for the LLM. "Fastest path" means minimal scope to a *good* roast, not LLM-off.
 
 **Critical path to the first roast (do in order):**
-1. **#222 — deterministic pre-FC** (heat 100 / fan low, watch FC; gate the advisor out of pre-FC).
-2. **#223 — deterministic post-FC + drop rule** (the n8n tree: FC → 80/50; dev thresholds;
-   drop 193–196 °C + DTR 10–20%; emergency 196/198). NO LLM. Inside the safety box.
-3. **#219 — charge-referenced clock** → correct DTR (prerequisite for the drop rule).
-4. **#224 (replay-harness part only)** — validate the deterministic controller on the
-   recorded roasts (incl. tonight's failure runs as regressions) BEFORE burning beans.
-→ then the supervised roast (clears the **#134** gate). This is the proven n8n system on
-RoastPilot's controller + safety envelope; it should give a good roast.
+1. **#222 — deterministic pre-FC** (heat 100 / fan low, watch FC; advisor not consulted pre-FC).
+2. **#223 — post-FC LLM control loop** (from FC: consult every ~5 s; context = bean/env/RoR
+   + roast duration + post-FC flag + dev time/%; **the model's own decisions since FC**
+   (anti-thrash) + **the objective + a reference curve**; LLM advises → the controller's outer
+   loop executes-or-not through the safety box + a coherence/deadband gate). The n8n thresholds
+   are the box.
+3. **#219 — charge-referenced clock** → correct DTR + roast-duration (inputs to #223's context
+   and the drop). Prerequisite.
+4. **#224 (replay-harness part only)** — validate the contexted+gated post-FC LLM loop on the
+   recorded roasts (does it produce sane, coherent trajectories, not tonight's thrash?) BEFORE
+   the live roast.
+→ then the supervised roast (clears the **#134** gate).
 
 **Deferred — after the first good roast:**
-- **#226 — post-FC LLM advice** (heat+fan+drop on the deterministic baseline; D35 option c) +
-  the **LLM-eval** half of #224 (gpt-4o drop eval).
 - **#205** RoR smoothing, **#217** fixed-scale curve, **#220** DTR surfacing (observability),
   **#210/#212** operability (the manual override at the machine covers supervised runs),
-  the §7.2 training-corpus / outcome-labels work (→ roastpilot-cloud, D29).
+  the broader **LLM-eval** + §7.2 training-corpus / outcome-labels work (→ roastpilot-cloud, D29).
 
-The deterministic controller alone is enough to attempt — and pass — roast 5; the LLM and
-the polish layer on after.
+The first roast carries the post-FC LLM by design; the replay-harness validation (#224) is the
+de-risk before beans, and the safety box + the decision-history context are what make it safe.
 
 ---
 
