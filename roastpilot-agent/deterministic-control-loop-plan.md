@@ -216,6 +216,14 @@ a replacement for the LLM. "Fastest path" means minimal scope to a *good* roast,
 - **#205** RoR smoothing, **#217** fixed-scale curve (observability),
   **#210/#212** operability (the manual override at the machine covers supervised runs),
   the broader **LLM-eval** + §7.2 training-corpus / outcome-labels work (→ roastpilot-cloud, D29).
+- **D36 (operator, 14 Jun): the pre-FC anticipatory LLM advisory layer** over the
+  deterministic floor (§7.1's first concrete instance — late-Maillard→FC, advisory-only,
+  same safety box + deadband + execute-or-not, fails closed to the deterministic trim).
+  Ships AFTER the first roast and only after it clears the baked-roast negative regression
+  cases on the #224 replay harness. Paired with **a curve-insight feature spike** (predicted-FC
+  ETA, RoR curvature/crash-flick, turning-point + recovery metrics, distance-from-reference,
+  control-signal entropy as the anti-thrash signal). The **windowed series + derived features**
+  half of D36 is NOT deferred — it folds into #223 (post-FC) for the first roast.
 
 The first roast carries the post-FC LLM by design; the replay-harness validation (#224) is the
 de-risk before beans, and the safety box + the decision-history context are what make it safe.
@@ -255,6 +263,18 @@ thresholds / charge + drying strategy), and the controller tracks it **anticipat
 before first crack too**, not just via static rules. The operator's "max heat / low fan
 until browning" is the *default* drying strategy; learning can refine it per bean (a
 denser / higher-grown bean wants a different ramp).
+
+**D36 (operator, 14 Jun 2026) schedules §7.1's first concrete instance:** an *advisory*
+LLM in the late-Maillard→FC window that may **refine, not own,** the deterministic
+anticipatory trim — gated exactly like the post-FC loop (advisory-only, safety box,
+direction-flip deadband, execute-or-not) and **failing closed to the deterministic floor.**
+It is the LLM degenerate case of plan-tracking before a learned plan exists. It ships only
+*after* the first roast and only after clearing the baked-roast negative regression cases on
+the #224 replay harness. The features that make anticipation possible (predicted-FC **ETA**
+from bean-temp + RoR extrapolation to the *profile* FC band — not a hardcoded constant; RoR
+curvature for crash/flick; turning-point + recovery metrics; distance-from-reference; and
+control-signal entropy / fan-change count as the anti-thrash signal) are specified in D36 and
+fed to **both** loops; the post-FC half folds into #223 now.
 
 **M1 must therefore make the control PARAMETERS, not constants:**
 - The pre-FC lever policy + the post-FC thresholds (drop window, DTR target, ramp shape)
