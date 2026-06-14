@@ -185,19 +185,32 @@ the controller and on-demand (operator-gated, costs credits) for the LLM.
 
 ---
 
-## 5. Sequencing
+## 5. Sequencing (D35a — priority: get to a successful FIRST ROAST, operator 14 Jun)
 
-- **Phase 1 — make it safe to roast again (small, fast).** Deterministic pre-FC (heat 100 /
-  fan ≤30, watch FC) + gate the advisor out of pre-FC. Fixes every failure attempt-3 showed,
-  mostly by *removing* advisor scope. Unblocks the next supervised roast.
-- **Phase 2 — deterministic development + drop.** Port the n8n decision tree + drop window;
-  wire #219 (clock) + #205 (RoR) as inputs. Decide (a) vs (b) for the drop.
-- **Phase 3 — eval + test harness.** Consolidate logs (§C); build the controller-replay
-  harness with tonight's failure runs as regressions; re-scope the LLM eval + add gpt-4o.
-- **Phase 4 — polish + operability.** UI cluster (#217/#219/#220), #210/#212 shutdown,
-  manual override.
+The priority is a successful first roast. The fastest + safest path is the **full
+deterministic controller** (the operator's proven n8n system ported), **LLM OFF**; the
+post-FC LLM is added only after a baseline roasts well. So the LLM path moves *after* the
+roast, not before it.
 
-Phase 1 alone is enough to attempt roast 5 with confidence; Phases 2–3 make it good.
+**Critical path to the first roast (do in order):**
+1. **#222 — deterministic pre-FC** (heat 100 / fan low, watch FC; gate the advisor out of pre-FC).
+2. **#223 — deterministic post-FC + drop rule** (the n8n tree: FC → 80/50; dev thresholds;
+   drop 193–196 °C + DTR 10–20%; emergency 196/198). NO LLM. Inside the safety box.
+3. **#219 — charge-referenced clock** → correct DTR (prerequisite for the drop rule).
+4. **#224 (replay-harness part only)** — validate the deterministic controller on the
+   recorded roasts (incl. tonight's failure runs as regressions) BEFORE burning beans.
+→ then the supervised roast (clears the **#134** gate). This is the proven n8n system on
+RoastPilot's controller + safety envelope; it should give a good roast.
+
+**Deferred — after the first good roast:**
+- **#226 — post-FC LLM advice** (heat+fan+drop on the deterministic baseline; D35 option c) +
+  the **LLM-eval** half of #224 (gpt-4o drop eval).
+- **#205** RoR smoothing, **#217** fixed-scale curve, **#220** DTR surfacing (observability),
+  **#210/#212** operability (the manual override at the machine covers supervised runs),
+  the §7.2 training-corpus / outcome-labels work (→ roastpilot-cloud, D29).
+
+The deterministic controller alone is enough to attempt — and pass — roast 5; the LLM and
+the polish layer on after.
 
 ---
 
