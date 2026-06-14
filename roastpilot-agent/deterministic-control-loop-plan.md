@@ -197,19 +197,23 @@ a replacement for the LLM. "Fastest path" means minimal scope to a *good* roast,
 **Critical path to the first roast (do in order):**
 1. **#222 — deterministic pre-FC** (heat 100 / fan low, watch FC; advisor not consulted pre-FC).
 2. **#223 — post-FC LLM control loop** (from FC: consult every ~5 s; context = bean/env/RoR
-   + roast duration + post-FC flag + dev time/%; **the model's own decisions since FC**
-   (anti-thrash) + **the objective + a reference curve**; LLM advises → the controller's outer
-   loop executes-or-not through the safety box + a coherence/deadband gate). The n8n thresholds
-   are the box.
-3. **#219 — charge-referenced clock** → correct DTR + roast-duration (inputs to #223's context
+   + roast duration + post-FC + **development time (duration since FC) AND development
+   percentage (DTR, share of the whole roast)** — two distinct values, not a ratio of each
+   other; **the model's own decisions since FC** (anti-thrash) + **the objective + a reference
+   curve**; LLM advises → the controller's outer loop executes-or-not through the safety box +
+   a coherence/deadband gate). The n8n thresholds are the box.
+3. **#219 — charge-referenced clock** → correct roast duration + DTR (inputs to #223's context
    and the drop). Prerequisite.
-4. **#224 (replay-harness part only)** — validate the contexted+gated post-FC LLM loop on the
+4. **#220 — surface development time + development percentage (DTR)** on the dashboard — BEFORE
+   the first test (operator, 14 Jun): the operator must see both live, and the LLM loop needs
+   both. Depends on #219.
+5. **#224 (replay-harness part only)** — validate the contexted+gated post-FC LLM loop on the
    recorded roasts (does it produce sane, coherent trajectories, not tonight's thrash?) BEFORE
    the live roast.
 → then the supervised roast (clears the **#134** gate).
 
 **Deferred — after the first good roast:**
-- **#205** RoR smoothing, **#217** fixed-scale curve, **#220** DTR surfacing (observability),
+- **#205** RoR smoothing, **#217** fixed-scale curve (observability),
   **#210/#212** operability (the manual override at the machine covers supervised runs),
   the broader **LLM-eval** + §7.2 training-corpus / outcome-labels work (→ roastpilot-cloud, D29).
 
