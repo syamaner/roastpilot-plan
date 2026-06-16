@@ -365,6 +365,33 @@ always on**, and the pre-FC LLM only **refines** it and **fails closed to** it, 
 FC still arrives even if the LLM is silent, slow, wrong, or gated. The advisory
 makes the approach gentler; the floor guarantees the approach happens.
 
+### 8.5 Round-2 operator answers (D40, 16 Jun 2026)
+Pressure-testing §8 with the operator settled four build-shaping points:
+
+- **"Reference curve" = the roast's OWN telemetry up to time *t***, NOT an ideal /
+  target "good curve". The per-tick context carries the in-progress curve
+  (bean / env / heat / fan, + RoR) over the roast so far so the model can see **how
+  today's responses have actually landed** and correct its own trajectory. Any
+  ideal-curve / cross-roast feedback is **roastpilot-cloud scope (D29)**, out of M1.
+  The objective stays the existing DTR / drop targets (§8.1). This is a scope
+  *reduction* — the ambiguous "what a good development curve looks like" wording is
+  retired.
+- **History-in-every-prompt, decisions encoded.** Each per-tick user context must
+  present a **clear history so far including the model's OWN prior recommendations
+  (encoded)** — the direct fix for the #218 incoherence (the model had no memory of
+  its own moves). This is the curve-to-*t* plus the decision trace, together.
+- **Coherence/deadband = a short dwell.** Operator floor ~2–3 s; against the ~5 s
+  post-FC consult cadence this resolves to **no lever direction-reversal across
+  consecutive consults unless the move is large** (magnitude-gated — decisive moves
+  still allowed per §1; only incoherent flip-flopping is damped). Exact threshold
+  tuned on the replay harness / bake-off.
+- **Validation = our data, not shadow mode.** The post-FC loop is de-risked by
+  replaying our recorded roasts + a fresh **full-roster bake-off** (incl. gpt-4o),
+  operator-run; the control-loop **model pin comes from that eval** (trajectory
+  sanity), not the drop-only bake-off (D33/D34). The first roast keeps the live
+  post-FC LLM (D35a). **#223 is split into maintained sub-tasks** (policy+limits /
+  teaching prompt / context builder / loop+gate / validation); #223 stays the parent.
+
 Cross-refs: D39 (plan.md §1), D35 (the split), D36 (pre-FC layer + curve
 features), D34 (`v4` is drop-narrow), #222 (`RoastControlPolicy` = the limit
 source), #223 (post-FC loop), #228 (pre-FC advisory), agent
