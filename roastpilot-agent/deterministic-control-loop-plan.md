@@ -311,3 +311,61 @@ plan interface and (ii) an ML-grade, outcome-labelled log / export. Those two ma
 learning loop and the eventual fine-tune **additive, not a rewrite.** Cross-refs:
 roastpilot-cloud plan, D29 (feedback-learning deferred to cloud), §C (test harness =
 training corpus), memory `artisan-roast-logs-dataset`, `advisor-bakeoff-harness`.
+
+## 8. LLM control contract (D39, operator design review 16 Jun 2026)
+
+Pressure-testing §3/§4-A before the loops are built surfaced four contracts both
+LLM loops (post-FC #223, pre-FC advisory #228) must satisfy. These are
+**sharpenings, not a redesign** — §3 already has the per-phase deterministic
+policy and the execute-or-not box; #223 already specs the rich context (windowed
+history/chart, DTR, decision-history, reference curve) and the gate. What was
+under-specified: the *teaching prompt*, the *explicit limits in context*, the
+*single source* for those limits, and the *pre-FC objective wording*.
+
+Current state (verified 16 Jun): `AdvisorContext` carries **targets**
+(`target_drop_temp_c`, `target_development_percent`, charge band) but **no
+explicit limits**; the advisor prompts (`v1`–`v4`) are bake-off-tuned **user**
+strings aimed at the **drop decision**, with **no teaching system prompt**;
+`safety.py` enforces the command×phase matrix + temp ceilings (≤196 / 240 /
+emergency-drop >198) + a 0–100 clamp, but **no phase-dependent heat/fan
+limits** — those arrive with the still-unbuilt `RoastControlPolicy` (§4-A.1).
+
+### 8.1 A teaching system prompt (the Hottop "whole shebang")
+Each loop carries a **stable `system` message**, separate from the per-tick user
+context (so it caches and stays constant across a roast), that teaches the
+control model: the **Hottop** (electric drum + thermal lag; fan as the primary
+airflow/cooling lever; drop / cooling mechanics); the **phase model** (drying →
+browning → Maillard → FC → development → drop) and **what each phase requires**;
+the **controls** (heat/fan 0–100, their effects and lag) and their limits; the
+**metrics** (bean/env temp, RoR, DTR, development time, turning point, FC-ETA);
+and the **objective**. The drop-tuned `v4` (D34) is NOT this prompt — it stays
+the drop-decision lens; the control system prompt is a **named deliverable in
+#223 (post-FC) and #228 (pre-FC)**, validated on the #224 replay harness.
+
+### 8.2 Explicit phase-resolved limits in the context
+`AdvisorContext` gains the **live, phase-resolved limits** the model must reason
+inside — heat floor + ceiling, fan floor + ceiling, the ≤196 °C indicated
+drop/bitter ceiling, the emergency-drop bound — **not just the targets** it has
+today. The model is told exactly the box it is operating in, per phase.
+
+### 8.3 Single source of truth for the limits (load-bearing)
+The per-phase **`RoastControlPolicy` (§4-A.1) is the ONE place the limits are
+defined**, and it feeds **both** the prompt context (8.2) **and** the harness
+execute-or-not gate (the `SafetyEvaluation` / box). **Told must equal enforced:**
+the LLM is never told a limit the harness won't apply, nor clamped by one it was
+not told. Two copies of the numbers (one in the prompt, one in the gate) would
+drift into **silent clamping the model cannot reason about** — the exact
+incoherence D35 exists to prevent — so there is no second copy anywhere.
+
+### 8.4 Pre-FC objective: smooth into FC, never stall (#228)
+The late-Maillard→FC advisory's objective is to **bend the RoR smoothly into FC**
+(avoid crashing through it) **but never stall or delay FC**. The safety of this is
+structural: **#222's deterministic floor (heat-high / fan-low driving to FC) is
+always on**, and the pre-FC LLM only **refines** it and **fails closed to** it, so
+FC still arrives even if the LLM is silent, slow, wrong, or gated. The advisory
+makes the approach gentler; the floor guarantees the approach happens.
+
+Cross-refs: D39 (plan.md §1), D35 (the split), D36 (pre-FC layer + curve
+features), D34 (`v4` is drop-narrow), #222 (`RoastControlPolicy` = the limit
+source), #223 (post-FC loop), #228 (pre-FC advisory), agent
+`advisor.AdvisorContext` + `safety.py`.
