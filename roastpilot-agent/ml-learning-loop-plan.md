@@ -1,6 +1,8 @@
 # ML Learning-Loop & Fine-Tune Plan (proposed D42) — §7 detailed design
 
-**Status:** DRAFT for operator ratification (20 Jun 2026). Expands plan §7 (the learning
+**Status:** RATIFIED as **D42** (operator, 20 Jun 2026); now plan.md §1 D42. Over-done line
+set at drop > 197 °C with the §7.1 seed = ≤195 °C core + 196–197 °C soft (operator: good roasts
+occur at 196–197). Expands plan §7 (the learning
 loop → anticipatory per-bean control, and the roast logs as a fine-tune corpus) into a
 concrete, methodology-grounded design. Ratify into `plan.md` §1 as **D42** once accepted.
 
