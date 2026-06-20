@@ -230,3 +230,29 @@ limit, NIPS 2012). Tracking: Lee et al. Batch-MPC (AIChE 1999); Terminal-ILC (ar
 predictive feedforward (IFAC 2017); LV-ILMPC (Control Eng. Practice 2020); RL-tuned MPC (ACS
 Omega 2025). Learning-from-logs: Kumar et al. (ICLR 2022); Foster/Block/Misra (NeurIPS 2024).
 Commercial: Cropster bean-curve prediction. Plus the in-house empirical (#290) + origin priors.
+
+---
+
+## 8. Prototype results (PR #293, 20 Jun) — two open questions answered + a corpus fix
+
+The §7.1 reference-curve prototype ran on the 17 known-good mediums (landmark-registered, then
+pooled — never naive cross-time averaging):
+
+- **Registered reference shape:** TP 77 °C → DRY-END 150 °C → **FC 177 °C (±3.0)** → **DROP
+  193 °C (±2.0)**, RoR declining gently 10.2 → 9.9 °C/min through development. A clean
+  managed-decline, no crash (confirms #229/#290).
+- **§5.1 RESOLVED — pooling does NOT help here.** Mean off-diagonal inter-origin *shape*
+  correlation (de-trended against the pooled mean) is **−0.33** across the 4 origins with
+  N≥2 — origins' deviations are uncorrelated/anti-correlated. **Verdict: lean per-origin, do
+  NOT uniformly pool** (exactly the ρ→1 caveat, now empirical). Hierarchical shrinkage to a
+  weak global mean only.
+- **≤195-vs-≤197 sensitivity RESOLVED — negligible.** Adding the soft 196–197 °C tier
+  (×0.5 weight) moves the registered BT by ≤1.21 °C at any node → the 197 boundary is **not
+  load-bearing**; include the soft tier freely.
+- **Corpus fix (D42 §4):** the Hottop **charge BT is a probe-thermal-state artefact**
+  (112–192 °C across the seed, non-monotone into the turning point), so **registration must
+  anchor node 0 on the TURNING POINT, not the charge mark.** Event-marker requirement for the
+  corpus.
+
+Status: prototype validated; **per-origin (not pooled) registered reference curves are the
+buildable §7.1 path.** Still M2/post-first-roast — the D35 control build stays first-roast P0.
