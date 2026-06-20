@@ -76,7 +76,7 @@ and the safety box. Validate on the replay harness (§C) before trusting it live
 
 | Issue | Disposition under D35 |
 |---|---|
-| **#218** advisor over-adjusts fan/heat (the evidence log) | **Becomes the "why" for D35.** Keep open as the evidence/acceptance anchor; close when the deterministic controller lands and a replay shows roaster-like levers. |
+| **#218** advisor over-adjusts fan/heat (the evidence log) | **Became the "why" for D35; closed 20 Jun as a duplicate of D35.** Detail folded into the stories: coarse-lever / hold-steady prompt → **#274**; direction-flip deadband (damp thrash, not decisive moves) → **#276**; single-source limits (the incoherence root cause) → **#273**; acceptance = roaster-like lever series / fan-change count, "not the #218 thrash" → **#277**. Acceptance lives on #277's replay, not on a standalone issue. |
 | **#214** v9 charge-aware *prompt* | **Reframe, do not build as written.** "Better prompt" is the wrong fix. Re-scope #214 to "advisor role under D35" (drop-confirmation / anomaly prompt) or close as superseded. |
 | **#172** stage-tuned advisor *prompt* sections | **Close as superseded** by D35 (per-phase control moves to the controller, not the prompt). |
 | **#209** post-charge settle window (merged) | **Superseded** by "pre-FC is deterministic, advisor not consulted pre-FC." Keep the code until the deterministic pre-FC lands, then remove (the settle window is a no-op once the advisor never runs pre-FC). |
