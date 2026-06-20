@@ -33,8 +33,16 @@ A terminology guard, because we now have **two** "reference curves":
 
 ## 1. Our data reality (empirical, PR #290) — what the learning loop must fit
 
-- **47 roasts, single operator, single Hottop.** Split 18 medium / 23 dark / 6 over-dark;
-  the filename-labelled `kona_3_dark` classified dark (classifier sanity-check passed).
+- **47 roasts, single operator, single Hottop.** At the **operator's over-done line of
+  drop > 197 °C** (decided 20 Jun): **17 medium / 10 dark / 20 over-dark** (the earlier >200 °C
+  proxy gave 6 over-dark; 14 roasts in (197,200] flip). The filename-labelled `kona_3_dark`
+  classified dark (sanity-check passed).
+- **Known-good medium reference set (the §7.1 seed) = 17 roasts**, all mapping to fixtures
+  `artisan-01…22`, second-crack-not-reached, drop 189.0–196.3 °C, **DTR median 16.6 %**
+  (range 12.4–20.7 %). *Boundary caveat:* the 197 line sits in the densest drop-BT bin
+  (196–198 °C), so the medium/over-dark split is sensitive there (`artisan-22` at 196.3 stays
+  in; several 197–198 flip out). A cleaner ≤195 °C band would give a less boundary-sensitive
+  seed for the reference curves — operator's call before §7.1 prototyping.
 - **DTR median 15.3 %** (IQR 13.6–18.6 %), **below Rao's 20–25 %** — our target is *our*
   profile (~15 %), not the textbook band. (Confirms D33/D36: anchor to profile, not
   published numbers.)
@@ -47,10 +55,9 @@ A terminology guard, because we now have **two** "reference curves":
   from filenames, processing/density/altitude only from the cited priors (flagged ASSUMED).
 - 28/47 map to the existing `artisan-NN` fixtures.
 
-**Open judgement call for the operator:** the over-dark cut used a >200 °C proxy, but the
-bitter ceiling is ~196 °C and **26/47 dropped past 196**. If 196 is the over-done line, the
-"good medium" reference set (which seeds everything below) shrinks substantially. *Decide
-this before building the reference curves — it changes which roasts are "known-good".*
+**Resolved (operator, 20 Jun): the over-done line is drop > 197 °C** → the known-good medium
+seed is the 17 roasts above. One residual choice flagged above: a tighter ≤195 °C band for a
+less boundary-sensitive seed.
 
 ---
 
@@ -122,15 +129,45 @@ architecture;** §7.2 is a later slot-in, not a near-term build.
 
 ---
 
+## 3b. External public data — a registration-only supplement, not a shortcut (researched 20 Jun)
+
+Can we augment N=47 with public roast curves? **Modestly, and only as registered shape.**
+- **Best lead: Roastetta** (~2,400 roasts, an explicit Hottop-2K+ filter, BT/ET + charge/
+  dry-end/FC/drop landmarks, JSON-profile download) — but the *Hottop-specific* count is
+  **unverified** (the sample skewed Kaleido) and there's **no stated reuse licence**; verify
+  volume + export path by hand before relying on it.
+- **Crumbs:** Sweet Maria's (`.alog`/CSV, but Probat/Popper), `jacciz` (~4 Bullet `.alog`, °F).
+- **The gold is not public:** curves paired with cup scores effectively don't exist openly
+  (CQI ~1,340 and an FT-NIR set have scores but **no curves**; the one source joining BT
+  curves to ~33,338 cupping ratings — a TU Wien thesis — is **proprietary/unreleased**).
+- **Hard caveat:** every accessible source is a **different machine** (different probe
+  calibration → only landmark-*registered* shape transfers, never absolute temps) or
+  **unlabelled**. So external data can add curve-shape variety for *generalisation*, kept
+  **strictly separate** from our single-machine reference curves; it cannot supply same-machine
+  temps or the outcome labels.
+
+**Verdict:** our own cup-rated roasts remain the higher-quality core; **there is no public path
+to a labelled fine-tune corpus today** (reinforces §3 — §7.2 depends on growing OUR labelled
+set). Roastetta-after-verification is an optional registration-only generalisation supplement,
+not a near-term priority.
+
+---
+
 ## 4. What this makes URGENT now — the corpus/data design (the load-bearing items)
 
 The methods above are only as good as the data we start logging *today*:
-1. **Outcome labels — the highest-value missing data.** Capture an operator rating + cup note
-   (and the drop/DTR) per roast. Decide the label modality (pairwise preference vs absolute
-   score vs a drop-proxy like ≤196 °C) — open question, but *start collecting something*.
-2. **Bean metadata** (origin / processing / density / altitude) — absent today (the #290
-   gap). Capture going forward; retro-label the 47 where possible (filenames give origin; the
-   priors give flagged defaults; the operator corrects).
+1. **Outcome labels — the INFRASTRUCTURE ALREADY EXISTS (correction, 20 Jun).** The harness
+   already persists `operator_rating` (1–5) + `operator_notes` with a `cloud_sync_status`
+   field (cloud-handoff ready, D29), exposed via `POST /api/roasts/{id}/rating` and the
+   `RoastRating` stars+notes widget on the detail page. So the gap is **not** the mechanism —
+   it is (a) the *habit* (rate every roast through the system, per operator, until the cloud
+   feedback brain exists) and (b) deciding the label modality later (pairwise vs absolute vs a
+   drop-proxy). The operator IS the label source until D29. *Start rating now.*
+2. **Bean metadata — the real capture gap (the #290 finding).** Origin / processing / density /
+   altitude are absent from the logs. **The Start Roast form must gain `processing` + altitude/
+   density** (it has identity + targets but not these two ML-critical axes); the past 47 stay
+   ASSUMED (filenames give origin, priors give flagged defaults, operator can't retro-correct).
+   New roasts: operator enters it accurately. (Form-revision proposal pairs with #273.)
 3. **Consistent event markers** (CHARGE/DRY/FCs/DROP) — required for landmark registration;
    already mostly present, formalise it.
 4. **Repeatable charge state** — log charge temp/mass/ambient so ILC's repeated-batch
