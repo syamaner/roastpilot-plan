@@ -105,7 +105,7 @@ thresholds resolved from the active `RoastProfile`, not hardcoded):
 | **preheat** | heat 100 / fan ≤30, ramp to charge band; emit the (bean-keyed) charge cue | none |
 | **charge → turning point** | hold heat 100 / fan low; auto-T0 from MCP bean-drop | none (this is #209's job, now deterministic) |
 | **drying → browning** | **heat high / fan low** (operator method: do not extend roast time); fan opens only entering browning | none / commentary |
-| **late Maillard → FC** (still pre-FC) | deterministic anticipatory heat **trim** (moderate, e.g. ~60–70 %, not a crash), fan controlled; bend RoR into FC | **none** (deterministic) |
+| **late Maillard → FC** (still pre-FC) | deterministic anticipatory heat **trim** (moderate, e.g. ~60–70 %, not a crash), fan controlled; bend RoR into FC | **none** (deterministic) — **STATUS (21 Jun, D46): NOT YET BUILT.** #222 shipped a flat heat-100 floor; roast 3 proved the floor overshoots (flat 100 → late FC → env 239 → bean coasted to drop 203, 8 °C over the 195 ceiling, even at heat 0). The trim is now the P1 control priority (#327), ahead of #228. |
 | **development → drop** (post-FC) | the safety box only: ≤196 °C ceiling, emergency-drop >198, fail-closed; direction-flip deadband on lever changes | **LLM advises heat + fan + the drop** — decisive moves allowed (fast phase), thrash damped; fast cadence (~5 s); gpt-4o |
 | **cooling / complete** | stop sequence | none |
 
@@ -227,6 +227,26 @@ a replacement for the LLM. "Fastest path" means minimal scope to a *good* roast,
 
 The first roast carries the post-FC LLM by design; the replay-harness validation (#224) is the
 de-risk before beans, and the safety box + the decision-history context are what make it safe.
+
+### Post-roast-3 update (21 Jun 2026, D46/D50)
+
+The first clean end-to-end roast (roast 3) happened. Status against this sequencing:
+
+- **#222 (deterministic pre-FC floor) — SHIPPED and hardware-validated**, but as a FLAT
+  heat-100 floor. The §3 anticipatory trim was never built (plan ↔ impl drift).
+- **The floor OVERSHOOTS** (flat 100 → late FC → env 239 → bean coasted 193→203, 8 °C over
+  the 195 ceiling even at heat 0; the #313 drop-coherence guard held the drop for dev% while
+  momentum carried the bean over the ceiling — the dev-floor and temp-ceiling rules conflicted,
+  #323). **So the deterministic anticipatory trim is now REQUIRED, not optional (D46, #327) —
+  the P1 control priority, AHEAD of #228.**
+- **#223/#226/#276 (post-FC LLM control loop) — SHIPPED**; the c2 prompt cut heat correctly at
+  FC (10→0 by bean ~193). The overshoot was a pre-FC floor problem, not a post-FC loop problem.
+- **#228 (pre-FC anticipatory LLM advisory layer) stays LAST (D50)** — only after the
+  deterministic floor + trim are hardware-validated. It refines the deterministic trim and fails
+  closed to it.
+
+Also surfaced: T0/FC detection backdating (mcp #167 + the FC sibling #168, D49); the
+end-of-roast MCP segfault is fixed (coffee-roaster-mcp v0.1.6 / #165, D47).
 
 ---
 
