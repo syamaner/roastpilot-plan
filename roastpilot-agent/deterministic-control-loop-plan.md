@@ -105,7 +105,7 @@ thresholds resolved from the active `RoastProfile`, not hardcoded):
 | **preheat** | heat 100 / fan ≤30, ramp to charge band; emit the (bean-keyed) charge cue | none |
 | **charge → turning point** | hold heat 100 / fan low; auto-T0 from MCP bean-drop | none (this is #209's job, now deterministic) |
 | **drying → browning** | **heat high / fan low** (operator method: do not extend roast time); fan opens only entering browning | none / commentary |
-| **late Maillard → FC** (still pre-FC) | deterministic anticipatory heat **trim** (moderate, e.g. ~60–70 %, not a crash), fan controlled; bend RoR into FC | **none** (deterministic) — **STATUS (21 Jun, D46): NOT YET BUILT.** #222 shipped a flat heat-100 floor; roast 3 proved the floor overshoots (flat 100 → late FC → env 239 → bean coasted to drop 203, 8 °C over the 195 ceiling, even at heat 0). The trim is now the P1 control priority (#327), ahead of #228. |
+| **late Maillard → FC** (still pre-FC) | deterministic anticipatory heat **trim** (moderate, e.g. ~60–70 %, not a crash), fan controlled; bend RoR into FC | **none** (deterministic) — **STATUS (22 Jun, D51): BUILT + SHIPPED (#327/#336).** FC-ETA-keyed trim to **65 %** (window 60 s before predicted FC, min bean 155 °C), **hysteresis latch** so the lever doesn't flip-flop, trim_heat pinned ≥10 / ≤ the flat floor, **fails closed to the flat 100/30 floor** on any degenerate input (incl. a NaN-ETA guard). Defaults operator-APPROVED, shipped **ENABLED** for roast-4 supervised validation; safety-reviewed 4×. #228 (the LLM layer over this trim) still ships LAST (D50). |
 | **development → drop** (post-FC) | the safety box only: ≤196 °C ceiling, emergency-drop >198, fail-closed; direction-flip deadband on lever changes | **LLM advises heat + fan + the drop** — decisive moves allowed (fast phase), thrash damped; fast cadence (~5 s); gpt-4o |
 | **cooling / complete** | stop sequence | none |
 
@@ -248,6 +248,25 @@ The first clean end-to-end roast (roast 3) happened. Status against this sequenc
 Also surfaced: T0/FC detection backdating (mcp #167 + the FC sibling #168, D49); the
 end-of-roast MCP segfault is fixed (coffee-roaster-mcp v0.1.6 / #165, D47).
 
+### Post-roast-3 backlog cleared (22 Jun 2026, D51–D53)
+
+The agent-team session that followed roast 3 closed the operator's pre-triaged backlog:
+
+- **The deterministic anticipatory trim is now BUILT (D51, #327/#336)** — exactly the §3 fix:
+  FC-ETA-keyed heat trim to 65 % (window 60 s, min bean 155 °C), hysteresis latch, trim_heat
+  ≥10 / ≤ floor, **fails closed to the flat 100/30 floor** on any degenerate input incl. a
+  NaN-ETA guard (§8.4). Operator-approved defaults, shipped ENABLED for roast 4; safety-reviewed
+  4×. This is the plan↔impl drift from D46, resolved.
+- **The post-FC loop gained the c3 prompt (D52, #328/#349)** — fan as an ACTIVE post-FC brake
+  (c2 under-used it, holding 30–40 % while heat was already 0 and the bean overshooting). c3 is
+  the live default for roast 4; advisory-only, same safety box + lever-stability discipline.
+- **Control/safety operability shipped (D53):** #210 DROP-from-faulted, #332 acknowledge_fault
+  latency, #331 auto-finalize a stale faulted run on restart — plus two fault-semantics notes
+  (#348, #350/#329). Detail in `plan.md` §1 D51–D55.
+
+**Next gate: roast 4** — supervised validation of the trim (#336, enabled) + c3 (live default),
+targeting a clean drop ≤195 °C; then #228 (the LLM layer, still LAST, D50).
+
 ---
 
 ## 6. Decision-log entry (proposed, for `plan.md` §1 once ratified)
@@ -380,10 +399,18 @@ incoherence D35 exists to prevent — so there is no second copy anywhere.
 ### 8.4 Pre-FC objective: smooth into FC, never stall (#228)
 The late-Maillard→FC advisory's objective is to **bend the RoR smoothly into FC**
 (avoid crashing through it) **but never stall or delay FC**. The safety of this is
-structural: **#222's deterministic floor (heat-high / fan-low driving to FC) is
+structural: **the deterministic pre-FC floor (heat-high / fan-low driving to FC) is
 always on**, and the pre-FC LLM only **refines** it and **fails closed to** it, so
 FC still arrives even if the LLM is silent, slow, wrong, or gated. The advisory
 makes the approach gentler; the floor guarantees the approach happens.
+
+**STATUS (22 Jun, D51): the deterministic floor now has two layers, both always-on.**
+The base is #222's flat heat-100 / fan-30 floor; layered on it is the #327/#336
+**deterministic anticipatory trim** (65 % in the FC-ETA window, hysteresis-latched, NaN-ETA
+guarded) which itself **fails closed to the flat floor** on any degenerate input. So the
+fail-closed chain is now: #228 LLM layer → deterministic trim → flat floor. FC always
+arrives; the trim makes the approach cooler so development accrues before the ceiling (D46);
+the flat floor remains the bottom guarantee.
 
 ### 8.5 Round-2 operator answers (D40, 16 Jun 2026)
 Pressure-testing §8 with the operator settled four build-shaping points:
