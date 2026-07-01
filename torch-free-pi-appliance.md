@@ -35,7 +35,12 @@ install plain PyPI wheels.
 > so there is **zero regression** — the literal 96.9%/≤1-FP gate numbers differ only because the
 > test split grew 191→303 samples, where the **old AST path and the new path score identically**
 > (98.3% / 91.1% / 4 FP). The 4-FP/precision-on-303 question is a separate MODEL-quality issue
-> (filed in `coffee-first-crack-detection`), not a torch-free regression. Operator-accepted 1 Jul.
+> (filed in `coffee-first-crack-detection#55`), not a torch-free regression. **✅ MERGED 1 Jul (PR #56,
+> closes #54).** Review cycle caught a real BLOCKER first: the ONNX entrypoint was not torch-free *at
+> import* (`__init__` eager-imported torch model/dataset; `inference_onnx` imported the torch-importing
+> `inference.py`) — fixed via a torch-free `events.py` + lazy `__init__` + a torch-free-import test; the
+> preemphasis + float64 fixes dropped the worst-case equivalence to **2.71e-05**. **Phase 2 is now
+> unblocked** (gated only on Pi-5 live verification). FC repo has no CI → tracked as #57.
 
 Replace the torch feature extractor with a numpy/scipy Kaldi-compatible one (NOT librosa — see the
 finding above) in the **ONNX inference path**, then drop torch.
