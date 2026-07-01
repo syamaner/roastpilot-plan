@@ -22,8 +22,23 @@ install plain PyPI wheels.
 
 ## Phase 1 — Model pipeline (`coffee-first-crack-detection`)  ⟵ the prerequisite
 
-Replace the torch feature extractor with a librosa one in the **ONNX inference path**,
-then drop torch.
+> **IMPLEMENTATION FINDING (1 Jul 2026, branch `feature/54-…`, commit `7226d41`) — supersedes
+> the "librosa mel front-end" wording throughout this section.** `librosa` **cannot** reproduce
+> `ASTFeatureExtractor`'s Kaldi `fbank` (preemphasis, DC-offset removal, `mel_floor`, log-mel,
+> `(x−mean)/(std·2)` norm) — `librosa.feature.melspectrogram` gives different results and can't be
+> swapped in. The front-end is therefore a **from-scratch numpy/scipy Kaldi-compatible** module
+> (`mel_frontend.MelFrontend`, `from_config()` reads mean/std from `preprocessor_config.json`);
+> `scipy>=1.11` is added to the Pi deps; **`librosa` is kept ONLY for audio I/O (`librosa.load`)**.
+> So every "librosa mel front-end / swap to a librosa one" below means *that numpy/scipy Kaldi
+> front-end*. **Accuracy gate PASSED in substance:** the front-end is numerically equivalent to AST
+> (`input_values` match **<1.3e-05**, float32 noise; keystone test `test_numeric_mel_diff_vs_ast`),
+> so there is **zero regression** — the literal 96.9%/≤1-FP gate numbers differ only because the
+> test split grew 191→303 samples, where the **old AST path and the new path score identically**
+> (98.3% / 91.1% / 4 FP). The 4-FP/precision-on-303 question is a separate MODEL-quality issue
+> (filed in `coffee-first-crack-detection`), not a torch-free regression. Operator-accepted 1 Jul.
+
+Replace the torch feature extractor with a numpy/scipy Kaldi-compatible one (NOT librosa — see the
+finding above) in the **ONNX inference path**, then drop torch.
 
 - [ ] Swap the `ASTFeatureExtractor` mel front-end → a librosa one in **all 3 consumers**:
   `src/coffee_first_crack/inference_onnx.py` (`_load_extractor` + `_predict_window`'s
