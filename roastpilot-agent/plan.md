@@ -93,11 +93,13 @@
 
 Extracted from source 6 June 2026. The typed client (`mcp_client.py`) wraps exactly this surface.
 
-**13 tools** (`mcp_server.py:493-779`): `get_server_info`, `get_runtime_config`,
-`start_roast_session`, `get_roast_state(session_id?)`, `set_heat(heat_level_percent)`,
-`set_fan(fan_level_percent)`, `mark_beans_added`, `mark_first_crack`, `drop_beans`,
-`start_cooling`, `stop_cooling`, `export_roast_log(session_id?)`,
-`emergency_stop(reason?)`.
+**14 tools** (13 at v0.1.3 + `set_recording_metadata`, added 0.1.9/#176): `get_server_info`,
+`get_runtime_config`, `start_roast_session`, `get_roast_state(session_id?)`,
+`set_heat(heat_level_percent)`, `set_fan(fan_level_percent)`, `mark_beans_added`,
+`mark_first_crack`, `drop_beans`, `start_cooling`, `stop_cooling`,
+`export_roast_log(session_id?)`, `emergency_stop(reason?)`,
+`set_recording_metadata(origin, roast_num)`. (Ambient rides `get_roast_state`'s
+`ambient_status`, added 0.1.12/#185/D85 — a state field, NOT a new tool.)
 
 **Key facts the agent design relies on:**
 
@@ -178,7 +180,7 @@ Per orchestration plan § Implementation Modules, with refinements:
 src/roastpilot_agent/
 ├── controller.py     # transition table, tick() loop, T0 debounce; re-exports
 │                     #   RoastPhase from models.py (its home per D15)
-├── mcp_client.py     # Typed wrapper over the 13 tools; owns the MCP child process
+├── mcp_client.py     # Typed wrapper over the 14 tools; owns the MCP child process
 │                     #   (spawn, health, restart→recovery); Pydantic mirrors of
 │                     #   RoastSessionState / T0Status / FirstCrackStatus
 ├── advisor.py        # RoastAdvisor ABC, AdvisorContext, RoastDecision,
