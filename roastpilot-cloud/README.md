@@ -10,6 +10,9 @@ surface only)
 
 ## Documents
 
+- [`factory.md`](factory.md) — **software factory spec (D98)**: issue-driven
+  agent pipeline for C2–C8 (triage → implement → review, human merge), label
+  taxonomy, security model, autonomy ratchet, F1 epic stories.
 - [`plan.md`](plan.md) — full component plan: decisions D97 + D10–D13,
   two-plane architecture (Snowflake data platform / Vercel public surface),
   Snowflake schema + role/grant lockdown, connector sync contract
@@ -20,6 +23,10 @@ surface only)
 
 ## Decisions
 
+- **D98**: **Factory-first build for C2–C8** — GitHub-issue-driven agent
+  pipeline (`claude-code-action`, adapted from the hubble.md reference);
+  human specs, clarifies, and merges; C1 + F1 conventional. See
+  [`factory.md`](factory.md).
 - **D97**: **Snowflake + Vercel** replaces Supabase. Agent syncs directly via
   `snowflake-connector-python` (key-pair auth); telemetry lands in a
   queryable table; the public taster surface stays on Vercel because

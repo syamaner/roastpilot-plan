@@ -2,7 +2,8 @@
 
 **Status**: Drilled down and agreed, 7 June 2026. **Revised 16 July 2026 (D97):
 Snowflake replaces Supabase as the data platform; Vercel keeps the public
-surface only.**
+surface only. Same day (D98): C2–C8 built factory-first — see
+[`factory.md`](factory.md).**
 **Repo to create**: `github.com/syamaner/roastpilot-cloud`
 **Stack** (per D97, superseding D2's Supabase choice): Next.js (App Router) on
 Vercel (public pages + public review API only) + **Snowflake** (tables, stages,
@@ -16,6 +17,7 @@ compete with the July harness deadline (00-repository-structure.md).
 
 | # | Decision | Choice | Notes |
 |---|----------|--------|-------|
+| D98 | Build process | **Factory-first for C2–C8** | Issue-driven agent pipeline (triage → implement → review) on GitHub Actions + `claude-code-action`; the human specs, clarifies, and merges. C1 and the factory itself (new epic F1) are built conventionally. Full spec, security model, label taxonomy, and autonomy ratchet: [`factory.md`](factory.md). Merging is never autonomous; the agent repo is explicitly out of factory scope. |
 | D97 | Cloud stack revision (supersedes the Supabase half of D2) | **Snowflake + Vercel** | Snowflake becomes the single data platform: roast sync lands directly via `snowflake-connector-python` (key-pair auth), telemetry JSONL is parsed into a queryable table (the ingestion-pipeline win), aggregation runs as stored procedures, and owner analysis gets Streamlit-in-Snowflake. Vercel keeps only the taster-facing surface, because the public half **cannot** live inside Snowflake: Streamlit-in-Snowflake and SPCS public endpoints both require Snowflake authentication (verified against docs, 16 Jul 2026); anonymous phone access is unsupported. Functionality is unchanged from the 7 Jun plan. Cost model in §15; target is as close to free as Snowflake allows. |
 | D10 | Auth | **Device token only** — *mechanism amended by D97* | Owner actions still flow device SPA → agent → cloud, and there is still **no login UI in M2**. The mechanism changes: instead of a bearer token against REST route handlers, the agent holds a key pair for a dedicated `ROASTPILOT_AGENT` Snowflake service user. The public web app holds a separate key pair for a minimal `PUBLIC_WEB` service user (SQL API). Magic-link owner login stays backlog. |
 | D11 | Review spam control | **Slug entropy + rate limit** | High-entropy unlisted slug (≥96 bits, base58) is the access control. Per-IP rate limit + honeypot field on the review form. Revocation = regenerate slug. Signed per-share tokens → backlog. Unchanged by D97. |
@@ -346,16 +348,23 @@ connector boundary; contract tests run real SQL against DEV (pennies).
 
 ## 11. Epics
 
-| Epic | Scope | Depends on |
-|---|---|---|
-| C1 Scaffold | Snowflake account (30-day trial for the build, §15), schemachange, Next.js repo, CI (lint/typecheck/test), Vercel project, resource monitor from day one | — |
-| C2 Schema | migrations, roles/grants + secure views, stored procs, `data_quality_violations` view, summary-variant field mapping vs real MCP fixture | C1 |
-| C3 Sync | agent-repo `cloud_sync` (connector sessions: stage PUT, COPY, MERGE, procs); presigned-URL download check (SNOWFLAKE_SSE) | C2 |
-| C4 Public page | `/r/[slug]` SSR + ISR via SQL API, curve from telemetry view, OG image | C2 |
-| C5 Reviews | form (from Make prototype), rate limit (pick Upstash vs Vercel KV), `SUBMIT_REVIEW` proc wiring | C4 |
-| C6 References | aggregation proc + agent-side `prepare_roast` query (D13) | C3 |
-| C7 Ops | key-pair provisioning/rotation, resource monitors, trial→on-demand cutover, backup/export runbook, deploy runbook | C3–C6 |
-| C8 Analysis (optional) | Streamlit-in-Snowflake operator workspace: cross-roast queries, paired N vs N+1 comparisons (feeds open item 5) | C2 |
+Build process per D98: C1 and F1 are conventional; **C2–C8 are
+factory-executed** (issue-driven agent pipeline, human merge — see
+[`factory.md`](factory.md)). Story decomposition for C2+ is itself factory
+work (`to-issues`, PM-reviewed), so those issues are created per-epic at
+kickoff, not up front.
+
+| Epic | Scope | Depends on | Build |
+|---|---|---|---|
+| C1 Scaffold | Snowflake account (30-day trial for the build, §15), schemachange, Next.js repo, CI (lint/typecheck/test), Vercel project, resource monitor from day one, repo `AGENTS.md` + state docs | — | conventional |
+| F1 Factory | triage + implement workflows, triage/`to-issues` skills, review port, dry run + runbook (factory.md §11) | C1 | conventional |
+| C2 Schema | migrations, roles/grants + secure views, stored procs, `data_quality_violations` view, summary-variant field mapping vs real MCP fixture | C1, F1 | factory |
+| C3 Sync | agent-repo `cloud_sync` (connector sessions: stage PUT, COPY, MERGE, procs); presigned-URL download check (SNOWFLAKE_SSE) | C2 | factory (agent-repo side stays conventional) |
+| C4 Public page | `/r/[slug]` SSR + ISR via SQL API, curve from telemetry view, OG image | C2 | factory |
+| C5 Reviews | form (from Make prototype), rate limit (pick Upstash vs Vercel KV), `SUBMIT_REVIEW` proc wiring | C4 | factory |
+| C6 References | aggregation proc + agent-side `prepare_roast` query (D13) | C3 | factory |
+| C7 Ops | key-pair provisioning/rotation, resource monitors, trial→on-demand cutover, backup/export runbook, deploy runbook | C3–C6 | human + factory |
+| C8 Analysis (optional) | Streamlit-in-Snowflake operator workspace: cross-roast queries, paired N vs N+1 comparisons (feeds open item 5) | C2 | factory |
 
 Agent-side counterparts (sync queue wiring, `FeedbackConfig`,
 `AdvisorContext.reference_roasts`) are already specced in the agent plan and
