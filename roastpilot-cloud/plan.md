@@ -434,6 +434,37 @@ land as agent-repo stories alongside C3/C6.
 9. **Key rotation**: both service users' key pairs rotated per the C7
    runbook; Snowflake supports two active public keys per user, so rotation
    is zero-downtime. Vercel env + agent config hold the private keys.
+10. **All-data sync scope — not just roasts** (raised 16 Jul via the agent-side
+    bean-sourcing feature, `roastpilot-agent#573`). M2 sync covers roasts +
+    telemetry + reviews (§5). But the agent's **bean-profile library** (the D45
+    runtime store), including the green **density/moisture** attributes the
+    bean-similarity work (`roastpilot-agent#567` v2) needs, is NOT yet in sync
+    scope — required for cross-device use and any cloud-side recommender or
+    similarity. When that's scheduled: add a `cloud_bean_profiles` table +
+    a bean-profile sync path (MERGE on profile id), and the agent-repo
+    `cloud_sync` module gains the profile push alongside the roast push.
+    Sequence **after** M2 Loop A; not in the initial scope.
+11. **Snowflake-native capability opportunities for the recommender /
+    bean-similarity** (evaluate post-M2, cost-checked). Now the data platform is
+    Snowflake, several native capabilities fit the `roastpilot-agent#573`
+    recommender + `#567` similarity directions and are worth evaluating rather
+    than reimplementing agent-side:
+    - **Cortex vector search** — `EMBED_TEXT_*` over bean flavour-note text +
+      `VECTOR_COSINE_SIMILARITY` gives a *semantic* "tastes like your
+      well-rated roasts" axis, complementing #567's structured
+      density/moisture Gower distance.
+    - **#567 Gower distance as a stored proc** over the whole cloud bean corpus
+      (not just the local roster), so a scraped vendor catalogue can be ranked
+      against the full owned corpus in SQL.
+    - **Cortex LLM** (`COMPLETE` / `CLASSIFY_TEXT` / `EXTRACT_ANSWER`) — run
+      catalogue extraction + recommendation reasoning data-resident in
+      Snowflake instead of the agent's external LLM key.
+    - **Streamlit-in-Snowflake (C8)** — the natural operator-only home for
+      recommender/similarity tuning + exploration.
+    Honesty: all post-M2, all **expand beyond Loop A's deliberately-minimal
+    scope**, and Cortex functions carry per-token credit cost beyond the
+    ~£5/mo model — so each needs its own cost/scope decision (a D-number)
+    before adoption. Recorded as opportunities, not commitments.
 
 ## 15. Cost Model (D97 — "as free as possible", stated honestly)
 
