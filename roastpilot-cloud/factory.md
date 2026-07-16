@@ -212,3 +212,137 @@ deadline.
    checkout, it is cheap.
 4. Issue intake beyond the operator (e.g. tasters reporting bugs via the
    public page) is out of scope until the repo is public; revisit at C7.
+
+## 13. Soundness validation + hardening (16 Jul 2026 research pass)
+
+A four-angle adversarial validation of this spec (claude-code-action best
+practice; the lethal-trifecta security model; Warp/hubble.md source fidelity;
+the autonomy-ramp + review-collusion literature). **Verdict: SOUND ARCHITECTURE,
+with must-fix gaps before the factory builds anything — concentrated in the
+pre-merge CI secret path, pipeline self-modification, and test-strength gaming.**
+The read-only-agent / privileged-publisher split is confirmed as GitHub Security
+Lab's recommended two-workflow pattern and correctly breaks the lethal trifecta
+at the agent job; the staged ratchet + different-model reviewer + independent
+pr-triage all match established practice. The gaps below are what those good
+instincts don't yet close.
+
+**Must-fix — amends §8 Security:**
+
+1. **Pin `claude-code-action` ≥ v1.0.94** (or a SHA at/after it) — the Jan-2026
+   RyotaK/GMO bot-allowlist-bypass CVE fix. Keep `allowed_bots` /
+   `allowed_non_write_users` explicit-allowlist (never `*`) and
+   `show_full_output` off. Auth: API key at F1-S2, with Workload Identity
+   Federation (OIDC → short-lived credential, no static key) the upgrade to weigh.
+2. **Human-gate the DEV-Snowflake-key CI job.** The publisher split does NOT
+   cover the post-PR CI job, which by design runs *agent-authored code* against
+   the DEV key — the second-order injection pattern (the agent writes the
+   exfiltrator; the CI job pulls the trigger; RyotaK/Cline real-world proof).
+   Put that job behind a **GitHub Environment with a required reviewer**,
+   egress-lock the runner (step-security/harden-runner), and `npm ci
+   --ignore-scripts`. Keep the DEV key's blast radius minimal by construction
+   (DEV database only, resource-capped, no prod grants).
+3. **The agent cannot modify the factory's own pipeline.** Its patch must never
+   touch `.github/**` (workflows/actions), the privileged glue scripts,
+   CODEOWNERS, or branch-protection config — the Pipeline-Poisoning (D-PPE)
+   vector Anthropic's own `security.md` is silent on. Enforce with **CODEOWNERS
+   on `.github/` + require-code-owner-review**, AND a deterministic guard in the
+   publish path that fails any agent diff touching those paths.
+4. **Secret-scan every agent-authored diff** (gitleaks/trufflehog) in the
+   publish path before the PR opens; a committed-secret exfil attempt fails closed.
+
+**Must-fix — amends §10 quality gates (the test-strength gaming vector):**
+
+5. **Mutation testing on the diff, over the cloud repo's security-critical
+   surface** (the secure views + their baked-in `visibility <> 'private'`
+   filter, grants/roles, the Zod/Pydantic range+enum validation, the deletion
+   cascade). The measured reward-hack of Claude-family authors (ImpossibleBench,
+   ICLR 2026) is **test-file modification / weakened assertions**, and
+   first-pass-CI-green + `codecov/patch` *reward* it — both are blind to
+   test-strength reduction. A surviving mutant is a fact, not a model judgement:
+   the non-model leg the correlated-reviewer finding demands (cross-family
+   reviewers still co-accept ~16% of buggy code — two model lenses ≈ far fewer
+   than two independent votes). This is what makes the green-rate promotion gate
+   trustworthy instead of gameable.
+6. **Hard rule: any diff that edits a test, weakens an assertion, or adds
+   `# pragma: no cover` cannot auto-chain — it goes to a human.** Cheap,
+   decisive, targets the author's dominant measured hack directly.
+
+**Must-fix — operational governance (mostly cheap config, not engineering):**
+
+7. **Aggregate cost caps + alerting** — a per-run token cap can't see N runs ×
+   cap or a runaway retry loop. Set an **Anthropic monthly spend limit** (hard
+   pause) + a lower usage alert, AND a **GitHub Actions budget** (alerts +
+   stop-at-limit) on Actions minutes. Supersedes the §12 per-run-only open item.
+8. **Idempotency guards on non-idempotent GitHub writes.** A naive whole-job
+   retry re-fires side effects → a duplicate PR/comment. A branch push is
+   idempotent (same ref); **PR-create and comment-post are not** — gate them
+   with an "already exists?" pre-check keyed on issue/branch and disable naive
+   retry on those steps (guard in the tool layer, not the prompt). Honor
+   429/`Retry-After` with backoff on both APIs (GitHub's 100-concurrent
+   secondary limit trips a fan-out first).
+9. **A manual kill-switch / global pause enforced OUTSIDE the agent's code** —
+   the workflow-disable REST endpoint (one call halts everything) + an
+   in-workflow "pause flag" repo variable the jobs read first. (An auto
+   circuit-breaker on consecutive failures is a fast-follow; the *manual* switch
+   is the must-fix.)
+10. **A rollback runbook for a bad merged PR** — a documented, pre-tested path:
+    Vercel Instant Rollback (stop the bleeding, seconds) + revert-PR (fix
+    source-of-truth so it doesn't re-deploy). Design around the Vercel gotchas:
+    instant rollback only works for previously-production-aliased deploys,
+    doesn't re-apply env changes, and **turns OFF production auto-assign after —
+    so auto-deploy silently pauses until someone re-promotes.**
+11. **Dependency review on agent PRs.** An agent that adds/bumps npm deps to the
+    Next.js app is a supply-chain vector (typosquats, known-vulnerable versions).
+    GitHub's `dependency-review-action` is **paid on private repos** → wire OSS
+    `osv-scanner` as a required check instead.
+12. **Provenance trailer on every factory PR** — model ID + prompt/skill version
+    + pinned action-SHA + issue ref in the PR body/commit (extend Claude Code's
+    `Co-Authored-By`), so a *systemic* bad-PR cause is traceable and agent- vs
+    human-authored history is distinguishable. Pair with a human `Signed-off-by`.
+13. **A factory-level regression eval harness — the single gap a human merge gate
+    does NOT cover.** The gate catches an individual bad PR but not a *systematic*
+    quality regression from a model bump or a prompt edit. A modest suite (a
+    dozen known issues → expected triage/PR outcomes + deterministic scorers:
+    compiles / tests pass / diff-in-bounds), gated in CI on any prompt/model
+    change, is the highest-leverage single addition (Anthropic's own eval
+    guidance backs the capability-vs-regression split).
+
+**Paywall caveat (private repo):** GitHub push protection, dependency review,
+CodeQL, and artifact attestations are **paid (Advanced Security) on private
+repos** — so the tier-independent must-haves are the OSS equivalents (**gitleaks**
+for secret-scanning #4, **osv-scanner** for dependency review #11). Budget for
+Advanced Security OR wire the OSS gates; don't assume the native feature is there.
+
+**Should-add — hardening / correctness of the ramp:**
+
+- **A permanent human spot-audit that survives full autonomy** — 100% of PRs
+  touching the security surface (secure views / grants / validation) + ~10%
+  random, rotated auditor. The current ramp removes the human at triage and
+  never statistically re-inserts one.
+- **Re-shape the §10 ratchet gate.** "≥5 with zero overrides" is under-powered:
+  n=5 can't distinguish an 80%-good agent from a 50%-good one, and easy tickets
+  won't surface the over-eager-on-underspecified-issue mode. Gate on **issue-type
+  diversity + a confidence-interval acceptance threshold**; add a **shadow /
+  draft-for-audit rung** before auto-chaining; and **weight triage-override-rate
+  above first-pass-green** (green-rate is agent-movable — a canary built to be
+  gamed; override-rate is a human judgement the agent can't write to).
+- **Spec-grounded review** — review against the issue's acceptance criteria, not
+  just the diff (green ≠ maintainable/correct-on-edge-cases, per SWE-Atlas).
+- Fold at F1: `--ignore-scripts` (malicious postinstall), a guard against
+  base64/obfuscated secret leakage in CI logs, and validation of the triage JSON
+  at the applier (a prompt-injected verdict must not lie to the privileged job).
+
+**Confirmed good (keep as-is):** the two-workflow trifecta break (§8), the
+human-gated merge, the independent pr-triage adjudicator, the different-family
+(Codex) reviewer as the *first* independence move, and the
+non-safety-critical-repo-as-testbed scoping. hubble.md's
+seed/read-only/privileged-publisher attribution verified real in its workflow
+YAML. Wording nit: the Warp post *is* the Oz cloud-factory series (uses
+`oz-agent-action`) — adapting the pattern without hosted Oz is legitimate, but
+soften any implied clean separation.
+
+Sources: Anthropic claude-code-action docs + `security.md`; GitHub Security Lab
+two-workflow + pwn-request guidance; GMO Flatt/RyotaK CVE (fixed v1.0.94);
+Willison on the lethal trifecta; ImpossibleBench (ICLR 2026); Cursor + Meta on
+reward-hacking + mutation testing; "Play Favorites" / "Nine Judges, Two Effective
+Votes" on cross-family reviewer correlation; Google SRE canarying-releases.
