@@ -13,7 +13,7 @@ naming, and stack decisions.
 | # | Decision | Choice | Rationale |
 |---|----------|--------|-----------|
 | D1 | Device SPA location | **Inside `roastpilot-agent` repo** (`web/` subfolder, Vite build output shipped inside the Python wheel) | M1 bundles the SPA with the agent — same deployment unit, so by the project's own principle (repo boundary = deployment boundary) it belongs in the same repo. One PR per feature, no cross-repo API type sync during the July build. Extract later only if remote hosting materializes. |
-| D2 | Cloud stack | **Next.js on Vercel + Supabase** (Postgres, storage, auth) — one full-stack TypeScript repo | The cloud plane is not headless: it owns public roast pages and the no-account taster review flow (unlisted links opened on phones). Server-rendered pages give working link previews. Route handlers serve the sync API. Fastest to MVP. |
+| D2 | Cloud stack | ~~**Next.js on Vercel + Supabase**~~ — **superseded by D97 (16 Jul 2026): Snowflake + Vercel** (see `roastpilot-cloud/plan.md` §1) | Original rationale (public pages, link previews, fastest to MVP) stands for the Vercel half. D97 replaces Supabase with Snowflake as the data platform: agent syncs via connector, telemetry becomes queryable SQL, analysis via Streamlit-in-Snowflake. The public taster surface stays on Vercel because Snowflake cannot serve anonymous users (SiS and SPCS public endpoints both require Snowflake auth; verified 16 Jul 2026). |
 | D3 | Naming & GitHub home | **`github.com/syamaner/roastpilot-agent`** and **`github.com/syamaner/roastpilot-cloud`** | All CFP supporting links already point at `syamaner/*`; consistent story for the September talk. A `roastpilot` org can come later with GitHub redirects. The working folder `coffee-roaster-agent-v2` is planning-only and is not the published repo name. |
 | D4 | Feedback-learning plan depth | **M1 + M2 (Loop A) detailed; Loop B as backlog appendix only** | Matches the corrections docs and the CFP accuracy boundaries: audio capture, annotation, fine-tuning, and auto model updates are future backlog, not current scope. |
 
@@ -25,7 +25,7 @@ naming, and stack decisions.
 |------------|--------|-----------|----------|-------|
 | `coffee-roaster-mcp` | ✅ Exists (PyPI + MCP Registry) | Device-local | Python | Hardware/session boundary. One small Loop A contract change (FC override source marker). No other changes in M1/M2. |
 | `roastpilot-agent` | 🟡 New — M1, critical path | Device-local | Python + TS (`web/`) | Deterministic controller, safety policy, PydanticAI advisor, SQLite, FastAPI + SSE, cloud-sync client, **and** the bundled device SPA. |
-| `roastpilot-cloud` | 🟡 New — M2 | Vercel + Supabase | TypeScript (Next.js) | Public roast pages, taster review UI (unlisted links, no account), sync API, reference-roast summaries. **Annotation service removed from M2 scope** (Loop B backlog). |
+| `roastpilot-cloud` | 🟡 New — M2 | Vercel (public surface) + Snowflake (data platform) — D97 | TypeScript (Next.js) + SQL/schemachange | Public roast pages, taster review UI (unlisted links, no account), connector-based roast sync, reference-roast summaries, telemetry-in-SQL + operator analytics. **Annotation service removed from M2 scope** (Loop B backlog). |
 | `coffee-first-crack-detection` | ✅ Exists (HF dataset/model/Space) | Batch / HF Hub | Python | No M1/M2 work. Loop B fine-tuning is backlog. |
 
 **Reference-only (no changes, never deleted):** `bean-agent` (legacy prototype),
@@ -151,7 +151,9 @@ Recommendations to refine during per-repo drill-downs; defined as
   replay harness.
 
 ### `roastpilot-cloud`
-- **schema-migration-reviewer** — Postgres migrations + Supabase RLS policies.
+- **schema-migration-reviewer** — Snowflake schemachange migrations:
+  role/grant lockdown, secure views, procedural cascades, and no silent
+  reliance on unenforced constraints (D97; Snowflake enforces NOT NULL only).
 - **privacy-auditor** — opt-in paths honored, no PII on public pages,
   unlisted-slug entropy, rate limiting on review endpoints, anonymization on
   upload.

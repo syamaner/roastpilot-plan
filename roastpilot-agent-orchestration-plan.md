@@ -464,7 +464,8 @@ the local Milestone 1 slice. Its purpose is to browse roast sessions, share
 coffee with tasters, collect human feedback, and provide read-only reference
 context for future roasts.
 
-Good first stack:
+Good first stack (**superseded by D97, 16 Jul 2026: Snowflake + Vercel** — see
+`roastpilot-cloud/plan.md` §1; kept below as the original sketch):
 
 - Supabase or another hosted Postgres service for database, auth, and storage.
 - Vercel or Cloudflare Pages for the public web UI.
@@ -1710,7 +1711,7 @@ boundaries. See `00-repository-structure.md` for the agreed structure
    - Repository: `github.com/roastpilot/roastpilot-web`
 
 4. **`roastpilot-cloud`** (Cloud, TypeScript) 🟡 New (Milestone 2)
-   - Cloud data plane (Supabase/Vercel)
+   - Cloud data plane (Snowflake + Vercel, per D97)
    - Roast logs, tasting reviews, reference summaries
    - Annotation service for FC audio validation
    - Privacy controls and anonymization
@@ -1756,11 +1757,11 @@ boundaries. See `00-repository-structure.md` for the agreed structure
                      │ HTTPS (optional, best-effort)
                      │
 ┌────────────────────▼─────────────────────────────────┐
-│           CLOUD (Supabase/Vercel)                    │
+│           CLOUD (Snowflake + Vercel, D97)            │
 ├──────────────────────────────────────────────────────┤
 │  ┌─────────────────────────────────────────────┐    │
 │  │  roastpilot-cloud (TypeScript)              │    │
-│  │  - Postgres (roast logs, reviews)          │    │
+│  │  - Snowflake (roast logs, reviews)         │    │
 │  │  - S3/R2 (FC audio samples)                 │    │
 │  │  - Reference roast aggregation              │    │
 │  │  - Annotation service                       │    │
