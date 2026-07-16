@@ -6,11 +6,14 @@ story issues) done 16 Jul 2026 directly in the `roastpilot-cloud` repo.
 **Applies to**: `github.com/syamaner/roastpilot-cloud` only. The agent repo
 keeps its interactive operating model (D23); safety-critical code is never
 factory-autonomous.
-**References**: Warp, "How to build a cloud software factory" (the automatic
-triage skill); `bholmesdev/hubble.md` (working reference implementation whose
-workflow structure we adapt). Platform substitution: GitHub Actions +
-`anthropics/claude-code-action` (already proven in the agent repo's
-`claude-code-review.yml`), not Warp Oz. No new platform, no new billing.
+**References**: Warp, "How to build a cloud software factory — the automatic
+triage skill"
+(<https://www.warp.dev/blog/how-to-build-a-cloud-software-factory-the-automatic-triage-skill>);
+`bholmesdev/hubble.md` (<https://github.com/bholmesdev/hubble.md>) — working
+reference implementation whose workflow structure we adapt. Platform
+substitution: GitHub Actions + `anthropics/claude-code-action` (already proven
+in the agent repo's `claude-code-review.yml`), not Warp Oz. No new platform, no
+new billing.
 
 ---
 
