@@ -231,8 +231,12 @@ instincts don't yet close.
 1. **Pin `claude-code-action` ≥ v1.0.94** (or a SHA at/after it) — the Jan-2026
    RyotaK/GMO bot-allowlist-bypass CVE fix. Keep `allowed_bots` /
    `allowed_non_write_users` explicit-allowlist (never `*`) and
-   `show_full_output` off. Auth: API key at F1-S2, with Workload Identity
-   Federation (OIDC → short-lived credential, no static key) the upgrade to weigh.
+   `show_full_output` off. Auth: follow the proven house precedent — the agent
+   repo's `claude-code-review.yml` already runs `claude-code-action@v1` with an
+   **OAuth token + read-only permissions**, so the factory adopts the same at
+   F1-S2 (this resolves the §12 auth open item), with Workload Identity
+   Federation (OIDC → short-lived credential, no static key) the hardening
+   upgrade to weigh later.
 2. **Human-gate the DEV-Snowflake-key CI job.** The publisher split does NOT
    cover the post-PR CI job, which by design runs *agent-authored code* against
    the DEV key — the second-order injection pattern (the agent writes the
