@@ -17,6 +17,7 @@ compete with the July harness deadline (00-repository-structure.md).
 
 | # | Decision | Choice | Notes |
 |---|----------|--------|-------|
+| D99 | M2 kickoff (17 Jul 2026) | **M2 starts now; C1 underway** | Operator ruling: remaining M1 work (E11 completion half, E12 validation) is operator/hardware-gated, not build-capacity-bound, so M2 no longer competes with the harness deadline — the timing rule is satisfied. C1 issues #1–#4 flipped `ready-to-implement` same day; C1-S1 started. **Region (resolves §14 item 7 with a deviation):** the Snowflake trial account was created 16 Jul on **Azure UK South (London), Standard edition** (org `IO03393`, locator `EX88650`), not the AWS eu-west-2 default — data stays in London; Azure London on-demand is in the same ballpark per credit (~$3), so the §15 cost model holds (~£4–7/mo, monitor cap unchanged at 5 credits). Vercel account to be created at C1-S3. |
 | D98 | Build process | **Factory-first for C2–C8** | Issue-driven agent pipeline (triage → implement → review) on GitHub Actions + `claude-code-action`; the human specs, clarifies, and merges. C1 and the factory itself (new epic F1) are built conventionally. Full spec, security model, label taxonomy, and autonomy ratchet: [`factory.md`](factory.md). Merging is never autonomous; the agent repo is explicitly out of factory scope. |
 | D97 | Cloud stack revision (supersedes the Supabase half of D2) | **Snowflake + Vercel** | Snowflake becomes the single data platform: roast sync lands directly via `snowflake-connector-python` (key-pair auth), telemetry JSONL is parsed into a queryable table (the ingestion-pipeline win), aggregation runs as stored procedures, and owner analysis gets Streamlit-in-Snowflake. Vercel keeps only the taster-facing surface, because the public half **cannot** live inside Snowflake: Streamlit-in-Snowflake and SPCS public endpoints both require Snowflake authentication (verified against docs, 16 Jul 2026); anonymous phone access is unsupported. Functionality is unchanged from the 7 Jun plan. Cost model in §15; target is as close to free as Snowflake allows. |
 | D10 | Auth | **Device token only** — *mechanism amended by D97* | Owner actions still flow device SPA → agent → cloud, and there is still **no login UI in M2**. The mechanism changes: instead of a bearer token against REST route handlers, the agent holds a key pair for a dedicated `ROASTPILOT_AGENT` Snowflake service user. The public web app holds a separate key pair for a minimal `PUBLIC_WEB` service user (SQL API). Magic-link owner login stays backlog. |
@@ -426,9 +427,10 @@ land as agent-repo stories alongside C3/C6.
    none of which M2 builds (`key_patterns` stays empty, §4). M2 ships the
    rating-filtered *process* reference (D13: reinforce well-rated roasts);
    pull-forward = a new D-number, not a tweak. Revisit at the cloud phase.
-7. **Region choice** (D97): default AWS `eu-west-2` (London), Standard
-   edition, on-demand. US East is ~25% cheaper per credit but the delta at
-   this volume is about a pound a month; decide at C1 and record it.
+7. ~~Region choice~~ **Resolved by D99 (17 Jul 2026)**: the account exists —
+   **Azure UK South (London), Standard, on-demand** (org `IO03393`, locator
+   `EX88650`), a deviation from the AWS eu-west-2 default. Cost model §15
+   unchanged in substance.
 8. **Presigned artifact downloads**: confirm `GET_PRESIGNED_URL` against the
    SNOWFLAKE_SSE stage at C3 (owner-side "download CSV" path).
 9. **Key rotation**: both service users' key pairs rotated per the C7
