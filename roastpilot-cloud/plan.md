@@ -68,9 +68,15 @@ Two planes:
 `PUBLIC` anywhere. `ROASTPILOT_AGENT` role: DML on the roastpilot database +
 stage read/write. `PUBLIC_WEB` role: SELECT on two **secure views**
 (roast-by-slug and reviews-by-roast, with `visibility <> 'private'` baked into
-the view definition) plus EXECUTE on `SUBMIT_REVIEW` — nothing else. A fully
+the view definition) plus the right to call `SUBMIT_REVIEW` — granted in
+Snowflake as `USAGE ON PROCEDURE` (not `EXECUTE`, which is not a Snowflake
+procedure object-privilege), together with the prerequisite `USAGE` on the
+containing database/schema and the shared warehouse — nothing else. A fully
 compromised web app can read shareable roasts and insert reviews, and nothing
-more.
+more. (Corrected 17 Jul 2026 via C1-S4 review: the surface stays "two views +
+call SUBMIT_REVIEW", but the grant keyword is `USAGE`, and the reviewer must
+allow the prerequisite db/schema/warehouse USAGE grants without treating them
+as surface creep.)
 
 **Placement constraint (verified 16 Jul 2026)**: Streamlit-in-Snowflake apps
 and SPCS public endpoints both require Snowflake authentication (user login or
@@ -180,7 +186,8 @@ create table reference_roast_summaries (
 create stage roast_artifacts encryption = (type = 'SNOWFLAKE_SSE');
 
 -- Roles: ROASTPILOT_AGENT (DML + stage), PUBLIC_WEB (secure views +
--- EXECUTE SUBMIT_REVIEW only), no PUBLIC grants. Secure views embed
+-- USAGE ON PROCEDURE SUBMIT_REVIEW only, plus prerequisite USAGE on
+-- db/schema/warehouse), no PUBLIC grants. Secure views embed
 -- visibility <> 'private'.
 ```
 
