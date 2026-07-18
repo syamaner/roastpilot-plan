@@ -372,6 +372,33 @@ dependency-review, native secret-scanning). osv-scanner / gitleaks are dropped.
 Surfaced when Codex flagged the dependency-review step against the stale
 "private repo → osv-scanner" plan text during #37 review.
 
+**D101 (18 Jul 2026) — Snowflake preview isolation + synthetic-telemetry seed.**
+Decided before the C2 build starts, so schema/data work inherits it.
+- **In-account isolation, not a second account.** One Snowflake account; a
+  dedicated PREVIEW environment fully separate from prod: database
+  `ROASTPILOT_PREVIEW`, role `ROASTPILOT_PREVIEW_ROLE` (scoped to only that DB
+  + warehouse), warehouse `PREVIEW_WH` (XS, auto-suspend 60s) capped by resource
+  monitor `PREVIEW_MONITOR` (10 credits/month, notify→suspend), and a **key-pair
+  SERVICE user** `ROASTPILOT_PREVIEW_APP` (no password login). Provisioned
+  18 Jul.
+- **Vercel env scoping IS the safety boundary.** Preview-scoped env vars point
+  the app's PR preview deploys at `ROASTPILOT_PREVIEW`; Production-scoped vars at
+  prod. Same var names (`SNOWFLAKE_ACCOUNT/USER/PRIVATE_KEY/ROLE/WAREHOUSE/
+  DATABASE`, `SNOWFLAKE_AUTHENTICATOR=SNOWFLAKE_JWT`), different per-environment
+  values. GH secrets/vars mirror the preview values for CI/migration runs
+  (`SNOWFLAKE_PREVIEW_*` + `SNOWFLAKE_PREVIEW_PRIVATE_KEY` secret).
+- **Hard rule:** migrations run against **prod only from `main`**; preview/CI
+  migrations target the preview DB. A factory-generated migration must never
+  reach prod from a PR/preview.
+- **Preview/CI data = synthetic, seeded from local M1 roast telemetry, never
+  prod, never real users.** A local enrichment pipeline (`scripts/seed/`, run by
+  the operator) takes the real M1 roast curves (roastpilot-agent exports /
+  `tests/fixtures/` live-roast excerpts), strips/synthesises identifying data,
+  fans them into variations for volume, and **synthesises** the user/tasting/
+  taster-surface rows. Built alongside the first schema migration (loader needs
+  the C2 schema). Build note: multi-line PEM in env — app reads it directly or
+  base64-encodes.
+
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
 
