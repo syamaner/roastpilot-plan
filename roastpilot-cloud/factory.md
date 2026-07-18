@@ -410,6 +410,34 @@ Decided before the C2 build starts, so schema/data work inherits it.
   the C2 schema). Build note: multi-line PEM in env — app reads it directly or
   base64-encodes.
 
+**D103 (19 Jul 2026) — shift the diverse lens LEFT: fold Codex before "ready",
+not after.** F1's rework is dominated by review findings landing after a PR is
+marked ready — F1-S8 alone ran **5 Codex rounds / ~15 real P1s, all post-open**,
+on the grant-boundary keystone that two Opus `safety-reviewer` passes called
+clean. Root cause: the pre-open review pass was Claude-family only (author +
+subagent reviewers), and a same-family lens co-accepts a bug the author already
+rationalised; the one lens that reliably caught them (Codex, a different model
+family) only ran *after* the PR was ready, so every catch became rework. Three
+process changes, codified in `pr-preflight` (step 3 + new step 5) and both
+repos' AGENTS.md PR-Hygiene:
+- **Diverse-lens pre-open loop (flagship):** open review-worthy PRs as a
+  **draft**, trigger `@codex review`, wait for the verdict on the head sha
+  (never guess time — match Codex's `Reviewed commit:` sha), fold every real
+  finding, only then mark **ready**. A draft-fold is not rework; the same
+  finding post-ready is.
+- **Fix the CLASS, sweep the repo, pre-open** — one categorical fix + a
+  repo-wide `grep` for siblings, never per-symptom patches (the round-2..N
+  engine: the sanitizer, git-guard, and identifier-compare classes each recurred
+  this way).
+- **Snowflake grant-boundary checklist** on any grants/roles/migration diff (no
+  PUBLIC grant + PUBLIC audited; USE SECONDARY ROLES is a statement not a
+  session param; DEFAULT_SECONDARY_ROLES verified not assumed; future grants
+  audited; exact identifier byte-compares) — folds the F1-S8 class up front.
+The KPI stays **preventable post-open rework → ~0**, not the gross fix rate:
+healthy rework (a reviewer catching a real defect) is the system working and
+must not be gamed away. Codex stays advisory-but-triaged — this moves *when* it
+runs, not whether it gates.
+
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
 
