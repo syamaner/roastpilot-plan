@@ -225,6 +225,22 @@ deadline.
 4. Issue intake beyond the operator (e.g. tasters reporting bugs via the
    public page) is out of scope until the repo is public; revisit at C7.
 
+5. **Oz-pivot option (raised 18 Jul, during the F1-S3 live-commissioning grind — a
+   real decision for the C2+ phase, NOT M2-F1).** The self-assembled GHA +
+   `claude-code-action` substrate has a recurring tax: runner-environment gremlins
+   the managed Oz platform would eliminate (the ENV_SCRUB/bubblewrap/AppArmor-userns
+   fight is the type case). Operator inputs (18 Jul): (a) Oz **can** use the Claude
+   Code subscription (so no flip to metered/API billing — ongoing model cost stays
+   roughly flat), (b) **no** ambassador discount (standard Oz pricing). Consequence:
+   the pivot is mostly a one-time MIGRATION cost (days — the security model, guard,
+   deterministic publisher, skills, and logic are substrate-independent and carry;
+   the GHA/bubblewrap plumbing is discarded, and some of that rigor was only there to
+   compensate for GHA not being managed) + a security RE-VERIFY of Oz's own isolation
+   /trifecta model. Decision deferred to **after F1 proves the loop end-to-end on
+   GHA** (don't pivot mid-grind); revisit at the C2 kickoff with a side-by-side. The
+   build thesis ("adapt the Oz pattern without hosted Oz — prove it's portable") is a
+   narrative cost of pivoting, but an honest one.
+
 ## 13. Soundness validation + hardening (16 Jul 2026 research pass)
 
 A four-angle adversarial validation of this spec (claude-code-action best
