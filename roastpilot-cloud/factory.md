@@ -354,6 +354,38 @@ repos** — so the tier-independent must-haves are the OSS equivalents (**gitlea
 for secret-scanning #4, **osv-scanner** for dependency review #11). Budget for
 Advanced Security OR wire the OSS gates; don't assume the native feature is there.
 
+**Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
+18 Jul 2026, on the first factory-authored PR #34):**
+
+The publish job opens the PR as `github-actions[bot]` using the built-in
+`GITHUB_TOKEN`. GitHub deliberately **suppresses / gates downstream workflow
+triggers from `GITHUB_TOKEN`-authored events** (to prevent recursive runs). The
+consequence, confirmed on #34: the factory PR's **CI run stalls in
+`action_required`** (manual-approval-gated), the **Codex connector does not pick
+it up** (same reason it skips Dependabot PRs), and Claude Code Review would not
+fire either — so the PR the factory authored autonomously **sails past the entire
+review + CI apparatus.** The automation that authors the PR is the same thing that
+starves it of review. This is a hole in the review-integrity model, not a nicety.
+
+- **FIX (the linchpin — a real security-posture decision, stays human §2):** the
+  publish job must open the PR with a **workflow-triggering identity — a dedicated
+  GitHub App token** (recommended: scoped, clean, revocable) or a PAT, **not** the
+  built-in `GITHUB_TOKEN`. A PR authored by a proper App identity triggers CI +
+  Codex + Claude Code Review exactly like a human-authored PR. Without this, "the
+  review roster" cannot run on factory output at all. (Prerequisite for F1-S4;
+  needs operator App-creation + secret.)
+- **The roster for a factory PR = the same lenses we run on our own** (CI required;
+  Codex advisory-but-triaged + the wait-for-verdict rule; Claude Code Review inline,
+  not a required check; domain sub-agents routed by the AGENTS.md rubric). **Two
+  decisions:** (i) publisher identity = GitHub App (rec) / PAT / live-with-manual-
+  CI-approval; (ii) domain sub-agents on factory PRs = auto-run on matching diffs
+  vs rubric-routed-for-human-invocation (rec: rubric-routed to start, automate later).
+- **Independence is structural here (D23), not a courtesy:** the author of a factory
+  PR is ALWAYS an agent, so the implement agent must never triage its own review —
+  the human or the `pr-triage` sub-agent adjudicates every finding; the author only
+  ever produced the diff. This is the single most important review rule in the
+  factory, and the reason `pr-triage` exists.
+
 **Should-add — hardening / correctness of the ramp:**
 
 - **A permanent human spot-audit that survives full autonomy** — 100% of PRs
