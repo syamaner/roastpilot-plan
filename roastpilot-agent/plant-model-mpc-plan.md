@@ -150,4 +150,4 @@ usefully shapes the `roast_telemetry` schema around a concrete downstream need.
 ## 6. Status
 - **Phase 1 feasibility running (18 Jul)** against the combined 73-roast corpus — verdict pending
   (calibration finding + multi-horizon RMSE-vs-baseline + heat-step counterfactual → GO/NO-GO).
-- Tracking issue: roastpilot-agent (see D102 row in `plan.md` §1).
+- Tracking issue: **roastpilot-agent#580** (mirrors this plan; the phased checklist lives there).
