@@ -47,7 +47,7 @@ The whole ladder rests on the data, so it is pinned here. **Two corpora, ONE pla
 - **Lacks:** ambient/room temp (the Yocto probe, `#342`, is a RoastPilot-only recent add);
   RoR (derive from BT); phase/dev (derive from marks).
 
-### Corpus B — RoastPilot store (13 completed roasts)
+### Corpus B — RoastPilot store (14 completed roasts)
 - Path: `~/roasts/roastpilot.sqlite3`, table `telemetry_snapshots`. **READ-ONLY** — copy the
   file or open `mode=ro`; never open the operator's live DB read-write (bake-off #578 lesson).
 - Fields per tick: `bean_temp_c`, `env_temp_c`, `heat_level_percent`, `fan_level_percent`,
@@ -56,7 +56,7 @@ The whole ladder rests on the data, so it is pinned here. **Two corpora, ONE pla
   (Yocto, store-only).
 
 ### Combined + future
-- **~60 roasts (47 Artisan + 13 completed store; the store's other runs are faulted/aborted)**, ~35k usable modelling ticks, 1 Hz, one plant. Enough for a low-order ARX or
+- **~61 roasts (47 Artisan + 14 completed store; the store's other runs are faulted/aborted)**, ~35k usable modelling ticks, 1 Hz, one plant. Enough for a low-order ARX or
   grey-box; enough to test a small ML comparator honestly; **not** enough for deep nets yet.
 - **Future landing zone: Snowflake `roast_telemetry` (D97, live via D99 — Azure UK South).**
   As new roasts sync (M2/C1), the corpus grows in Snowflake, which becomes the durable
@@ -189,5 +189,5 @@ table is NOT (it's roast-log data — same rule; regenerable from code + manifes
   FOPDT** (gain/time-constant/dead-time — extrapolates to unseen inputs, drops into a
   Smith-predictor/IMC controller) rather than the black-box ARX, **(3) the acceptance gate =
   RMSE-in-the-BT>=150-regime-vs-persistence**, not overall RMSE. This confirms the plan's own
-  "excitation is the silent killer" caveat as THE blocker.
+  "excitation is the silent killer" caveat as THE blocker. **Phase-1 bundle MERGED to main (PR #581, 18 Jul)** — reproducible harness + data-manifest fingerprint; the WAL-safe DB copy corrected the store count 13->14 (a completed run lived only in the WAL).
 - Tracking issue: **roastpilot-agent#580** (mirrors this plan; the phased checklist lives there).
