@@ -239,7 +239,16 @@ deadline.
    /trifecta model. Decision deferred to **after F1 proves the loop end-to-end on
    GHA** (don't pivot mid-grind); revisit at the C2 kickoff with a side-by-side. The
    build thesis ("adapt the Oz pattern without hosted Oz — prove it's portable") is a
-   narrative cost of pivoting, but an honest one.
+   narrative cost of pivoting, but an honest one. **RESOLVED — Oz RULED OUT
+   (18 Jul 2026, operator).** The subscription assumption (a) was wrong: the Claude
+   Code subscription **cannot** be used with Oz, so a pivot would force metered
+   (Warp-credit / Anthropic-API) billing on top of Oz compute — ongoing cost rises
+   meaningfully, which was the single factor the whole decision hung on. Combined
+   with (b) no discount, the migration doesn't pay for itself. **Decision: stay on
+   GitHub Actions + `claude-code-action` for the whole factory (F1 and C2+); absorb
+   the runner-environment tax (it's a bounded, one-time-per-gremlin cost, and each
+   fix is now written down).** Oz not revisited unless the subscription-compat or
+   pricing story changes.
 
 ## 13. Soundness validation + hardening (16 Jul 2026 research pass)
 
