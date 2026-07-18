@@ -313,9 +313,20 @@ instincts don't yet close.
 **Must-fix — operational governance (mostly cheap config, not engineering):**
 
 7. **Aggregate cost caps + alerting** — a per-run token cap can't see N runs ×
-   cap or a runaway retry loop. Set an **Anthropic monthly spend limit** (hard
+   cap or a runaway retry loop. ~~Set an **Anthropic monthly spend limit** (hard
    pause) + a lower usage alert, AND a **GitHub Actions budget** (alerts +
-   stop-at-limit) on Actions minutes. Supersedes the §12 per-run-only open item.
+   stop-at-limit) on Actions minutes.~~ **Reconciled by D102 (18 Jul 2026): this
+   item assumed METERED billing; the actual model has no metered spend to cap.**
+   Anthropic = flat-fee Claude Code subscription (the factory runs on the
+   subscription token, not the pay-per-token API), so there is no dollar spend
+   limit to set — runaway protection is the factory's own controls (per-run
+   `max_turns` cap + the kill-switch, F1-S10). GitHub Actions = free/unlimited on
+   a PUBLIC repo with NO payment method on file, so it cannot incur charges
+   (fail-safe by construction). So the "cost cap" acceptance is met by the
+   billing model, not by config. **REVISIT if any of these change:** repo goes
+   private (Actions minutes become metered), a payment method is added, or the
+   factory switches to metered Anthropic API billing — at which point set the
+   real spend limit + Actions budget. Supersedes the §12 per-run-only open item.
 8. **Idempotency guards on non-idempotent GitHub writes.** A naive whole-job
    retry re-fires side effects → a duplicate PR/comment. A branch push is
    idempotent (same ref); **PR-create and comment-post are not** — gate them
