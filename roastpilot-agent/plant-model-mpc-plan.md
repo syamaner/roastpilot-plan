@@ -47,7 +47,7 @@ The whole ladder rests on the data, so it is pinned here. **Two corpora, ONE pla
 - **Lacks:** ambient/room temp (the Yocto probe, `#342`, is a RoastPilot-only recent add);
   RoR (derive from BT); phase/dev (derive from marks).
 
-### Corpus B — RoastPilot store (26 completed roasts, ~18k samples)
+### Corpus B — RoastPilot store (13 completed roasts)
 - Path: `~/roasts/roastpilot.sqlite3`, table `telemetry_snapshots`. **READ-ONLY** — copy the
   file or open `mode=ro`; never open the operator's live DB read-write (bake-off #578 lesson).
 - Fields per tick: `bean_temp_c`, `env_temp_c`, `heat_level_percent`, `fan_level_percent`,
@@ -56,7 +56,7 @@ The whole ladder rests on the data, so it is pinned here. **Two corpora, ONE pla
   (Yocto, store-only).
 
 ### Combined + future
-- **~73 roasts / ~60k samples**, 1 Hz, one plant. Comfortably enough for a low-order ARX or
+- **~60 roasts (47 Artisan + 13 completed store; the store's other runs are faulted/aborted)**, ~35k usable modelling ticks, 1 Hz, one plant. Enough for a low-order ARX or
   grey-box; enough to test a small ML comparator honestly; **not** enough for deep nets yet.
 - **Future landing zone: Snowflake `roast_telemetry` (D97, live via D99 — Azure UK South).**
   As new roasts sync (M2/C1), the corpus grows in Snowflake, which becomes the durable
