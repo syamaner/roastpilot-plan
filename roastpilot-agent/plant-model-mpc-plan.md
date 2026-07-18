@@ -106,6 +106,34 @@ usefully shapes the `roast_telemetry` schema around a concrete downstream need.
 
 ---
 
+## 2a. Reproducibility (a hard requirement, operator 18 Jul)
+
+Every phase must be reproducible from committed artifacts — but **raw roast data is NOT
+committed to the code repo** (AGENTS.md forbids roast logs, `.alog`, serial captures, and
+SQLite DBs; the `tests/fixtures/` exception is for *small* contract fixtures only, not a
+60k-sample corpus). Reproducibility is therefore achieved by three committed things plus a
+versioned data home:
+
+1. **Pipeline CODE — committed, gated, deterministic.** Every transform (parse → unify →
+   calibration-align → feature-engineer → model → eval) is committed as scripts under the
+   repo (like `scripts/bakeoff_reference_567.py`). No randomness without a pinned seed; the
+   ARX least-squares + leave-one-roast-out CV are deterministic by construction.
+2. **DATA MANIFEST — committed** (`docs/research/plant-model/data-manifest.*`): the exact 47
+   `.alog` filenames + **sha256** + sample counts, and the 26 store **run_ids** used (completed-run
+   telemetry is immutable by the store's completion trigger). A re-run verifies its inputs
+   against the manifest — same checksums ⇒ same data ⇒ same result. This is what "commit the
+   data" means under the no-roast-logs rule: commit the data's *fingerprint + provenance*, not
+   the bytes.
+3. **Repro README — committed**: exact commands + the documented data locations (`~/Library/…/roasting/*.alog`,
+   `~/roasts/roastpilot.sqlite3` read-only).
+4. **Durable versioned data home = Snowflake (M2/D97).** This is the real answer to "commit the
+   data": once the telemetry syncs to `roast_telemetry`, the corpus is versioned + queryable from
+   a single source, and the pipeline reads from there. Until then it reads local sources verified
+   against the manifest. The raw data belongs in the data platform, not in git.
+
+Results artifacts (report `.md`, metrics `.csv`) are committed; the raw per-tick JSON/feature
+table is NOT (it's roast-log data — same rule; regenerable from code + manifest).
+
 ## 3. Phases (cheap-first, data-gated — complexity follows the corpus)
 
 - **Phase 0 — Data foundation.** Land per-tick telemetry in Snowflake (M2/D97); define the tidy,
@@ -148,6 +176,18 @@ usefully shapes the `roast_telemetry` schema around a concrete downstream need.
 - Calibration + ambient handled as above.
 
 ## 6. Status
-- **Phase 1 feasibility running (18 Jul)** against the combined 73-roast corpus — verdict pending
-  (calibration finding + multi-horizon RMSE-vs-baseline + heat-step counterfactual → GO/NO-GO).
+- **Phase 1 COMPLETE (18 Jul) — verdict: NEEDS-MORE-DATA / conditional no-go.** Calibration
+  RESOLVED (corpora pool safely: dry-end ~150 C in both; the FC/drop offsets are audio-lag + the
+  agent's cooler-drop policy, not a probe-scale shift; and the target RoR = dBT/dt is invariant to
+  any constant BT offset). ARX beats naive persistence 82-86% OVERALL (t+20/30/40) — **but that win
+  is the easy drying phase**; in the CONTROL regime (BT>=150) the ARX barely beats persistence
+  (~0.05-0.15 C/min): "RoR now ~ RoR in 30 s" is already controller-grade there. **Root cause =
+  EXCITATION, not sample count:** heat is pinned ~65% through development (the advisor moves FAN,
+  not heat), so the heat->RoR channel a controller would exploit is barely excited (Artisan 374 heat
+  steps vs store 38). More passive roasts won't help. **Before any GO: (1) DESIGNED excitation**
+  (deliberate safe heat staircase/PRBS to make gain + dead-time identifiable), **(2) a grey-box
+  FOPDT** (gain/time-constant/dead-time — extrapolates to unseen inputs, drops into a
+  Smith-predictor/IMC controller) rather than the black-box ARX, **(3) the acceptance gate =
+  RMSE-in-the-BT>=150-regime-vs-persistence**, not overall RMSE. This confirms the plan's own
+  "excitation is the silent killer" caveat as THE blocker.
 - Tracking issue: **roastpilot-agent#580** (mirrors this plan; the phased checklist lives there).
