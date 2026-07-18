@@ -115,6 +115,18 @@ verification notes (which suite proves it), and a size declaration (target
 this bar: an issue missing any of it comes back `ready-to-spec` or
 `needs-info`, never `ready-to-implement`.
 
+**Dry-run / meta-issue exemption (18 Jul 2026, ruling from the first live
+implement dry-run).** An internal factory-validation / dry-run issue — one
+that exists to exercise the pipeline itself rather than ship a plan-derived
+feature, and that self-declares as such — is **exempt from the plan-link
+requirement**: it may substitute a reference to F1-S6 ("End-to-end dry run on
+a sacrificial issue", §11) for the plan link, and triage must not bounce it to
+`needs-info` on the missing link alone. All other §5 items still apply. (This
+ruling was itself surfaced by triage: on the first live dry-run it correctly
+recognised the meta nature of the issue, refused to guess whether the rule
+bound it, and routed to `needs-info` with the question — the intended
+surface→escalate→adjudicate loop. The exemption is the adjudication.)
+
 ## 6. Workflows (implemented in F1; structure adapted from hubble.md)
 
 - **`triage-issues.yml`** — `on: issues [opened]`; seed → triage → apply as
