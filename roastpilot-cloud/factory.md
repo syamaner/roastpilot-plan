@@ -142,8 +142,10 @@ surface→escalate→adjudicate loop. The exemption is the adjudication.)
   spirit: `/code-review --comment`, inline findings block via conversation
   resolution, the check itself not required (workflow-edit guard, agent-repo
   lesson).
-- All third-party actions pinned by SHA; repo stays private until first
-  public-worthy release, but the security posture assumes public.
+- All third-party actions pinned by SHA. **The repo is PUBLIC (D100)** — so
+  GitHub Advanced Security (CodeQL, dependency review, secret scanning + push
+  protection) is free and the native gates are used directly; the OSS-fallback
+  plan below (osv-scanner, gitleaks) is superseded. See D100.
 
 ## 7. Skills (in-repo, `.claude/skills/`)
 
@@ -334,8 +336,11 @@ instincts don't yet close.
     so auto-deploy silently pauses until someone re-promotes.**
 11. **Dependency review on agent PRs.** An agent that adds/bumps npm deps to the
     Next.js app is a supply-chain vector (typosquats, known-vulnerable versions).
-    GitHub's `dependency-review-action` is **paid on private repos** → wire OSS
-    `osv-scanner` as a required check instead.
+    ~~GitHub's `dependency-review-action` is paid on private repos → wire OSS
+    `osv-scanner` instead.~~ **Superseded by D100: the repo is public, so
+    `dependency-review-action` is free and is wired as the gate** (F1-S4, #37:
+    `fail-on-severity: high`, GPL/AGPL deny-list, `fail-on-scopes: runtime,
+    development, unknown`).
 12. **Provenance trailer on every factory PR** — model ID + prompt/skill version
     + pinned action-SHA + issue ref in the PR body/commit (extend Claude Code's
     `Co-Authored-By`), so a *systemic* bad-PR cause is traceable and agent- vs
@@ -348,11 +353,24 @@ instincts don't yet close.
     change, is the highest-leverage single addition (Anthropic's own eval
     guidance backs the capability-vs-regression split).
 
-**Paywall caveat (private repo):** GitHub push protection, dependency review,
-CodeQL, and artifact attestations are **paid (Advanced Security) on private
-repos** — so the tier-independent must-haves are the OSS equivalents (**gitleaks**
-for secret-scanning #4, **osv-scanner** for dependency review #11). Budget for
-Advanced Security OR wire the OSS gates; don't assume the native feature is there.
+**Paywall caveat — RESOLVED by D100 (repo is public):** the caveat below applied
+only while the repo was assumed private. GitHub push protection, dependency
+review, CodeQL, and artifact attestations are paid (Advanced Security) *on
+private repos*, but are **free on public repos** — which this repo is. So the
+native gates are used directly (CodeQL #36, dependency-review #37, native
+secret-scanning + push protection enabled), and the OSS equivalents (gitleaks,
+osv-scanner) are NOT needed. If the repo is ever taken private, revisit: either
+budget for Advanced Security or wire the OSS gates.
+
+**D100 (18 Jul 2026) — the repo is public; native GHAS gates supersede the
+OSS-fallback plan.** The factory security surface (§6) and the paywall caveats
+(§8 #11, the caveat above) were written assuming a private repo. The repo was
+made public at C1 kickoff, so CodeQL, dependency review, secret scanning + push
+protection, and artifact attestations are all free and are wired as the native
+gates (F1-S4: #35 Claude review, #36 CodeQL incl. `actions` + `python`, #37
+dependency-review, native secret-scanning). osv-scanner / gitleaks are dropped.
+Surfaced when Codex flagged the dependency-review step against the stale
+"private repo → osv-scanner" plan text during #37 review.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
