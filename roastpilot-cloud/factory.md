@@ -115,6 +115,14 @@ verification notes (which suite proves it), and a size declaration (target
 this bar: an issue missing any of it comes back `ready-to-spec` or
 `needs-info`, never `ready-to-implement`.
 
+**Plan-small addendum (D104, 19 Jul 2026):** the size declaration is a **PR
+plan**, not a hope — each ready issue maps to exactly ONE thin PR whose
+**logic** diff is under ~400 lines (migrations / generated files / fixtures /
+docs are exempt and get their own issue), and the issue names its
+dependencies/order and the **domain reviewer** its diff triggers (AGENTS.md
+rubric). An issue without the ordered, sized, reviewer-tagged plan is not
+ready-to-implement.
+
 **Dry-run / meta-issue exemption (18 Jul 2026, ruling from the first live
 implement dry-run).** An internal factory-validation / dry-run issue — one
 that exists to exercise the pipeline itself rather than ship a plan-derived
@@ -155,7 +163,9 @@ surface→escalate→adjudicate loop. The exemption is the adjudication.)
 - **`to-issues`** — decomposes a plan epic (C2…C8) into story issues meeting
   §5, as a *draft batch the PM reviews* before anything is labelled
   `ready-to-implement`. This is why C2+ stories are deliberately not
-  pre-created: decomposition is factory work, human-approved.
+  pre-created: decomposition is factory work, human-approved. **Per D104 its
+  output is a PR PLAN**: per story — scope, ~logic size (<400, exempt classes
+  split out), dependency order, and the domain reviewer the diff triggers.
 - Implementation conventions (stack rules, gates, PR hygiene) live in the
   repo's `AGENTS.md` (written at C1), which the implementing agent reads
   like any Claude Code session would.
@@ -437,6 +447,43 @@ The KPI stays **preventable post-open rework → ~0**, not the gross fix rate:
 healthy rework (a reviewer catching a real defect) is the system working and
 must not be gamed away. Codex stays advisory-but-triaged — this moves *when* it
 runs, not whether it gates.
+
+**D104 (19 Jul 2026) — PLAN-SMALL is a decomposition gate, not a review-time
+catch.** (PM directive, from the agent-repo DORA/PR-flow work.) The `to-issues`
+decomposition (§7) must output an explicit **PR plan**: each ready-to-implement
+issue is exactly ONE thin PR, scoped so its **logic** diff is under ~400 lines —
+Snowflake migrations, generated files, fixtures, and docs are exempt from the
+cap and get their own issue/PR. Per drafted story the decomposition records:
+scope, ~logic size, dependencies/order, and **which domain reviewer the PR
+triggers** (AGENTS.md rubric: schema-migration-reviewer for Snowflake/grants,
+privacy-auditor for routes/reviewer-data, factory-security-reviewer for
+pipeline, qa/e2e). A story that decomposes into "build X" without this ordered,
+sized, reviewer-tagged PR list is **NOT ready-to-implement** — this is now part
+of §5's intake bar, enforced at the `ready-to-spec → ready-to-implement`
+transition by `triage`. Encoded in the `to-issues` skill + §5/§7 + AGENTS.md.
+
+**D105 (19 Jul 2026) — factory draft-first adopted, with the draft-verdict
+amendment; closes #62/#66.** The publisher opens each factory PR as a **DRAFT**;
+the diverse lens (Codex) iterates on the draft; `pr-triage`/the lead folds
+findings **by class**; only then is the PR marked ready. Iterating with Codex is
+expected in the DRAFT phase; **once-on-final-commit / don't-re-litigate governs
+only the POST-ready phase.** Two hard-won amendments from the live #64 arc:
+- **The draft-phase exit is "no findings within a window", never "clean verdict
+  on the draft"** — observed 19 Jul: an explicit `@codex review` on a draft runs
+  and posts findings-reviews, but Codex does NOT complete the clean-verdict flow
+  (no "Didn't find any major issues" comment) on drafts; a draft waiting for a
+  clean signal waits forever. Verdict-at-ready.
+- **claude-review skips drafts and runs on `ready_for_review` — but the skip
+  must be coordinated with any review-gate/status logic, never shipped alone**:
+  a skipped job reports Success, so a gate that treats "the review workflow ran
+  successfully" as "a review executed" is satisfied by a run where it never ran
+  (the agent repo hit exactly this race). The cloud repo keeps its draft-skip
+  (merged in #65) — this repo's context differs from the agent repo's #593
+  keep-on-drafts choice because factory PRs will open as drafts routinely and
+  double-running claude-review per draft round is cost/noise at factory scale;
+  the divergence is deliberate and recorded here (#66 closed on this decision).
+  The ready-transition actor today is the lead/`pr-triage` (dispatch-first);
+  automation of that transition is an autonomy-ratchet (§10) step, not assumed.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
