@@ -485,6 +485,21 @@ only the POST-ready phase.** Two hard-won amendments from the live #64 arc:
   The ready-transition actor today is the lead/`pr-triage` (dispatch-first);
   automation of that transition is an autonomy-ratchet (§10) step, not assumed.
 
+**D106 (19 Jul 2026) — account-role DDL is operator-run provisioning, never
+migration-stream work (closes cloud #61).** The ACCOUNT-scoped DDL C2 needs
+(`CREATE ROLE ROASTPILOT_AGENT` / `PUBLIC_WEB`) is run once by the operator as
+ACCOUNTADMIN, the same pattern as the preview/DEV-CI provisioning. Migrations
+ASSUME the roles exist and only grant/use them within the database — all of
+which the DEV-CI role can deploy and the F1-S8 grant audit can verify. Zero new
+CI privilege; the audit's rejection of account grants stays correct-by-design.
+The C2 decomposition includes the provisioning step as an explicit runbook
+story. (Same batch of operator decisions, 19 Jul: cloud #47 = close the
+review-job Bash exfil path THEN enable the Claude lens on factory PRs, in S7;
+#59 = the PUBLIC-audit completeness limit ACCEPTED, closed; #58 folds into S6;
+the live DEV dispatch bundles into S6's dry run; S6 additionally scopes the
+@claude PR feedback loop + the codex-verdict stamp-and-flip status; C2 kicks
+off after F1 completes.)
+
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
 
