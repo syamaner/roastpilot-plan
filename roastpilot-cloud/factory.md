@@ -486,7 +486,14 @@ only the POST-ready phase.** Two hard-won amendments from the live #64 arc:
   automation of that transition is an autonomy-ratchet (§10) step, not assumed.
 
 **D106 (19 Jul 2026) — account-role DDL is operator-run provisioning, never
-migration-stream work (closes cloud #61).** The ACCOUNT-scoped DDL C2 needs
+migration-stream work (closes cloud #61). PROVISIONED same day:** the operator
+ran the D106 script — roles `ROASTPILOT_AGENT` + `PUBLIC_WEB` (SYSADMIN
+hierarchy), prod database **`ROASTPILOT`** (naming confirmed; the
+DEV/PREVIEW/prod family is complete), shared warehouse `ROASTPILOT_WH` (XS,
+auto-suspend 60) capped by `ROASTPILOT_MONITOR` (5 credits/month, notify 50%
+/ suspend 100% / suspend-immediate 110%), warehouse USAGE granted to both
+roles. Service USERS deliberately not created (key pairs arrive with C3/C4);
+no prod deploy credential (C7 cutover decision). The ACCOUNT-scoped DDL C2 needs
 (`CREATE ROLE ROASTPILOT_AGENT` / `PUBLIC_WEB`) is run once by the operator as
 ACCOUNTADMIN, the same pattern as the preview/DEV-CI provisioning. Migrations
 ASSUME the roles exist and only grant/use them within the database — all of
