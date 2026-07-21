@@ -220,6 +220,8 @@ here, where the author is always an agent). The factory never merges.
 | F1-S4 | Review workflow port + repo `AGENTS.md` review rubric section |
 | F1-S5 | `to-issues` skill + dry-run decomposition of C2 (output PM-reviewed, then labelled) |
 | F1-S6 | End-to-end dry run on a sacrificial issue; factory runbook (failure modes, stuck states, cost log) |
+| F1-S9 | **Anti-gaming quality gates** — mutation testing (security-critical Python) + the anti-gaming diff classifier + the **spec-grounded review pipeline** (the §14 "should-add" hardening, now built): a read-only agent judges the PR diff against the linked issue's acceptance criteria and a deterministic publisher turns that verdict into merge-gating comments. See **D107** for the design + security model. Shipped d1–e (cloud #74/#82/#83/#86/#87 read-only-agent + publisher, #91 publish wiring); reconciliation/revalidation completeness is cloud #88/#89/#90, must-fix before the factory-bot enable (#47). |
+| F1-S7..S11 | Documented in the roastpilot-cloud `docs/state/registry.md` story table (operator order: S5 → S10 → S8 → S9 → S7 → S6 → S11); this §11 table is being caught up incrementally — F1-S9 added first as it is the one with the deepest design (D107). |
 
 Sequencing: C1 (conventional) → F1 → C2+ (factory). The M2 timing rule is
 unchanged: none of this starts while it would compete with the M1 harness
@@ -506,6 +508,54 @@ review-job Bash exfil path THEN enable the Claude lens on factory PRs, in S7;
 the live DEV dispatch bundles into S6's dry run; S6 additionally scopes the
 @claude PR feedback loop + the codex-verdict stamp-and-flip status; C2 kicks
 off after F1 completes.)
+
+**D107 (21 Jul 2026) — F1-S9 spec-grounded review: design + security model +
+the completeness slice (documents shipped work; the §14 "should-add"
+spec-grounded-review item, now built).** F1-S9 landed anti-gaming quality gates
+in three parts (mutation testing, the anti-gaming diff classifier, and the
+spec-grounded review pipeline); this decision records the pipeline's design so
+the plan reflects the merged reality (the §11 table previously stopped at F1-S6).
+
+- **Architecture (controller owns the loop; the LLM advises — the M1 invariant
+  holds here too).** A **read-only** review agent (no write token, no MCP write
+  tools) reads the linked issue's acceptance criteria + the PR diff, both
+  fenced as UNTRUSTED behind a **per-run CSPRNG nonce delimiter** (unforgeable —
+  ends the char-class-guard arms race), and emits a typed verdict artifact. A
+  separate **deterministic publisher** (privileged, `pull-requests: write` only)
+  re-derives kind/severity from a TRUSTED `criteria-spine.json` (metadata only,
+  no agent text) and turns the verdict into merge-gating inline comments +
+  a summary. The agent cannot self-grade: severity is deterministic
+  (`closing && !satisfied → blocker`), omitted criteria default to unsatisfied.
+- **Security model (hardened over ~9 Codex rounds on cloud #87).** Publisher
+  runs from `ref: base.sha` (never PR head — a PR must not rewrite its own
+  judge), full checkout + `npm ci --ignore-scripts` off the base lock, minimal
+  permissions (no id-token/contents:write), fail-closed artifact parsing
+  (byte-cap → `isUtf8` → strict schema → cross-field invariants), fail-loud
+  workflow-output validation (a runner regression must fail the step, never
+  fabricate a no-op), capped attacker-influenced lists (65536-char comment
+  limit), and TOCTOU revalidation of head-SHA + references before any
+  destructive delete. Two-tier gating: inline blocker threads hard-gate via
+  `required_conversation_resolution`; the summary/fallback is operator-attention
+  (the publish job is NOT a required check — a skipped required check would
+  deadlock the draft/dependabot/fork classes).
+- **Go-live (operator, 21 Jul):** the gate is LIVE on the repo's own non-draft
+  human/claude PRs (non-required, reversible); factory-bot enable is **#47**
+  (which also closes the review-job Bash exfil path, per D106's S7 note).
+- **Completeness slice — cloud #90 (folds #88/#89), must-fix before #47.** A
+  unified reconciliation pass (delete obsolete bot-owned blocker threads on a
+  satisfying/partial verdict, generation-aware so an older run never deletes a
+  newer run's threads), kind-aware + all-paths new-closing-reference
+  revalidation (a body-edit `Refs↔Closes` change must not leave a stale gate or
+  a stale all-clear), a **complete reviewed-closing-set spine-contract change**
+  (record closing issues with zero unmet criteria too, so the revalidation can't
+  false-positive into a permanent red gate), base-SHA verification, and
+  fallback/count accuracy. Decomposed into 6 thin dependency-ordered slices
+  (90.1 base-SHA → 90.2 spine-set → 90.3 generation-key → 90.4 reconcile-delete
+  → 90.5 kind-aware/all-paths → 90.6 fallback/count), each ≤400 logic lines,
+  every one routed through `factory-security-reviewer` (the spine-contract +
+  privileged-delete surfaces). Process note (D104 applied retroactively): the
+  original d4 grew to ~1224 logic lines across the review rounds — a monolith;
+  the completeness work is deliberately sliced up front instead of folded.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
