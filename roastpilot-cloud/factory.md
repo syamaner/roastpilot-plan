@@ -747,9 +747,11 @@ authoritative. Otherwise `X-RateLimit-Remaining: 0` plus a valid
 `X-RateLimit-Reset` UTC epoch timestamp identifies primary exhaustion and waits
 exactly until reset. Either server-directed wait is honored only when it is at
 or below the existing 60-second single-wait ceiling; a longer wait fails
-without retrying early. A `429` without either usable timing signal waits the
-documented minimum 60 seconds before retrying. An ordinary `403` without the
-primary-limit tuple or `Retry-After` still fails immediately.
+without retrying early. A `429` without either usable timing signal starts with
+the documented minimum 60-second wait; a continued failure doubles that wait
+per GitHub's guidance and therefore exceeds the ceiling, so it gives up instead
+of making an early second retry. An ordinary `403` without the primary-limit
+tuple or `Retry-After` still fails immediately.
 
 The existing five-retry budget remains the total-attempt bound. Invalid reset
 headers never turn an ordinary `403` into a retry; a bare `429` still takes the
