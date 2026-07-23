@@ -542,11 +542,14 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   human/claude PRs (non-required, reversible); factory-bot enable is **#47**
   (which also closes the review-job Bash exfil path, per D106's S7 note).
 - **Completeness slice — cloud #90 (folds #88/#89), must-fix before #47.**
-  Generation-aware reconciliation auto-deletes only **no-obligation** blockers
-  whose closing reference was removed or downgraded; it deliberately leaves
-  verdict-satisfied threads for independent human/lead resolution so the review
-  agent cannot self-unblock a PR. The same generation guard ensures an older run
-  never deletes a newer run's valid thread. The slice also adds kind-aware +
+  On `hasCriteria: true`, generation-aware reconciliation auto-deletes only
+  **no-obligation** blockers whose closing reference was removed or downgraded;
+  it deliberately leaves verdict-satisfied threads for independent human/lead
+  resolution so the review agent cannot self-unblock a PR. That path's
+  generation guard ensures an older run never deletes a newer run's valid
+  thread. The separate `hasCriteria: false` generic cleanup still needs #88's
+  generation comparison before #47 (reopened by the 90.6a-3 self-audit). The
+  slice also adds kind-aware +
   all-paths new-closing-reference revalidation (a body-edit `Refs↔Closes` change
   must not leave a stale gate or stale all-clear), a **complete
   reviewed-closing-set spine contract** (including closing issues with zero
