@@ -592,7 +592,17 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   the summary headline, fallback inclusion, logging, and filtered exit status;
   de-referenced/downgraded review-time findings are labeled separately in the
   same finding unit. Inline-thread gating, reconciliation, and fallback payloads
-  are unchanged. **90.6b-3 is next.** Process note
+  are unchanged. **90.6b-3 merged as cloud #110 on 23 Jul:** non-blocking
+  findings whose issue is absent from the current any-kind reference set are
+  omitted before rendering and budget accounting; still-referenced findings,
+  including closing references downgraded to non-closing, remain visible. The
+  existing pre-write reference-snapshot recheck guards that current-state
+  decision, and #89 is complete. The remaining before-#47 item under #90 is the
+  separately scoped **resolution-aware fallback exclusion**: add GraphQL
+  review-thread resolution state so fallback rendering excludes only blockers
+  already represented by posted-and-unresolved threads, while a patched but
+  resolved blocker remains visible in the fallback. This is the next thin
+  slice. Process note
   (D104 applied retroactively):
   the original d4 grew to ~1224 logic lines across the review rounds — a
   monolith; the completeness work is deliberately sliced up front instead of
