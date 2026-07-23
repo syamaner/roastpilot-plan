@@ -220,7 +220,7 @@ here, where the author is always an agent). The factory never merges.
 | F1-S4 | Review workflow port + repo `AGENTS.md` review rubric section |
 | F1-S5 | `to-issues` skill + dry-run decomposition of C2 (output PM-reviewed, then labelled) |
 | F1-S6 | End-to-end dry run on a sacrificial issue; factory runbook (failure modes, stuck states, cost log) |
-| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101. Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists; cloud #102 is the next thin slice, using structural YAML parsing; #41 and #42 remain separately specced follow-ups; and #47 is held while the Claude GitHub App is suspended. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
+| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101; and the structural YAML audit is complete in cloud #102. Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists; #41 and #42 remain separately specced follow-ups; and #47 is held while the Claude GitHub App is suspended. Per D109, cloud #114 tracks the `needs-info` policy decision for reachable local composites outside `.github/actions`. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
 | F1-S9 | **Anti-gaming quality gates** — mutation testing (security-critical Python) + the anti-gaming diff classifier + the **spec-grounded review pipeline** (the §14 "should-add" hardening, now built): a read-only agent judges the PR diff against the linked issue's acceptance criteria and a deterministic publisher turns that verdict into merge-gating comments. See **D107** for the design + security model. Shipped d1–e (cloud #74/#82/#83/#86/#87 read-only-agent + publisher, #91 publish wiring); reconciliation/revalidation completeness is complete through cloud #88/#89/#90 and no longer blocks the factory-bot enable story (#47), which retains its separate enable/security scope. |
 | F1-S8, S10, S11 | Documented in the roastpilot-cloud `docs/state/registry.md` story table (operator order: S5 → S10 → S8 → S9 → S7 → S6 → S11); this §11 table is being caught up incrementally, with F1-S9 and the now-active F1-S7 recorded here. |
 
@@ -635,6 +635,18 @@ the following boundaries after the S7 state audit:
   #42 (unknown-license fail-closed policy) remain separate follow-ups. They are
   specced and reviewed independently after #102 rather than being folded into
   the parser slice.
+
+**D109 (23 Jul 2026) — local composite-action audit boundary.** Review of cloud
+#102 established that GitHub can execute a local composite action from outside
+`.github/actions`, while #102's operator-approved audit boundary covers only
+workflow manifests and `.github/actions/**/action.{yml,yaml}`. The cloud repo
+currently has no local-action invocation and no action manifest, so this is a
+latent gap rather than a reachable bypass. Cloud #114 records the required
+follow-up decision: either constrain local actions to the protected
+`.github/actions` root, including traversal and symlink handling, or recursively
+trace every reachable local action and extend the protected-path model. That
+design stays out of #102 rather than silently broadening a parser slice already
+under review.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
