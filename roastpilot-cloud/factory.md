@@ -220,7 +220,7 @@ here, where the author is always an agent). The factory never merges.
 | F1-S4 | Review workflow port + repo `AGENTS.md` review rubric section |
 | F1-S5 | `to-issues` skill + dry-run decomposition of C2 (output PM-reviewed, then labelled) |
 | F1-S6 | End-to-end dry run on a sacrificial issue; factory runbook (failure modes, stuck states, cost log) |
-| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101; the structural YAML audit completed in cloud #102 via PR #113 (`5262e77`); and #41's immutable local marketplace delivery merged via PR #117 (`4396b1c`). Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists and #47 is held while the Claude GitHub App is suspended. Per D110, #42's fail-closed unlicensed-output check is the next approved thin story; cloud #116 separately tracks the upstream stale-synchronize guard. Per D109, cloud #114 tracks the `needs-info` policy decision for reachable local composites outside `.github/actions`. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
+| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101; the structural YAML audit completed in cloud #102 via PR #113 (`5262e77`); #41's immutable local marketplace delivery merged via PR #117 (`4396b1c`); and #42's unconditional fail-closed unlicensed-output enforcement merged via PR #118 (`e7fdbd0`). Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists and #47 is held while the Claude GitHub App is suspended. Cloud #116 separately tracks the upstream stale-synchronize guard. Per D109, cloud #114 tracks the `needs-info` policy decision for reachable local composites outside `.github/actions`. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
 | F1-S9 | **Anti-gaming quality gates** — mutation testing (security-critical Python) + the anti-gaming diff classifier + the **spec-grounded review pipeline** (the §14 "should-add" hardening, now built): a read-only agent judges the PR diff against the linked issue's acceptance criteria and a deterministic publisher turns that verdict into merge-gating comments. See **D107** for the design + security model. Shipped d1–e (cloud #74/#82/#83/#86/#87 read-only-agent + publisher, #91 publish wiring); reconciliation/revalidation completeness is complete through cloud #88/#89/#90 and no longer blocks the factory-bot enable story (#47), which retains its separate enable/security scope. |
 | F1-S8, S10, S11 | Documented in the roastpilot-cloud `docs/state/registry.md` story table (operator order: S5 → S10 → S8 → S9 → S7 → S6 → S11); this §11 table is being caught up incrementally, with F1-S9 and the now-active F1-S7 recorded here. |
 
@@ -693,7 +693,11 @@ the fail-closed option: cloud #42 permits no unknown-license exceptions. The
 repository-owned parser fails on every non-empty `unlicensed` result, and the
 workflow must not set `allow-dependencies-licenses`. A future exception
 mechanism requires a separate decision and exact version-aware enforcement;
-it cannot silently rely on the action's broader matcher.
+it cannot silently rely on the action's broader matcher. This shipped in cloud
+PR #118 (`e7fdbd0`) with strict bounded parsing, sanitized failure reporting,
+runner-equivalent structural guards against exception inputs, exact-process
+failure tests, full changed-line coverage, and the mandatory
+`factory-security-reviewer` findings fixed and re-reviewed.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
