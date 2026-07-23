@@ -220,7 +220,7 @@ here, where the author is always an agent). The factory never merges.
 | F1-S4 | Review workflow port + repo `AGENTS.md` review rubric section |
 | F1-S5 | `to-issues` skill + dry-run decomposition of C2 (output PM-reviewed, then labelled) |
 | F1-S6 | End-to-end dry run on a sacrificial issue; factory runbook (failure modes, stuck states, cost log) |
-| F1-S9 | **Anti-gaming quality gates** — mutation testing (security-critical Python) + the anti-gaming diff classifier + the **spec-grounded review pipeline** (the §14 "should-add" hardening, now built): a read-only agent judges the PR diff against the linked issue's acceptance criteria and a deterministic publisher turns that verdict into merge-gating comments. See **D107** for the design + security model. Shipped d1–e (cloud #74/#82/#83/#86/#87 read-only-agent + publisher, #91 publish wiring); reconciliation/revalidation completeness is cloud #88/#89/#90, must-fix before the factory-bot enable (#47). |
+| F1-S9 | **Anti-gaming quality gates** — mutation testing (security-critical Python) + the anti-gaming diff classifier + the **spec-grounded review pipeline** (the §14 "should-add" hardening, now built): a read-only agent judges the PR diff against the linked issue's acceptance criteria and a deterministic publisher turns that verdict into merge-gating comments. See **D107** for the design + security model. Shipped d1–e (cloud #74/#82/#83/#86/#87 read-only-agent + publisher, #91 publish wiring); reconciliation/revalidation completeness is complete through cloud #88/#89/#90 and no longer blocks the factory-bot enable story (#47), which retains its separate enable/security scope. |
 | F1-S7..S11 | Documented in the roastpilot-cloud `docs/state/registry.md` story table (operator order: S5 → S10 → S8 → S9 → S7 → S6 → S11); this §11 table is being caught up incrementally — F1-S9 added first as it is the one with the deepest design (D107). |
 
 Sequencing: C1 (conventional) → F1 → C2+ (factory). The M2 timing rule is
@@ -597,12 +597,19 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   omitted before rendering and budget accounting; still-referenced findings,
   including closing references downgraded to non-closing, remain visible. The
   existing pre-write reference-snapshot recheck guards that current-state
-  decision, and #89 is complete. The remaining before-#47 item under #90 is the
-  separately scoped **resolution-aware fallback exclusion**: add GraphQL
-  review-thread resolution state so fallback rendering excludes only blockers
-  already represented by posted-and-unresolved threads, while a patched but
-  resolved blocker remains visible in the fallback. This is the next thin
-  slice. Process note
+  decision, and #89 is complete. **Resolution-aware fallback exclusion merged
+  as cloud #111 on 23 Jul, completing #90:** the publisher now queries bounded,
+  strictly parsed GraphQL review-thread state using the root comment's
+  64-bit-safe `fullDatabaseId`. Freshly created blockers and patched blockers
+  confirmed on unresolved threads remain inline-only; patched blockers on
+  resolved threads, or whose resolution state cannot be confirmed, stay
+  visible in fallback and force the existing nonzero publisher result. The
+  classification applies to successful all-PATCH plans as well as degraded
+  partial plans, including criterion, unreviewed-issue, overflow aggregate,
+  and diff-truncation covering markers. GraphQL/API/schema/pagination
+  uncertainty omits nothing. #88, #89, and #90 are complete, so #47 is
+  unblocked on the reconciliation-completeness axis while retaining its
+  separate factory-bot enable and review-job security work. Process note
   (D104 applied retroactively):
   the original d4 grew to ~1224 logic lines across the review rounds — a
   monolith; the completeness work is deliberately sliced up front instead of
