@@ -552,9 +552,10 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   for independent human/lead
   resolution so the review agent cannot self-unblock a PR. That path's
   generation guard ensures an older run never deletes a newer run's valid
-  thread. The separate `hasCriteria: false` generic cleanup still needs #88's
-  generation comparison before #47 (reopened by the 90.6a-3 self-audit). The
-  slice also adds kind-aware +
+  thread. The separate `hasCriteria: false` generic cleanup gets the same #88
+  generation comparison in **90.6a-4**, sequenced after aggregate
+  reconciliation and before the remaining 90.6b accuracy work (reopened by the
+  90.6a-3 self-audit; placement approved 23 Jul). The slice also adds kind-aware +
   all-paths new-closing-reference revalidation (a body-edit `Refs↔Closes` change
   must not leave a stale gate or stale all-clear), a **complete
   reviewed-closing-set spine contract** (including closing issues with zero
@@ -562,12 +563,13 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   accuracy, and count/comment-budget accuracy. The original 90.1–90.6 plan was
   refined during implementation: 90.2 absorbed base provenance; 90.5 split out
   its current-state and TOCTOU hardening; and 90.6 split into bucket/fallback/
-  aggregate-reconciliation sub-slices plus final count, non-blocking-staleness,
-  and assembled-comment-budget work. Each implementation PR remains ≤400 logic
-  lines and routes through `factory-security-reviewer` (plus `qa` for accuracy
-  slices). Process note (D104 applied retroactively): the original d4 grew to
-  ~1224 logic lines across the review rounds — a monolith; the completeness work
-  is deliberately sliced up front instead of folded.
+  aggregate-reconciliation/no-criteria-generation sub-slices plus final count,
+  non-blocking-staleness, and assembled-comment-budget work. Each implementation
+  PR remains ≤400 logic lines and routes through `factory-security-reviewer`
+  (plus `qa` for accuracy slices). Process note (D104 applied retroactively):
+  the original d4 grew to ~1224 logic lines across the review rounds — a
+  monolith; the completeness work is deliberately sliced up front instead of
+  folded.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
