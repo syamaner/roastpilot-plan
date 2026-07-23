@@ -541,21 +541,25 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
 - **Go-live (operator, 21 Jul):** the gate is LIVE on the repo's own non-draft
   human/claude PRs (non-required, reversible); factory-bot enable is **#47**
   (which also closes the review-job Bash exfil path, per D106's S7 note).
-- **Completeness slice — cloud #90 (folds #88/#89), must-fix before #47.** A
-  unified reconciliation pass (delete obsolete bot-owned blocker threads on a
-  satisfying/partial verdict, generation-aware so an older run never deletes a
-  newer run's threads), kind-aware + all-paths new-closing-reference
-  revalidation (a body-edit `Refs↔Closes` change must not leave a stale gate or
-  a stale all-clear), a **complete reviewed-closing-set spine-contract change**
-  (record closing issues with zero unmet criteria too, so the revalidation can't
-  false-positive into a permanent red gate), base-SHA verification, and
-  fallback/count accuracy. Decomposed into 6 thin dependency-ordered slices
-  (90.1 base-SHA → 90.2 spine-set → 90.3 generation-key → 90.4 reconcile-delete
-  → 90.5 kind-aware/all-paths → 90.6 fallback/count), each ≤400 logic lines,
-  every one routed through `factory-security-reviewer` (the spine-contract +
-  privileged-delete surfaces). Process note (D104 applied retroactively): the
-  original d4 grew to ~1224 logic lines across the review rounds — a monolith;
-  the completeness work is deliberately sliced up front instead of folded.
+- **Completeness slice — cloud #90 (folds #88/#89), must-fix before #47.**
+  Generation-aware reconciliation auto-deletes only **no-obligation** blockers
+  whose closing reference was removed or downgraded; it deliberately leaves
+  verdict-satisfied threads for independent human/lead resolution so the review
+  agent cannot self-unblock a PR. The same generation guard ensures an older run
+  never deletes a newer run's valid thread. The slice also adds kind-aware +
+  all-paths new-closing-reference revalidation (a body-edit `Refs↔Closes` change
+  must not leave a stale gate or stale all-clear), a **complete
+  reviewed-closing-set spine contract** (including closing issues with zero
+  unmet criteria), runner-observed base-SHA verification, filtered fallback
+  accuracy, and count/comment-budget accuracy. The original 90.1–90.6 plan was
+  refined during implementation: 90.2 absorbed base provenance; 90.5 split out
+  its current-state and TOCTOU hardening; and 90.6 split into bucket/fallback/
+  aggregate-reconciliation sub-slices plus final count, non-blocking-staleness,
+  and assembled-comment-budget work. Each implementation PR remains ≤400 logic
+  lines and routes through `factory-security-reviewer` (plus `qa` for accuracy
+  slices). Process note (D104 applied retroactively): the original d4 grew to
+  ~1224 logic lines across the review rounds — a monolith; the completeness work
+  is deliberately sliced up front instead of folded.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
