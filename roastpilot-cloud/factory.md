@@ -718,6 +718,20 @@ actions elsewhere in the repository are forbidden rather than widening that
 boundary. Cloud #114 is one conventional thin logic PR with mandatory
 `factory-security-reviewer` and QA passes.
 
+**D113 (24 Jul 2026) — D112 includes runner-resolved action entrypoints.**
+Draft review of cloud PR #119 established that validating only the local action
+directory and manifest leaves the same protected-root boundary open through a
+Node action's `runs.main` / `runs.pre` / `runs.post`, or a local Docker action's
+`runs.image`: the runner resolves those file-backed values from the action
+directory, so traversal, an absolute path, or a symlink can execute mutable code
+outside `.github/**`. The #114 slice therefore also requires every declared
+file-backed entrypoint to be relative to its action directory, contained after
+POSIX/Windows normalization, present, regular, and free of symlink components.
+`docker://` images are remote identifiers rather than repository paths and stay
+out of this filesystem check. This closes D112's chosen boundary; it does not
+add import-graph tracing, shell-command parsing, recursive outside-root action
+discovery, or a wider CODEOWNERS boundary.
+
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
 
