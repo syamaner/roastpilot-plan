@@ -346,7 +346,8 @@ instincts don't yet close.
    with an "already exists?" pre-check keyed on issue/branch and disable naive
    retry on those steps (guard in the tool layer, not the prompt). Honor
    429/`Retry-After` with backoff on both APIs (GitHub's 100-concurrent
-   secondary limit trips a fan-out first).
+   secondary limit trips a fan-out first). D114 below records the complete
+   REST rate-limit response contract used by the shared client.
 9. **A manual kill-switch / global pause enforced OUTSIDE the agent's code** —
    the workflow-disable REST endpoint (one call halts everything) + an
    in-workflow "pause flag" repo variable the jobs read first. (An auto
@@ -738,6 +739,25 @@ Cloud #120 tracks that excluded executable-closure policy across Node imports
 and spawns, composite shell, container workspace access, and ordinary
 privileged workflow `run:` steps. Until #120 records an operator decision, no
 repository-local action may be introduced into a privileged factory job.
+
+**D114 (24 Jul 2026) — complete bounded REST rate-limit handling.** Cloud #54
+completes #53's shared-client backoff against GitHub's documented REST
+rate-limit response shapes. For a `403` or `429`, a valid `Retry-After` remains
+authoritative. Otherwise `X-RateLimit-Remaining: 0` plus a valid
+`X-RateLimit-Reset` UTC epoch timestamp identifies primary exhaustion and waits
+exactly until reset. Either server-directed wait is honored only when it is at
+or below the existing 60-second single-wait ceiling; a longer wait fails
+without retrying early. A `429` without either usable timing signal waits the
+documented minimum 60 seconds before retrying. An ordinary `403` without the
+primary-limit tuple or `Retry-After` still fails immediately.
+
+The existing five-retry budget remains the total-attempt bound. Invalid reset
+headers never turn an ordinary `403` into a retry; a bare `429` still takes the
+60-second fallback. This is one conventional thin logic PR in
+`scripts/factory/github-api.mts` plus focused unit tests, with the mandatory
+`factory-security-reviewer` and QA passes. It does not add GraphQL retry
+handling, change call-site idempotency, alter workflow concurrency, or modify
+the factory's privileged publish/reconcile paths.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
