@@ -220,7 +220,7 @@ here, where the author is always an agent). The factory never merges.
 | F1-S4 | Review workflow port + repo `AGENTS.md` review rubric section |
 | F1-S5 | `to-issues` skill + dry-run decomposition of C2 (output PM-reviewed, then labelled) |
 | F1-S6 | End-to-end dry run on a sacrificial issue; factory runbook (failure modes, stuck states, cost log) |
-| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101, but code-owner enforcement remains off pending an independently eligible reviewer design. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. Remaining decisions are tracked in cloud #41 (plugin pin + synchronize guard), #42 (unknown licenses), #47 (safe factory-bot Claude lens), and #102 (structural YAML audit). |
+| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101. Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists; cloud #102 is the next thin slice, using structural YAML parsing; #41 and #42 remain separately specced follow-ups; and #47 is held while the Claude GitHub App is suspended. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
 | F1-S9 | **Anti-gaming quality gates** — mutation testing (security-critical Python) + the anti-gaming diff classifier + the **spec-grounded review pipeline** (the §14 "should-add" hardening, now built): a read-only agent judges the PR diff against the linked issue's acceptance criteria and a deterministic publisher turns that verdict into merge-gating comments. See **D107** for the design + security model. Shipped d1–e (cloud #74/#82/#83/#86/#87 read-only-agent + publisher, #91 publish wiring); reconciliation/revalidation completeness is complete through cloud #88/#89/#90 and no longer blocks the factory-bot enable story (#47), which retains its separate enable/security scope. |
 | F1-S8, S10, S11 | Documented in the roastpilot-cloud `docs/state/registry.md` story table (operator order: S5 → S10 → S8 → S9 → S7 → S6 → S11); this §11 table is being caught up incrementally, with F1-S9 and the now-active F1-S7 recorded here. |
 
@@ -615,6 +615,26 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   the original d4 grew to ~1224 logic lines across the review rounds — a
   monolith; the completeness work is deliberately sliced up front instead of
   folded.
+
+**D108 (23 Jul 2026) — F1-S7 remaining-slice decisions.** The operator approved
+the following boundaries after the S7 state audit:
+
+- Keep `require_code_owner_reviews` **off** until a second independently
+  eligible reviewer or team exists. The single current owner cannot provide an
+  independent approval, so enabling enforcement now risks a protected-branch
+  deadlock.
+- While the Claude GitHub App is suspended, factory-authored PRs stay out of
+  the Claude lens. Cloud #47 remains a separately specced redesign: its former
+  Option A is not viable because the pinned review plugin relies on
+  `gh pr view`, `gh pr diff`, and `gh pr comment`.
+- Cloud #102 is the next thin implementation slice. It replaces the best-effort
+  regex pin/allowlist audit with a structural parse using the typed,
+  dependency-free `yaml` package, including composite-action discovery and
+  fail-closed invalid-YAML reporting.
+- Cloud #41 (immutable plugin delivery plus stale-synchronize re-review) and
+  #42 (unknown-license fail-closed policy) remain separate follow-ups. They are
+  specced and reviewed independently after #102 rather than being folded into
+  the parser slice.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
