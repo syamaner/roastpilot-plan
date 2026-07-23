@@ -674,11 +674,26 @@ operator approved both post-#102 PM recommendations:
   output. Do not add a second scanner. Missing/malformed output and any
   unlicensed dependency fail the check. Exceptions are allowed only as exact
   reviewed PURLs through `allow-dependencies-licenses`, with an adjacent
-  rationale; broad names, globs, and wildcard bypasses are forbidden.
+  rationale; broad names, globs, and wildcard bypasses are forbidden. D111
+  supersedes this exception allowance after exact-source review proved the
+  action's PURL matcher ignores versions.
 
 Both remain conventional F1 pipeline changes with the mandatory
 `factory-security-reviewer` pass. Neither decision restores the suspended
 Claude GitHub App, changes required checks, or changes branch protection.
+
+**D111 (23 Jul 2026) — unknown-license exceptions are disabled.** Exact-source
+inspection during cloud #42 implementation showed that the pinned
+`dependency-review-action` does not implement exact-PURL license exceptions:
+its `purlsMatch` comparison deliberately ignores PURL versions and compares
+only ecosystem plus normalized package name. An entry such as
+`pkg:npm/example@1.2.3` therefore exempts every version of `example`, which is
+broader than D110's approved exact-reviewed-PURL boundary. The operator chose
+the fail-closed option: cloud #42 permits no unknown-license exceptions. The
+repository-owned parser fails on every non-empty `unlicensed` result, and the
+workflow must not set `allow-dependencies-licenses`. A future exception
+mechanism requires a separate decision and exact version-aware enforcement;
+it cannot silently rely on the action's broader matcher.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
