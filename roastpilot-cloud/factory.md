@@ -220,7 +220,7 @@ here, where the author is always an agent). The factory never merges.
 | F1-S4 | Review workflow port + repo `AGENTS.md` review rubric section |
 | F1-S5 | `to-issues` skill + dry-run decomposition of C2 (output PM-reviewed, then labelled) |
 | F1-S6 | End-to-end dry run on a sacrificial issue; factory runbook (failure modes, stuck states, cost log) |
-| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101; and the structural YAML audit completed in cloud #102 via PR #113 (`5262e77`). Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists; #41 and #42 remain separate and are now `needs-info` after their PM scope audits; and #47 is held while the Claude GitHub App is suspended. Per D109, cloud #114 tracks the `needs-info` policy decision for reachable local composites outside `.github/actions`. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
+| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101; and the structural YAML audit completed in cloud #102 via PR #113 (`5262e77`). Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists and #47 is held while the Claude GitHub App is suspended. Per D110, #41's SHA-pinned local marketplace delivery and #42's fail-closed unlicensed-output check are approved as separate thin stories; cloud #116 separately tracks the upstream stale-synchronize guard. Per D109, cloud #114 tracks the `needs-info` policy decision for reachable local composites outside `.github/actions`. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
 | F1-S9 | **Anti-gaming quality gates** — mutation testing (security-critical Python) + the anti-gaming diff classifier + the **spec-grounded review pipeline** (the §14 "should-add" hardening, now built): a read-only agent judges the PR diff against the linked issue's acceptance criteria and a deterministic publisher turns that verdict into merge-gating comments. See **D107** for the design + security model. Shipped d1–e (cloud #74/#82/#83/#86/#87 read-only-agent + publisher, #91 publish wiring); reconciliation/revalidation completeness is complete through cloud #88/#89/#90 and no longer blocks the factory-bot enable story (#47), which retains its separate enable/security scope. |
 | F1-S8, S10, S11 | Documented in the roastpilot-cloud `docs/state/registry.md` story table (operator order: S5 → S10 → S8 → S9 → S7 → S6 → S11); this §11 table is being caught up incrementally, with F1-S9 and the now-active F1-S7 recorded here. |
 
@@ -639,7 +639,8 @@ the following boundaries after the S7 state audit:
   because the pinned action rejects ref-suffixed marketplace URLs; #42 needs
   approval for a deterministic `invalid-license-changes.unlicensed` output
   check and its exact-PURL exception policy. Neither is folded into the parser
-  slice or implemented before those decisions.
+  slice or implemented before those decisions. D110 below records the
+  operator's subsequent approval of both recommendations.
 
 **D109 (23 Jul 2026) — local composite-action audit boundary.** Review of cloud
 #102 / PR #113 established that GitHub can execute a local composite action from
@@ -652,6 +653,29 @@ follow-up decision: either constrain local actions to the protected
 trace every reachable local action and extend the protected-path model. That
 design stayed out of merged PR #113 rather than silently broadening the parser
 slice.
+
+**D110 (23 Jul 2026) — F1-S7 follow-up implementation boundaries.** The
+operator approved both post-#102 PM recommendations:
+
+- Split cloud #41. The existing issue becomes the thin immutable-delivery
+  story: checkout `anthropics/claude-code` at a source-reviewed full commit SHA
+  and pass that checkout as a local `plugin_marketplaces` path. A direct
+  `https://...git#<ref>` input is not viable because both the pinned and current
+  `claude-code-action` marketplace validator require remote inputs to end in
+  `.git`; Claude's marketplace-source contract also has no first-class exact
+  `sha` field. Cloud #116 tracks the upstream code-review command's
+  head-unaware "Claude has already commented" synchronize guard rather than
+  folding a behavioral redesign or vendored command into the delivery pin.
+- Implement cloud #42 as a repository-owned, typed, fail-closed parser over the
+  pinned dependency-review action's `invalid-license-changes.unlicensed`
+  output. Do not add a second scanner. Missing/malformed output and any
+  unlicensed dependency fail the check. Exceptions are allowed only as exact
+  reviewed PURLs through `allow-dependencies-licenses`, with an adjacent
+  rationale; broad names, globs, and wildcard bypasses are forbidden.
+
+Both remain conventional F1 pipeline changes with the mandatory
+`factory-security-reviewer` pass. Neither decision restores the suspended
+Claude GitHub App, changes required checks, or changes branch protection.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
