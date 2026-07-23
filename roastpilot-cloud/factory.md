@@ -543,8 +543,13 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   (which also closes the review-job Bash exfil path, per D106's S7 note).
 - **Completeness slice — cloud #90 (folds #88/#89), must-fix before #47.**
   On `hasCriteria: true`, generation-aware reconciliation auto-deletes only
-  **no-obligation** blockers whose closing reference was removed or downgraded;
-  it deliberately leaves verdict-satisfied threads for independent human/lead
+  **no-obligation** individual blockers whose closing reference was removed or
+  downgraded, plus the diff-truncation aggregate only when **no current closing
+  references remain**. The aggregate boundary preserves #77's interim
+  cross-object-staleness guarantee: linked-issue criteria can change without a
+  PR event, so a still-closing aggregate persists until #77 adds revision-aware
+  revalidation. Reconciliation deliberately leaves verdict-satisfied threads
+  for independent human/lead
   resolution so the review agent cannot self-unblock a PR. That path's
   generation guard ensures an older run never deletes a newer run's valid
   thread. The separate `hasCriteria: false` generic cleanup still needs #88's
