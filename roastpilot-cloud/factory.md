@@ -586,7 +586,13 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   every required appended section under one 65,536-character budget and both
   skip-list omission suffixes fit inside their exact shared 2,000-character
   allocation; only whole non-blocking bullets can be omitted, with an explicit
-  artifact pointer. **90.6b-2 is next.** Process note
+  artifact pointer. **90.6b-2 merged as cloud #109 on 23 Jul:** one
+  current-applicable blocker count, derived from the same filtered criteria,
+  unreviewed issues, and diff-truncation predicate as inline posting, now drives
+  the summary headline, fallback inclusion, logging, and filtered exit status;
+  de-referenced/downgraded review-time findings are labeled separately in the
+  same finding unit. Inline-thread gating, reconciliation, and fallback payloads
+  are unchanged. **90.6b-3 is next.** Process note
   (D104 applied retroactively):
   the original d4 grew to ~1224 logic lines across the review rounds — a
   monolith; the completeness work is deliberately sliced up front instead of
