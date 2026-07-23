@@ -555,7 +555,11 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   thread. The separate `hasCriteria: false` generic cleanup gets the same #88
   generation comparison in **90.6a-4**, sequenced after aggregate
   reconciliation and before the remaining 90.6b accuracy work (reopened by the
-  90.6a-3 self-audit; placement approved 23 Jul). The slice also adds kind-aware +
+  90.6a-3 self-audit; placement approved 23 Jul). This closes the cross-run
+  ownership race but not the pre-existing same-run REST window after the
+  no-reference recheck: a body edit can make an older blocker applicable again
+  before its DELETE. That distinct TOCTOU is tracked on cloud #90 as another
+  must-fix-before-#47 item. The slice also adds kind-aware +
   all-paths new-closing-reference revalidation (a body-edit `Refs↔Closes` change
   must not leave a stale gate or stale all-clear), a **complete
   reviewed-closing-set spine contract** (including closing issues with zero
