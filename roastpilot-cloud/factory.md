@@ -558,8 +558,10 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   90.6a-3 self-audit; placement approved 23 Jul). This closes the cross-run
   ownership race but not the pre-existing same-run REST window after the
   no-reference recheck: a body edit can make an older blocker applicable again
-  before its DELETE. That distinct TOCTOU is tracked on cloud #90 as another
-  must-fix-before-#47 item. The slice also adds kind-aware +
+  before its DELETE. **90.6a-5** closes that distinct TOCTOU before #47 by
+  revalidating after comment pagination at the destructive boundary, stopping
+  fail-closed with an accurate partial-delete result on drift. The slice also
+  adds kind-aware +
   all-paths new-closing-reference revalidation (a body-edit `Refs↔Closes` change
   must not leave a stale gate or stale all-clear), a **complete
   reviewed-closing-set spine contract** (including closing issues with zero
