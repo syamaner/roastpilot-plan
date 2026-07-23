@@ -576,7 +576,13 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
   aggregate-reconciliation/no-criteria-generation sub-slices plus final count,
   non-blocking-staleness, and assembled-comment-budget work. Each implementation
   PR remains ≤400 logic lines and routes through `factory-security-reviewer`
-  (plus `qa` for accuracy slices). Process note (D104 applied retroactively):
+  (plus `qa` for accuracy slices). The remaining 90.6b work is serialised as:
+  **90.6b-1** one assembled-comment budget (including byte-exact omitted-count
+  suffix headroom), **90.6b-2** current-applicable count/exit semantics (#89),
+  then **90.6b-3** the non-blocking de-referenced staleness filter. This order
+  stabilises the final rendering boundary before sharing one applicability
+  representation across count, exit, and non-blocking reporting. Process note
+  (D104 applied retroactively):
   the original d4 grew to ~1224 logic lines across the review rounds — a
   monolith; the completeness work is deliberately sliced up front instead of
   folded.
