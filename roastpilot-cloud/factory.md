@@ -933,8 +933,17 @@ triage passed; all required CI and `codecov/patch` passed. Its exact-head Codex
 review incorrectly treated the newly documented job-concurrency `queue: max`
 property as unsupported; independent triage verified the current GitHub schema,
 recorded the accepted 100-item cap and wait-time FIFO semantics, and resolved
-the thread with no code change. Issue #51 remains open and In Progress for
-51b-2a through 51b-3.
+the thread with no code change. Slice 51b-2a shipped in cloud PR #125
+(`04264719`) with 216 production insertions. The initial offset-page draft was
+stopped before open when local factory-security review found that an unrelated
+comment deletion could shift a page boundary and skip generated history; the
+shipped publisher uses opaque GraphQL cursors and rejects partial, malformed,
+errored, or unexhausted bounded responses before local git work. Local
+factory-security, QA, and independent triage passed; all required CI and
+`codecov/patch` passed after the five initially partial branches were covered;
+the exact-head Codex review was clean. The intentionally optional Claude review
+check failed while its App installation was suspended. Issue #51 remains open
+and In Progress for 51b-2b and 51b-3.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
