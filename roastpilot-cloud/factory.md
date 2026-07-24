@@ -850,10 +850,14 @@ re-checks both REST open state and the exact current `ready-to-implement` label
 from one snapshot immediately before any branch or PR write. Seed, apply, and
 publish use the same non-cancelling per-issue concurrency group with
 `queue: max`; the lock serializes only the privileged state transitions, not
-the long-running read-only agent work. Apply mutates and verifies readiness
-before replacing the hold with the final authorizing
-`<run-id>.<run-attempt>` generation. Implementation captures that generation
-at eligibility, and publish rejects a hold token or a changed current
+the long-running read-only agent work. Apply re-checks the open issue and its
+exact hold, replaces that hold with the validated verdict plus final
+`<run-id>.<run-attempt>` generation, then mutates and verifies readiness.
+Writing the final generation before readiness keeps the generation-producer
+slice independently fail-closed: until the consumer lands, readiness remains
+the available authorization boundary, and a failed readiness write cannot
+leave publication enabled. Implementation later captures that generation at
+eligibility, and publish rejects a hold token or a changed current
 exact-bot/marker generation. Therefore a publisher and re-triage have a clear
 ordering: a publisher that acquired the lock first may finish, while a seed
 that acquired it first invalidates all older publishers before changing
@@ -887,9 +891,10 @@ Delivery is four ordered conventional PRs, each independently under the
 3. **51b-2 — deterministic dispatch and two-phase generation producer.** Add
    manual dispatch, target validation, the hold/readiness/final-generation
    protocol, run-id-plus-attempt identity for apply, runbook procedure, and
-   backfill execution. The shared readiness fence from 51b-1 keeps publication
-   safe while generation is produced but not yet consumed. This slice uses
-   `Refs #51`.
+   backfill execution. Apply writes the validated final generation before
+   replacing and verifying readiness. The shared readiness fence from 51b-1
+   keeps publication safe while generation is produced but not yet consumed.
+   This slice uses `Refs #51`.
 4. **51b-3 — exact-generation implementation consumer.** Require the current
    dotted authorizing generation before the implementation agent starts and
    have the publisher re-check the same canonical exact-bot/marker history
