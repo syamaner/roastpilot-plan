@@ -750,8 +750,10 @@ or below the existing 60-second single-wait ceiling; a longer wait fails
 without retrying early. A `429` without either usable timing signal starts with
 the documented minimum 60-second wait; a continued failure doubles that wait
 per GitHub's guidance and therefore exceeds the ceiling, so it gives up instead
-of making an early second retry. An ordinary `403` without the primary-limit
-tuple or `Retry-After` still fails immediately.
+of making an early second retry. "Continued" is consecutive per timing source:
+a preceding `Retry-After` or primary-reset retry does not consume the first
+headerless-fallback slot. An ordinary `403` without the primary-limit tuple or
+`Retry-After` still fails immediately.
 
 The existing five-retry budget remains the total-attempt bound. Invalid reset
 headers never turn an ordinary `403` into a retry; a bare `429` still takes the
