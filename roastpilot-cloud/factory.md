@@ -819,6 +819,9 @@ dispatch immediately replaces every existing readiness label with exactly
 `needs-triage`, preserving unrelated labels, before the triage agent starts;
 the opened-issue path retains its original add-if-none behavior. This suspends
 stale implementation authorization while re-triage is reconsidering the issue.
+The deterministic seed job gets `contents: read` solely for a dispatch-only,
+credential-free sparse checkout of the tracked label normalizer; the read-only
+triage agent's permissions do not change.
 The triage job fetches the target issue's current title, body, state, author,
 and structured comments by that number because a dispatch has no
 `github.event.issue` payload and a
