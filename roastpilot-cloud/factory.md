@@ -909,14 +909,21 @@ Delivery is five ordered conventional PRs, each independently under the
    current implementation dispatches remain operable. Pause and drain any
    pre-fence publish run before the producer deploys. This slice uses
    `Refs #51`.
-4. **51b-2b — deterministic dispatch and two-phase generation producer.** Add
-   manual dispatch, target validation, readiness-first verified seed holds,
-   final-generation production, run-id-plus-attempt identity for apply, the
-   runbook procedure, and backfill execution. Apply writes the validated final
-   generation before replacing and verifying readiness; the 51b-2a publisher
-   fence keeps every new generation non-publishable even across ambiguous API
-   outcomes. This slice uses `Refs #51`.
-5. **51b-3 — exact-generation implementation consumer.** Require the current
+4. **51b-2b-i — apply verification substrate and generation primitives.**
+   Harden the existing apply path without activating generation production:
+   validate the canonical trusted issue number, re-check open state at the
+   privileged boundary, verify readiness PUT outcomes, and recover ambiguous
+   authorizing writes to the existing fail-closed state. Add the typed marker
+   build/extract primitives needed by the next slice. Existing opened-event
+   triage remains generation-free and operable. This slice uses `Refs #51`.
+5. **51b-2b-ii — deterministic dispatch and two-phase generation producer.**
+   Add manual dispatch, readiness-first verified seed holds, exact comment-id
+   threading, final-generation production, run-id-plus-attempt identity for
+   apply, the runbook procedure, and backfill execution. Apply writes the
+   validated final generation before replacing and verifying readiness; the
+   51b-2a publisher fence keeps every new generation non-publishable even
+   across ambiguous API outcomes. This slice uses `Refs #51`.
+6. **51b-3 — exact-generation implementation consumer.** Require the current
    dotted authorizing generation before the implementation agent starts and
    have the publisher re-check the same canonical exact-bot/marker history
    under the shared lock. Legacy numeric and hold generations remain readable
@@ -943,7 +950,7 @@ factory-security, QA, and independent triage passed; all required CI and
 `codecov/patch` passed after the five initially partial branches were covered;
 the exact-head Codex review was clean. The intentionally optional Claude review
 check failed while its App installation was suspended. Issue #51 remains open
-and In Progress for 51b-2b and 51b-3.
+and In Progress for 51b-2b-i, 51b-2b-ii, and 51b-3.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
@@ -953,9 +960,9 @@ Reconstructing the corrected 51b design then reached 490 production insertions.
 The first attempted split put the generation consumer before its producer, but
 mandatory QA rejected that independently inoperable boundary. The corrected
 sequence lands the shared readiness lock first, then the generation-era deny
-fence, then the generation producer, then the exact-generation consumer; every
-intermediate state remains operable and fail-closed at its available
-authorization boundary. All five slices route
+fence, then the apply-verification substrate, generation producer, and
+exact-generation consumer; every intermediate state remains operable and
+fail-closed at its available authorization boundary. All six slices route
 through `factory-security-reviewer` and mandatory QA before opening and after
 review folds. The story does not change triage verdict semantics or readiness
 labels;
@@ -972,6 +979,12 @@ interim deny signal, so ambiguous readiness writes cannot authorize
 publication. The same review also corrected seed ordering to verify readiness
 withdrawal before writing the hold and required preservation of the prior
 factory verdict as non-authoritative re-triage context.
+
+The later 51b-2b implementation reached 544 changed production lines despite
+staying at 398 insertions. The kickoff cap counts total live-logic churn, not
+only insertions; its deletion exemption applies only to an atomically retired
+unit. Pre-open independent triage therefore stopped the PR and split a
+deploy-compatible apply-verification substrate from generation activation.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
