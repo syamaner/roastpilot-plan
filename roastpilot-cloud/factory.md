@@ -810,17 +810,20 @@ only new trigger: `reopened` would require mutating issue lifecycle state and
 cannot retrigger an already-open missed issue, while `labeled` risks
 self-triggering through the triage pipeline's own readiness-label writes.
 
-Both event paths resolve one target issue number for concurrency, then the seed
-job validates it as a positive decimal integer, rejects REST objects carrying
-the `pull_request` marker or a non-open state before any write, and publishes
-the only value trusted by seeding, agent context, and privileged verdict
-validation. Invalid targets cause no issue write. After validation, a manual
-dispatch removes `ready-to-implement` first, ensures `needs-triage`, then
-removes every other superseded readiness label with per-label mutations before
-the triage agent starts. A final read verifies the hold. This suspends stale
-implementation authorization without replacing unrelated labels from a stale
-snapshot; the opened-issue path retains its original add-if-none behavior, and
-the seed job needs no repository checkout or `contents: read`.
+Both event paths resolve one target issue number, then the seed job validates
+it as a positive decimal integer, rejects REST objects carrying the
+`pull_request` marker or a non-open state before any write, and publishes the
+only value trusted by seeding, agent context, and privileged verdict
+validation. Invalid targets cause no issue write. Every triage execution,
+including an Actions re-run of the original `opened` event, establishes the
+same two-phase hold before the agent starts. Under a short shared per-issue
+privileged-operation lock, seed first writes a non-authorizing
+`hold:<run-id>.<run-attempt>` factory generation, then removes
+`ready-to-implement`, ensures `needs-triage`, removes every other superseded
+readiness label with per-label mutations, and verifies the hold from a fresh
+read. This suspends stale implementation authorization without replacing
+unrelated labels from a stale snapshot; the seed job needs no repository
+checkout or `contents: read`.
 The triage job fetches the target issue's current title, body, state, author,
 and structured comments by that number because a dispatch has no
 `github.event.issue` payload and a
@@ -835,32 +838,61 @@ can amend the issue. Retained context is capped at 50 comments and 64 KiB of
 serialized JSON, failing closed with a visible error rather than truncating.
 The implementation agent receives the same provenance-filtered bounded
 clarifications, so it cannot discard information that made an issue ready.
+Because the tracked filter is executable trust-boundary code used by both
+agents, the implementing agent cannot edit anything under
+`.claude/skills/triage/`: edit-tool denies provide defense in depth and the
+publisher's authoritative applied-tree path guard is the load-bearing control.
 The privileged apply boundary re-checks open state before
 either its verdict or fallback path writes, closing the seed-to-apply race; the
 implementation workflow requires open state alongside `ready-to-implement`
 before starting the agent, and the privileged implementation publisher
 re-checks both REST open state and the exact current `ready-to-implement` label
-from one snapshot immediately before any branch or PR write. Every applied
-triage comment carries the trusted Actions run generation; implementation
-captures that generation at eligibility, and publish requires the current
-exact-bot/marker comment to match it. The early check avoids wasted work; the
-publisher checks close the later agent/gates time-of-check/time-of-use window,
-including a re-triage that withdraws and then restores readiness before an
-older implementation finishes. Dispatches from
+from one snapshot immediately before any branch or PR write. Seed, apply, and
+publish use the same non-cancelling per-issue concurrency group with
+`queue: max`; the lock serializes only the privileged state transitions, not
+the long-running read-only agent work. Apply mutates and verifies readiness
+before replacing the hold with the final authorizing
+`<run-id>.<run-attempt>` generation. Implementation captures that generation
+at eligibility, and publish rejects a hold token or a changed current
+exact-bot/marker generation. Therefore a publisher and re-triage have a clear
+ordering: a publisher that acquired the lock first may finish, while a seed
+that acquired it first invalidates all older publishers before changing
+readiness. This is immediate revocation at the privileged publish boundary
+without cancelling a process mid-push. Numeric run-id-only markers remain
+readable as legacy history, but every new execution includes
+`GITHUB_RUN_ATTEMPT` so an Actions re-run cannot alias the prior attempt.
+Dispatches from
 non-`main` refs run no job and receive a run-unique rejected concurrency group,
 so they cannot cancel or replace an
 authorized per-issue run;
 the existing `FACTORY_PAUSED` gate and pause notice remain authoritative. The
 runbook discovers open issues only and uses explicit per-issue dispatches
 against current `main` for both paused and disabled windows, avoiding the
-old-run workflow-definition hazard of `gh run rerun`. This is one conventional
-workflow/skill/publisher/docs/test PR under the 400-line logic cap, with
-`factory-security-reviewer` and QA passes before opening and after any review
-folds. Final-head Codex review findings on clarification propagation,
-generation binding, bounded comment context, and stale full-label replacement
-are part of this same contract. It does not change triage verdict semantics,
-agent permissions, or readiness labels. Live agent execution waits for the
-suspended Claude GitHub App installation to resume.
+old-run workflow-definition hazard of `gh run rerun`.
+
+Delivery is two ordered conventional PRs, each independently under the
+400-line logic cap:
+
+1. **51a — protected bounded context substrate.** Add the shared deterministic
+   provenance/size filter, pass that context to triage and implementation, and
+   protect the executable triage skill directory at both enforcement layers.
+   This slice retains the existing `issues: [opened]` trigger and existing
+   seeding/apply/publish semantics; its PR uses `Refs #51`.
+2. **51b — deterministic dispatch and two-phase authorization.** Add manual
+   dispatch, target validation, the hold/readiness/final-generation protocol,
+   run-id-plus-attempt identity, short queued privileged-operation locking,
+   publisher checks, runbook procedure, and final state record. This slice
+   closes #51.
+
+This split was required when the settled 51a+51b draft reached 399 production
+insertions before a final exact-head review found the protected-filter,
+re-run-alias, cross-workflow race, and partial-write classes. None can be
+deferred after merging code that introduces the affected trust boundary.
+Both slices route through `factory-security-reviewer` and mandatory QA before
+opening and after review folds. The story does not change triage verdict
+semantics or readiness labels; 51a only narrows agent permissions around the
+new executable sanitizer. Live agent execution waits for the suspended Claude
+GitHub App installation to resume.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
