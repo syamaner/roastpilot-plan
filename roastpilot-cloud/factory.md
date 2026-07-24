@@ -965,8 +965,20 @@ primitives without activating generation production. Local factory-security,
 QA, and independent triage passed; all required CI and `codecov/patch` passed.
 The initially partial non-`Error` normalization branch was covered before
 merge, and the exact-head Codex review was clean. The intentionally optional
-Claude review check failed while its App installation was suspended. Issue #51
-remains open and In Progress for 51b-2b-ii-a, 51b-2b-ii-b, and 51b-3.
+Claude review check failed while its App installation was suspended. Slice
+51b-2b-ii-a shipped in cloud PR #127 (`52facd22`) with 388 effective changed
+production lines after the 32-line atomic dead-helper deletion exemption. It
+activates verified two-phase generations for the existing opened-event path
+only. Two exact-head Codex findings were independently confirmed and folded:
+downstream-only re-runs now reuse the seed-established execution, and an
+apply-only re-run accepts only that same trusted execution's exact hold or
+final generation so it can repair a partial label/fallback failure. Local
+factory-security, mandatory QA, and independent triage passed; all required CI
+and `codecov/patch` passed; the final exact-head Codex verdict was clean. The
+intentionally optional Claude review was skipped while its App installation
+was suspended. The factory was paused and verified drained immediately before
+merge and remains paused for the remaining rollout. Issue #51 remains open and
+In Progress for 51b-2b-ii-b and 51b-3.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
