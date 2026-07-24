@@ -775,10 +775,12 @@ installation. The scanner replacement-decodes and examines every pathname
 returned by `git ls-files -z`, plus every loaded regular-file and symlink byte
 stream, and fails on every decoded literal Unicode
 `Default_Ignorable_Code_Point`. Pathnames are scanned before allowlist and
-entry-type handling; the exact-path allowlist exempts content only, never an
-invisible name. NUL or malformed UTF-8 bytes do not fail by themselves, but
-cannot suppress detection of a valid default-ignorable sequence elsewhere in
-the same tracked entry. This categorical boundary includes the
+entry-type handling, while their raw Git bytes remain the filesystem identity.
+The exact-path allowlist exempts content only, never an invisible name, and a
+malformed raw name cannot match through its lossy decoded label. NUL or
+malformed UTF-8 bytes do not fail by themselves, but cannot suppress detection
+of a valid default-ignorable sequence elsewhere in the same tracked entry.
+This categorical boundary includes the
 originally reported U+200B-U+200F, U+202A-U+202E, U+2060-U+2064, and U+FEFF
 ranges plus sibling bidi controls, combining joiners, variation selectors,
 tags, and reserved default-ignorables that have the same invisible-review
