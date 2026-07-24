@@ -803,6 +803,26 @@ mandatory QA passes, three independently triaged current-head Codex fixes, a
 clean final-head Codex verdict, and exact-head Ubuntu execution of all 1,522
 tests including the Linux raw-path regression.
 
+**D116 (24 Jul 2026) — deterministic issue-triage backfill uses manual
+dispatch.** Cloud #51 adds a required `workflow_dispatch.issue_number` input to
+`triage-issues.yml` while retaining `issues: [opened]`. Manual dispatch is the
+only new trigger: `reopened` would require mutating issue lifecycle state and
+cannot retrigger an already-open missed issue, while `labeled` risks
+self-triggering through the triage pipeline's own readiness-label writes.
+
+Both event paths resolve one trusted target issue number for concurrency,
+seeding, agent context, and privileged verdict validation. The triage job
+fetches the target issue's current title/body by that number because a dispatch
+has no `github.event.issue` payload. Dispatches from non-`main` refs run no job;
+the existing `FACTORY_PAUSED` gate and pause notice remain authoritative. The
+runbook uses explicit per-issue dispatches against current `main` for both
+paused and disabled windows, avoiding the old-run workflow-definition hazard
+of `gh run rerun`. This is one conventional workflow/docs/test PR under the
+400-line logic cap, with pre-open `factory-security-reviewer` and QA passes. It
+does not change triage verdict semantics, agent permissions, readiness labels,
+or the privileged apply script, and live agent execution waits for the
+suspended Claude GitHub App installation to resume.
+
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
 
