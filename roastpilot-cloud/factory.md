@@ -853,7 +853,11 @@ publish use the same non-cancelling per-issue concurrency group with
 the long-running read-only agent work. Before generation production lands, a
 prerequisite publisher fence treats every valid or malformed generation-marker
 line immediately adjacent to the exact bot-owned triage comment's terminal
-marker as non-publishable. Generation-like text elsewhere in agent-authored
+marker as non-publishable. It traverses the complete bounded comment history
+with GitHub's opaque GraphQL connection cursor and fails closed when the
+connection cannot be exhausted; offset page numbers are unsafe because a
+concurrent deletion before a page boundary could otherwise skip the first
+comment on the next page. Generation-like text elsewhere in agent-authored
 rationale is data, not trusted syntax. Existing marker-only triage history has
 no adjacent generation line and continues to use the readiness boundary, so
 the prerequisite changes no current dispatch. The factory stays paused and any
@@ -899,7 +903,9 @@ Delivery is five ordered conventional PRs, each independently under the
 3. **51b-2a — generation-era publisher deny fence.** Teach the privileged
    publisher to read the canonical exact-bot/marker triage history and reject
    every valid or malformed adjacent generation-marker line across all comment
-   pages. Because no generation producer exists yet,
+   pages through an opaque GraphQL cursor, failing closed before local git work
+   when complete bounded exhaustion cannot be proved. Because no generation
+   producer exists yet,
    current implementation dispatches remain operable. Pause and drain any
    pre-fence publish run before the producer deploys. This slice uses
    `Refs #51`.
