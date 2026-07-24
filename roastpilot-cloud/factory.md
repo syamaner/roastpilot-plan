@@ -811,9 +811,10 @@ cannot retrigger an already-open missed issue, while `labeled` risks
 self-triggering through the triage pipeline's own readiness-label writes.
 
 Both event paths resolve one target issue number for concurrency, then the seed
-job validates it as a positive decimal integer and publishes the only value
-trusted by seeding, agent context, and privileged verdict validation. Invalid
-targets cause no issue write. The triage job fetches the target issue's current
+job validates it as a positive decimal integer, rejects REST objects carrying
+the `pull_request` marker before any write, and publishes the only value trusted
+by seeding, agent context, and privileged verdict validation. Invalid targets
+cause no issue write. The triage job fetches the target issue's current
 title/body by that number because a dispatch has no `github.event.issue`
 payload. Dispatches from non-`main` refs run no job;
 the existing `FACTORY_PAUSED` gate and pause notice remain authoritative. The
