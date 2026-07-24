@@ -772,8 +772,13 @@ workflow and protected scanner changes are outside the factory implementing
 agent's writable boundary. A standalone step in the existing CI gates job
 runs a dependency-free scanner from `scripts/factory/` before dependency
 installation. The scanner examines every `git ls-files -z` tracked entry whose
-working-tree content is valid UTF-8 text, and fails on literal U+200B-U+200F,
-U+202A-U+202E, U+2060-U+2064, or U+FEFF characters. Diagnostics identify the
+working-tree content is valid UTF-8 text, and fails on every literal Unicode
+`Default_Ignorable_Code_Point`. This categorical boundary includes the
+originally reported U+200B-U+200F, U+202A-U+202E, U+2060-U+2064, and U+FEFF
+ranges plus sibling bidi controls, combining joiners, variation selectors,
+tags, and reserved default-ignorables that have the same invisible-review
+risk. It corrects the kickoff enumeration after PR #122's independent triage
+applied the range-gap lesson already recorded by #70. Diagnostics identify the
 path, line, column, and code point without echoing attacker-controlled source
 text.
 
@@ -781,10 +786,10 @@ An exact repo-relative path allowlist exists but starts empty; adding an entry
 requires a conventional review of the protected scanner. Source and tests use
 visible `\uXXXX` escapes or runtime code-point construction instead of literal
 forbidden characters. This slice does not rewrite or normalize files, inspect
-untracked/generated/dependency content, reject other Unicode format
-characters, or change any factory publish/reconcile behavior. It is one PR
-under the 400-line logic cap, routed through `factory-security-reviewer` and
-QA before opening.
+untracked/generated/dependency content, reject non-default-ignorable Unicode
+merely for being non-ASCII, or change any factory publish/reconcile behavior.
+It is one PR under the 400-line logic cap, routed through
+`factory-security-reviewer` and QA before opening.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
