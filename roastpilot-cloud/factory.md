@@ -886,7 +886,7 @@ runbook discovers open issues only and uses explicit per-issue dispatches
 against current `main` for both paused and disabled windows, avoiding the
 old-run workflow-definition hazard of `gh run rerun`.
 
-Delivery is six ordered conventional PRs, each independently under the
+Delivery is seven ordered conventional PRs, each independently under the
 400-line logic cap:
 
 1. **51a — protected bounded context substrate.** Add the shared deterministic
@@ -916,14 +916,22 @@ Delivery is six ordered conventional PRs, each independently under the
    authorizing writes to the existing fail-closed state. Add the typed marker
    build/extract primitives needed by the next slice. Existing opened-event
    triage remains generation-free and operable. This slice uses `Refs #51`.
-5. **51b-2b-ii — deterministic dispatch and two-phase generation producer.**
-   Add manual dispatch, readiness-first verified seed holds, exact comment-id
-   threading, final-generation production, run-id-plus-attempt identity for
-   apply, the runbook procedure, and backfill execution. Apply writes the
-   validated final generation before replacing and verifying readiness; the
-   51b-2a publisher fence keeps every new generation non-publishable even
-   across ambiguous API outcomes. This slice uses `Refs #51`.
-6. **51b-3 — exact-generation implementation consumer.** Require the current
+5. **51b-2b-ii-a — opened-event two-phase generation producer core.** Keep the
+   existing `issues: [opened]` trigger while atomically adding readiness-first
+   verified seed holds, bounded unique-comment discovery, exact comment-id
+   threading, final/fallback generation production, and run-id-plus-attempt
+   identity for apply. Apply writes the validated final generation before
+   replacing and verifying readiness; the 51b-2a publisher fence keeps every
+   generated state non-publishable even across ambiguous API outcomes. Keep
+   the factory paused through this producer-only rollout. This slice uses
+   `Refs #51`.
+6. **51b-2b-ii-b — deterministic manual dispatch and backfill activation.**
+   Add the required dispatch input and run name, canonical target
+   normalization/validation, main-only dispatch gates and per-target
+   concurrency, current-context wiring, runbook procedure, and backfill
+   execution on top of the already-atomic generation producer. This slice
+   uses `Refs #51`.
+7. **51b-3 — exact-generation implementation consumer.** Require the current
    dotted authorizing generation before the implementation agent starts and
    have the publisher re-check the same canonical exact-bot/marker history
    under the shared lock. Legacy numeric and hold generations remain readable
@@ -958,7 +966,7 @@ QA, and independent triage passed; all required CI and `codecov/patch` passed.
 The initially partial non-`Error` normalization branch was covered before
 merge, and the exact-head Codex review was clean. The intentionally optional
 Claude review check failed while its App installation was suspended. Issue #51
-remains open and In Progress for 51b-2b-ii and 51b-3.
+remains open and In Progress for 51b-2b-ii-a, 51b-2b-ii-b, and 51b-3.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
@@ -968,9 +976,10 @@ Reconstructing the corrected 51b design then reached 490 production insertions.
 The first attempted split put the generation consumer before its producer, but
 mandatory QA rejected that independently inoperable boundary. The corrected
 sequence lands the shared readiness lock first, then the generation-era deny
-fence, then the apply-verification substrate, generation producer, and
-exact-generation consumer; every intermediate state remains operable and
-fail-closed at its available authorization boundary. All six slices route
+fence, then the apply-verification substrate, opened-event producer, manual
+dispatch activation, and exact-generation consumer; every intermediate state
+remains operable and fail-closed at its available authorization boundary. All
+seven slices route
 through `factory-security-reviewer` and mandatory QA before opening and after
 review folds. The story does not change triage verdict semantics or readiness
 labels;
@@ -993,6 +1002,15 @@ staying at 398 insertions. The kickoff cap counts total live-logic churn, not
 only insertions; its deletion exemption applies only to an atomically retired
 unit. Pre-open independent triage therefore stopped the PR and split a
 deploy-compatible apply-verification substrate from generation activation.
+
+After the substrate shipped, the rebased activation draft still reached 421
+changed production lines. Independent pre-open triage rejected a no-op manual
+dispatch prerequisite as misleading scaffolding. The natural boundary keeps
+the seed/apply generation transaction atomic: first produce generations for
+the existing opened-event path, then expose deterministic manual dispatch and
+its operator runbook on top of that producer. Both intermediate deployments
+remain fail-closed behind the 51b-2a publisher fence, and the factory stays
+paused until the exact-generation consumer is deployed.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
