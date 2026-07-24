@@ -949,8 +949,16 @@ errored, or unexhausted bounded responses before local git work. Local
 factory-security, QA, and independent triage passed; all required CI and
 `codecov/patch` passed after the five initially partial branches were covered;
 the exact-head Codex review was clean. The intentionally optional Claude review
-check failed while its App installation was suspended. Issue #51 remains open
-and In Progress for 51b-2b-i, 51b-2b-ii, and 51b-3.
+check failed while its App installation was suspended. Slice 51b-2b-i shipped
+in cloud PR #126 (`20876886`) with 134 changed production lines. It validates
+the canonical open target, verifies label replacements, recovers ambiguous
+authorizing writes to the existing fail-closed state, and adds strict marker
+primitives without activating generation production. Local factory-security,
+QA, and independent triage passed; all required CI and `codecov/patch` passed.
+The initially partial non-`Error` normalization branch was covered before
+merge, and the exact-head Codex review was clean. The intentionally optional
+Claude review check failed while its App installation was suspended. Issue #51
+remains open and In Progress for 51b-2b-ii and 51b-3.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
