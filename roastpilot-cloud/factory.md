@@ -815,11 +815,17 @@ job validates it as a positive decimal integer, rejects REST objects carrying
 the `pull_request` marker or a non-open state before any write, and publishes
 the only value trusted by seeding, agent context, and privileged verdict
 validation. Invalid targets cause no issue write. The triage job fetches the
-target issue's current title, body, state, and structured comments by that
-number because a dispatch has no `github.event.issue` payload and a re-triage
-must see human clarification without trusting prior bot verdicts as issue-body
-amendments. The privileged apply boundary re-checks open state before either
-its verdict or fallback path writes, closing the seed-to-apply race; the
+target issue's current title, body, state, author, and structured comments by
+that number because a dispatch has no `github.event.issue` payload and a
+re-triage must see human clarification. Before the agent sees that context, a
+deterministic filter tags and retains authorized clarifications only from the
+non-null issue author (regardless of association) or an `OWNER`, `MEMBER`, or
+`COLLABORATOR`; all other commenters are excluded. The factory's own prior
+triage verdict is retained separately as non-authoritative history only when
+both the `gh issue view` actor login (`github-actions`) and exact hidden triage
+marker match, so neither an outsider copying the marker nor another bot comment
+can amend the issue. The privileged apply boundary re-checks open state before
+either its verdict or fallback path writes, closing the seed-to-apply race; the
 implementation workflow requires open state alongside `ready-to-implement`
 before starting the agent, and the privileged implementation publisher
 re-checks REST open state immediately before any branch or PR write. The early
