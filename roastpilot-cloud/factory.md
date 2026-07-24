@@ -820,10 +820,14 @@ number because a dispatch has no `github.event.issue` payload and a re-triage
 must see human clarification without trusting prior bot verdicts as issue-body
 amendments. The privileged apply boundary re-checks open state before either
 its verdict or fallback path writes, closing the seed-to-apply race; the
-implementation workflow also requires open state alongside
-`ready-to-implement`, so a stale label cannot revive closed work. Dispatches
-from non-`main` refs run no job and receive a run-unique rejected concurrency
-group, so they cannot cancel or replace an authorized per-issue run;
+implementation workflow requires open state alongside `ready-to-implement`
+before starting the agent, and the privileged implementation publisher
+re-checks REST open state immediately before any branch or PR write. The early
+check avoids wasted work; the publisher check closes the later agent/gates
+time-of-check/time-of-use window, so a stale label or mid-run close cannot
+revive closed work. Dispatches from non-`main` refs run no job and receive a
+run-unique rejected concurrency group, so they cannot cancel or replace an
+authorized per-issue run;
 the existing `FACTORY_PAUSED` gate and pause notice remain authoritative. The
 runbook discovers open issues only and uses explicit per-issue dispatches
 against current `main` for both paused and disabled windows, avoiding the
