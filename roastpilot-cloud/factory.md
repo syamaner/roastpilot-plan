@@ -886,7 +886,7 @@ runbook discovers open issues only and uses explicit per-issue dispatches
 against current `main` for both paused and disabled windows, avoiding the
 old-run workflow-definition hazard of `gh run rerun`.
 
-Delivery is five ordered conventional PRs, each independently under the
+Delivery is six ordered conventional PRs, each independently under the
 400-line logic cap:
 
 1. **51a — protected bounded context substrate.** Add the shared deterministic
