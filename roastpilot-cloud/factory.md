@@ -798,6 +798,11 @@ merely for being non-ASCII, or change any factory publish/reconcile behavior.
 It is one PR under the 400-line logic cap, routed through
 `factory-security-reviewer` and QA before opening.
 
+This contract shipped in cloud PR #122 (`c0814869`) after local security and
+mandatory QA passes, three independently triaged current-head Codex fixes, a
+clean final-head Codex verdict, and exact-head Ubuntu execution of all 1,522
+tests including the Linux raw-path regression.
+
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
 
