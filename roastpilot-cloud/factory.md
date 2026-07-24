@@ -812,21 +812,28 @@ self-triggering through the triage pipeline's own readiness-label writes.
 
 Both event paths resolve one target issue number for concurrency, then the seed
 job validates it as a positive decimal integer, rejects REST objects carrying
-the `pull_request` marker before any write, and publishes the only value trusted
-by seeding, agent context, and privileged verdict validation. Invalid targets
-cause no issue write. The triage job fetches the target issue's current
-title/body by that number because a dispatch has no `github.event.issue`
-payload. Dispatches from non-`main` refs run no job and receive a run-unique
-rejected concurrency group, so they cannot cancel or replace an authorized
-per-issue run;
+the `pull_request` marker or a non-open state before any write, and publishes
+the only value trusted by seeding, agent context, and privileged verdict
+validation. Invalid targets cause no issue write. The triage job fetches the
+target issue's current title, body, state, and structured comments by that
+number because a dispatch has no `github.event.issue` payload and a re-triage
+must see human clarification without trusting prior bot verdicts as issue-body
+amendments. The privileged apply boundary re-checks open state before either
+its verdict or fallback path writes, closing the seed-to-apply race; the
+implementation workflow also requires open state alongside
+`ready-to-implement`, so a stale label cannot revive closed work. Dispatches
+from non-`main` refs run no job and receive a run-unique rejected concurrency
+group, so they cannot cancel or replace an authorized per-issue run;
 the existing `FACTORY_PAUSED` gate and pause notice remain authoritative. The
-runbook uses explicit per-issue dispatches against current `main` for both
-paused and disabled windows, avoiding the old-run workflow-definition hazard
-of `gh run rerun`. This is one conventional workflow/docs/test PR under the
-400-line logic cap, with pre-open `factory-security-reviewer` and QA passes. It
-does not change triage verdict semantics, agent permissions, readiness labels,
-or the privileged apply script, and live agent execution waits for the
-suspended Claude GitHub App installation to resume.
+runbook discovers open issues only and uses explicit per-issue dispatches
+against current `main` for both paused and disabled windows, avoiding the
+old-run workflow-definition hazard of `gh run rerun`. This is one conventional
+workflow/skill/publisher/docs/test PR under the 400-line logic cap, with
+`factory-security-reviewer` and QA passes before opening and after any review
+folds. It does not change triage verdict semantics, agent permissions, or
+readiness labels; the privileged apply change is limited to the open-state
+eligibility check. Live agent execution waits for the suspended Claude GitHub
+App installation to resume.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
