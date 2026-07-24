@@ -816,7 +816,9 @@ the `pull_request` marker before any write, and publishes the only value trusted
 by seeding, agent context, and privileged verdict validation. Invalid targets
 cause no issue write. The triage job fetches the target issue's current
 title/body by that number because a dispatch has no `github.event.issue`
-payload. Dispatches from non-`main` refs run no job;
+payload. Dispatches from non-`main` refs run no job and receive a run-unique
+rejected concurrency group, so they cannot cancel or replace an authorized
+per-issue run;
 the existing `FACTORY_PAUSED` gate and pause notice remain authoritative. The
 runbook uses explicit per-issue dispatches against current `main` for both
 paused and disabled windows, avoiding the old-run workflow-definition hazard
