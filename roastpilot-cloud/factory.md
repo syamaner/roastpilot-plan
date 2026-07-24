@@ -817,11 +817,11 @@ only value trusted by seeding, agent context, and privileged verdict
 validation. Invalid targets cause no issue write. Every triage execution,
 including an Actions re-run of the original `opened` event, establishes the
 same two-phase hold before the agent starts. Under a short shared per-issue
-privileged-operation lock, seed first writes a non-authorizing
-`hold:<run-id>.<run-attempt>` factory generation, then removes
-`ready-to-implement`, ensures `needs-triage`, removes every other superseded
-readiness label with per-label mutations, and verifies the hold from a fresh
-read. This suspends stale implementation authorization without replacing
+privileged-operation lock, seed first removes `ready-to-implement`, ensures
+`needs-triage`, removes every other superseded readiness label with per-label
+mutations, and verifies that non-authorizing readiness state from a fresh read.
+Only then does it write and verify the `hold:<run-id>.<run-attempt>` factory
+generation. This suspends stale implementation authorization without replacing
 unrelated labels from a stale snapshot; the seed job needs no repository
 checkout or `contents: read`.
 The triage job fetches the target issue's current title, body, state, author,
@@ -850,20 +850,26 @@ re-checks both REST open state and the exact current `ready-to-implement` label
 from one snapshot immediately before any branch or PR write. Seed, apply, and
 publish use the same non-cancelling per-issue concurrency group with
 `queue: max`; the lock serializes only the privileged state transitions, not
-the long-running read-only agent work. Apply re-checks the open issue and its
-exact hold, replaces that hold with the validated verdict plus final
-`<run-id>.<run-attempt>` generation, then mutates and verifies readiness.
-Writing the final generation before readiness keeps the generation-producer
-slice independently fail-closed: until the consumer lands, readiness remains
-the available authorization boundary, and a failed readiness write cannot
-leave publication enabled. Implementation later captures that generation at
-eligibility, and publish rejects a hold token or a changed current
-exact-bot/marker generation. Therefore a publisher and re-triage have a clear
-ordering: a publisher that acquired the lock first may finish, while a seed
-that acquired it first invalidates all older publishers before changing
-readiness. This is immediate revocation at the privileged publish boundary
-without cancelling a process mid-push. Numeric run-id-only markers remain
-readable as legacy history, but every new execution includes
+the long-running read-only agent work. Before generation production lands, a
+prerequisite publisher fence treats every non-legacy generation on the exact
+bot-owned triage comment as non-publishable. Existing marker-only triage history
+continues to use the readiness boundary, so the prerequisite changes no current
+dispatch. The factory stays paused and any pre-fence publish run is drained
+before generation production is deployed.
+
+Apply re-checks the open issue and its exact hold, replaces that hold with the
+validated verdict plus final `<run-id>.<run-attempt>` generation, then mutates
+and verifies readiness. The prerequisite fence makes both hold and final
+generations non-authorizing during the producer slice, so a committed label
+write with a lost response, or a failed recovery attempt, still cannot publish.
+Implementation later captures the final generation at eligibility, and publish
+replaces the blanket denial with an exact current bot/marker generation match.
+Therefore a publisher and re-triage have a clear ordering: a publisher that
+acquired the lock first may finish, while a seed that acquired it first
+withdraws and verifies readiness before changing the generation. This is
+immediate revocation at the privileged publish boundary without cancelling a
+process mid-push. Numeric run-id-only markers remain readable as legacy history,
+but every new execution includes
 `GITHUB_RUN_ATTEMPT` so an Actions re-run cannot alias the prior attempt.
 Dispatches from
 non-`main` refs run no job and receive a run-unique rejected concurrency group,
@@ -874,7 +880,7 @@ runbook discovers open issues only and uses explicit per-issue dispatches
 against current `main` for both paused and disabled windows, avoiding the
 old-run workflow-definition hazard of `gh run rerun`.
 
-Delivery is four ordered conventional PRs, each independently under the
+Delivery is five ordered conventional PRs, each independently under the
 400-line logic cap:
 
 1. **51a — protected bounded context substrate.** Add the shared deterministic
@@ -888,14 +894,20 @@ Delivery is four ordered conventional PRs, each independently under the
    plus the exact readiness label before branch or PR writes. Long agent jobs
    stay outside the shared lock, and existing implementation dispatches remain
    operable. This slice uses `Refs #51`.
-3. **51b-2 — deterministic dispatch and two-phase generation producer.** Add
-   manual dispatch, target validation, the hold/readiness/final-generation
-   protocol, run-id-plus-attempt identity for apply, runbook procedure, and
-   backfill execution. Apply writes the validated final generation before
-   replacing and verifying readiness. The shared readiness fence from 51b-1
-   keeps publication safe while generation is produced but not yet consumed.
-   This slice uses `Refs #51`.
-4. **51b-3 — exact-generation implementation consumer.** Require the current
+3. **51b-2a — generation-era publisher deny fence.** Teach the privileged
+   publisher to read the canonical exact-bot/marker triage history and reject
+   every non-legacy generation. Because no generation producer exists yet,
+   current implementation dispatches remain operable. Pause and drain any
+   pre-fence publish run before the producer deploys. This slice uses
+   `Refs #51`.
+4. **51b-2b — deterministic dispatch and two-phase generation producer.** Add
+   manual dispatch, target validation, readiness-first verified seed holds,
+   final-generation production, run-id-plus-attempt identity for apply, the
+   runbook procedure, and backfill execution. Apply writes the validated final
+   generation before replacing and verifying readiness; the 51b-2a publisher
+   fence keeps every new generation non-publishable even across ambiguous API
+   outcomes. This slice uses `Refs #51`.
+5. **51b-3 — exact-generation implementation consumer.** Require the current
    dotted authorizing generation before the implementation agent starts and
    have the publisher re-check the same canonical exact-bot/marker history
    under the shared lock. Legacy numeric and hold generations remain readable
@@ -913,7 +925,7 @@ review incorrectly treated the newly documented job-concurrency `queue: max`
 property as unsupported; independent triage verified the current GitHub schema,
 recorded the accepted 100-item cap and wait-time FIFO semantics, and resolved
 the thread with no code change. Issue #51 remains open and In Progress for
-51b-2 through 51b-3.
+51b-2a through 51b-3.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
@@ -922,15 +934,26 @@ deferred after merging code that introduces the affected trust boundary.
 Reconstructing the corrected 51b design then reached 490 production insertions.
 The first attempted split put the generation consumer before its producer, but
 mandatory QA rejected that independently inoperable boundary. The corrected
-sequence lands the shared readiness lock first, then the generation producer,
-then the exact-generation consumer; every intermediate state remains operable
-and fail-closed at its available authorization boundary. All four slices route
+sequence lands the shared readiness lock first, then the generation-era deny
+fence, then the generation producer, then the exact-generation consumer; every
+intermediate state remains operable and fail-closed at its available
+authorization boundary. All five slices route
 through `factory-security-reviewer` and mandatory QA before opening and after
 review folds. The story does not change triage verdict semantics or readiness
 labels;
 51a only narrows agent permissions around the new executable sanitizer. Live
 agent execution waits for the suspended Claude GitHub App installation to
 resume.
+
+The earlier four-slice producer plan relied on readiness alone between 51b-2
+and 51b-3. Pre-open factory-security and QA review rejected that boundary:
+GitHub can commit an authorizing label write while its response is lost, and a
+subsequent fail-closed reset can also fail. No multi-request rollback makes
+that outcome atomic. The added prerequisite slice makes generation itself an
+interim deny signal, so ambiguous readiness writes cannot authorize
+publication. The same review also corrected seed ordering to verify readiness
+withdrawal before writing the hold and required preservation of the prior
+factory verdict as non-authoritative re-triage context.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
