@@ -884,6 +884,12 @@ Delivery is two ordered conventional PRs, each independently under the
    publisher checks, runbook procedure, and final state record. This slice
    closes #51.
 
+Slice 51a shipped in cloud PR #123 (`eec686c2`) with 108 production
+insertions. Local factory-security, QA, and independent triage passed; all
+required CI and `codecov/patch` passed; the exact-head Codex review was clean.
+The intentionally optional Claude review check failed while its App
+installation was suspended. Issue #51 remains open and In Progress for 51b.
+
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
 re-run-alias, cross-workflow race, and partial-write classes. None can be
