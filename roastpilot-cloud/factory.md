@@ -763,6 +763,9 @@ headers never turn an ordinary `403` into a retry; a bare `429` still takes the
 handling, change call-site idempotency, alter workflow concurrency, or modify
 the factory's privileged publish/reconcile paths.
 
+This contract shipped in cloud PR #121 (`ac513fb`) after local security, QA,
+and independent PR-triage review plus a clean final-head Codex verdict.
+
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
 
