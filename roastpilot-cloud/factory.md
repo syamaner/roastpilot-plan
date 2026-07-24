@@ -814,9 +814,14 @@ Both event paths resolve one target issue number for concurrency, then the seed
 job validates it as a positive decimal integer, rejects REST objects carrying
 the `pull_request` marker or a non-open state before any write, and publishes
 the only value trusted by seeding, agent context, and privileged verdict
-validation. Invalid targets cause no issue write. The triage job fetches the
-target issue's current title, body, state, author, and structured comments by
-that number because a dispatch has no `github.event.issue` payload and a
+validation. Invalid targets cause no issue write. After validation, a manual
+dispatch immediately replaces every existing readiness label with exactly
+`needs-triage`, preserving unrelated labels, before the triage agent starts;
+the opened-issue path retains its original add-if-none behavior. This suspends
+stale implementation authorization while re-triage is reconsidering the issue.
+The triage job fetches the target issue's current title, body, state, author,
+and structured comments by that number because a dispatch has no
+`github.event.issue` payload and a
 re-triage must see human clarification. Before the agent sees that context, a
 deterministic filter tags and retains authorized clarifications only from the
 non-null issue author (regardless of association) or an `OWNER`, `MEMBER`, or
@@ -844,8 +849,8 @@ workflow/skill/publisher/docs/test PR under the 400-line logic cap, with
 `factory-security-reviewer` and QA passes before opening and after any review
 folds. It does not change triage verdict semantics, agent permissions, or
 readiness labels; the privileged apply and publish changes are limited to
-open/readiness eligibility checks. Live agent execution waits for the suspended
-Claude GitHub App installation to resume.
+open/readiness eligibility checks and the dispatch-only seed hold. Live agent
+execution waits for the suspended Claude GitHub App installation to resume.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
