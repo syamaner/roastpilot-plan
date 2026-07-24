@@ -851,10 +851,12 @@ from one snapshot immediately before any branch or PR write. Seed, apply, and
 publish use the same non-cancelling per-issue concurrency group with
 `queue: max`; the lock serializes only the privileged state transitions, not
 the long-running read-only agent work. Before generation production lands, a
-prerequisite publisher fence treats every parsed generation marker on the exact
-bot-owned triage comment as non-publishable. Existing marker-only triage history
-has no generation and continues to use the readiness boundary, so the
-prerequisite changes no current dispatch. The factory stays paused and any
+prerequisite publisher fence treats every valid or malformed generation-marker
+line immediately adjacent to the exact bot-owned triage comment's terminal
+marker as non-publishable. Generation-like text elsewhere in agent-authored
+rationale is data, not trusted syntax. Existing marker-only triage history has
+no adjacent generation line and continues to use the readiness boundary, so
+the prerequisite changes no current dispatch. The factory stays paused and any
 pre-fence publish run is drained before generation production is deployed.
 
 Apply re-checks the open issue and its exact hold, replaces that hold with the
@@ -896,7 +898,8 @@ Delivery is five ordered conventional PRs, each independently under the
    operable. This slice uses `Refs #51`.
 3. **51b-2a — generation-era publisher deny fence.** Teach the privileged
    publisher to read the canonical exact-bot/marker triage history and reject
-   every parsed generation marker. Because no generation producer exists yet,
+   every valid or malformed adjacent generation-marker line across all comment
+   pages. Because no generation producer exists yet,
    current implementation dispatches remain operable. Pause and drain any
    pre-fence publish run before the producer deploys. This slice uses
    `Refs #51`.
