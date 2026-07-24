@@ -870,7 +870,7 @@ runbook discovers open issues only and uses explicit per-issue dispatches
 against current `main` for both paused and disabled windows, avoiding the
 old-run workflow-definition hazard of `gh run rerun`.
 
-Delivery is three ordered conventional PRs, each independently under the
+Delivery is four ordered conventional PRs, each independently under the
 400-line logic cap:
 
 1. **51a — protected bounded context substrate.** Add the shared deterministic
@@ -878,35 +878,45 @@ Delivery is three ordered conventional PRs, each independently under the
    protect the executable triage skill directory at both enforcement layers.
    This slice retains the existing `issues: [opened]` trigger and existing
    seeding/apply/publish semantics; its PR uses `Refs #51`.
-2. **51b-1 — fail-closed implementation publication fence.** Add dotted
-   run-attempt generation parsing, require an authorizing generation before the
-   implementation agent starts, and have the privileged publisher re-check
-   open state, readiness, and that exact current generation under its short
-   shared per-issue lock. Until 51b-2 supplies new dotted generations,
-   implementation dispatches fail closed. This slice uses `Refs #51`.
+2. **51b-1 — shared privileged lock and publisher eligibility fence.** Move
+   only seed, apply, and publish onto the same short queued per-issue lock;
+   reject non-canonical implementation targets; and re-check REST open state
+   plus the exact readiness label before branch or PR writes. Long agent jobs
+   stay outside the shared lock, and existing implementation dispatches remain
+   operable. This slice uses `Refs #51`.
 3. **51b-2 — deterministic dispatch and two-phase generation producer.** Add
    manual dispatch, target validation, the hold/readiness/final-generation
-   protocol, run-id-plus-attempt identity for apply, the matching short queued
-   seed/apply locks, runbook procedure, and final state record. This slice
-   closes #51.
+   protocol, run-id-plus-attempt identity for apply, runbook procedure, and
+   backfill execution. The shared readiness fence from 51b-1 keeps publication
+   safe while generation is produced but not yet consumed. This slice uses
+   `Refs #51`.
+4. **51b-3 — exact-generation implementation consumer.** Require the current
+   dotted authorizing generation before the implementation agent starts and
+   have the publisher re-check the same canonical exact-bot/marker history
+   under the shared lock. Legacy numeric and hold generations remain readable
+   history but cannot authorize publication. This slice records final state
+   and closes #51.
 
 Slice 51a shipped in cloud PR #123 (`eec686c2`) with 108 production
 insertions. Local factory-security, QA, and independent triage passed; all
 required CI and `codecov/patch` passed; the exact-head Codex review was clean.
 The intentionally optional Claude review check failed while its App
 installation was suspended. Issue #51 remains open and In Progress for 51b-1
-and 51b-2.
+through 51b-3.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
 re-run-alias, cross-workflow race, and partial-write classes. None can be
 deferred after merging code that introduces the affected trust boundary.
-Reconstructing the corrected 51b design then reached 490 production insertions,
-so the publication consumer is deliberately installed before the generation
-producer: the intermediate state stops implementation rather than accepting
-legacy or stale authorization. All three slices route through
-`factory-security-reviewer` and mandatory QA before opening and after review
-folds. The story does not change triage verdict semantics or readiness labels;
+Reconstructing the corrected 51b design then reached 490 production insertions.
+The first attempted split put the generation consumer before its producer, but
+mandatory QA rejected that independently inoperable boundary. The corrected
+sequence lands the shared readiness lock first, then the generation producer,
+then the exact-generation consumer; every intermediate state remains operable
+and fail-closed at its available authorization boundary. All four slices route
+through `factory-security-reviewer` and mandatory QA before opening and after
+review folds. The story does not change triage verdict semantics or readiness
+labels;
 51a only narrows agent permissions around the new executable sanitizer. Live
 agent execution waits for the suspended Claude GitHub App installation to
 resume.
