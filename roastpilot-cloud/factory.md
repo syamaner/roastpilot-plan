@@ -815,13 +815,12 @@ job validates it as a positive decimal integer, rejects REST objects carrying
 the `pull_request` marker or a non-open state before any write, and publishes
 the only value trusted by seeding, agent context, and privileged verdict
 validation. Invalid targets cause no issue write. After validation, a manual
-dispatch immediately replaces every existing readiness label with exactly
-`needs-triage`, preserving unrelated labels, before the triage agent starts;
-the opened-issue path retains its original add-if-none behavior. This suspends
-stale implementation authorization while re-triage is reconsidering the issue.
-The deterministic seed job gets `contents: read` solely for a dispatch-only,
-credential-free sparse checkout of the tracked label normalizer; the read-only
-triage agent's permissions do not change.
+dispatch removes `ready-to-implement` first, ensures `needs-triage`, then
+removes every other superseded readiness label with per-label mutations before
+the triage agent starts. A final read verifies the hold. This suspends stale
+implementation authorization without replacing unrelated labels from a stale
+snapshot; the opened-issue path retains its original add-if-none behavior, and
+the seed job needs no repository checkout or `contents: read`.
 The triage job fetches the target issue's current title, body, state, author,
 and structured comments by that number because a dispatch has no
 `github.event.issue` payload and a
@@ -832,15 +831,22 @@ non-null issue author (regardless of association) or an `OWNER`, `MEMBER`, or
 triage verdict is retained separately as non-authoritative history only when
 both the `gh issue view` actor login (`github-actions`) and exact hidden triage
 marker match, so neither an outsider copying the marker nor another bot comment
-can amend the issue. The privileged apply boundary re-checks open state before
+can amend the issue. Retained context is capped at 50 comments and 64 KiB of
+serialized JSON, failing closed with a visible error rather than truncating.
+The implementation agent receives the same provenance-filtered bounded
+clarifications, so it cannot discard information that made an issue ready.
+The privileged apply boundary re-checks open state before
 either its verdict or fallback path writes, closing the seed-to-apply race; the
 implementation workflow requires open state alongside `ready-to-implement`
 before starting the agent, and the privileged implementation publisher
 re-checks both REST open state and the exact current `ready-to-implement` label
-from one snapshot immediately before any branch or PR write. The early check
-avoids wasted work; the publisher check closes the later agent/gates
-time-of-check/time-of-use window, so a concurrent re-triage that withdraws
-readiness or a mid-run close cannot publish stale work. Dispatches from
+from one snapshot immediately before any branch or PR write. Every applied
+triage comment carries the trusted Actions run generation; implementation
+captures that generation at eligibility, and publish requires the current
+exact-bot/marker comment to match it. The early check avoids wasted work; the
+publisher checks close the later agent/gates time-of-check/time-of-use window,
+including a re-triage that withdraws and then restores readiness before an
+older implementation finishes. Dispatches from
 non-`main` refs run no job and receive a run-unique rejected concurrency group,
 so they cannot cancel or replace an
 authorized per-issue run;
@@ -850,10 +856,11 @@ against current `main` for both paused and disabled windows, avoiding the
 old-run workflow-definition hazard of `gh run rerun`. This is one conventional
 workflow/skill/publisher/docs/test PR under the 400-line logic cap, with
 `factory-security-reviewer` and QA passes before opening and after any review
-folds. It does not change triage verdict semantics, agent permissions, or
-readiness labels; the privileged apply and publish changes are limited to
-open/readiness eligibility checks and the dispatch-only seed hold. Live agent
-execution waits for the suspended Claude GitHub App installation to resume.
+folds. Final-head Codex review findings on clarification propagation,
+generation binding, bounded comment context, and stale full-label replacement
+are part of this same contract. It does not change triage verdict semantics,
+agent permissions, or readiness labels. Live agent execution waits for the
+suspended Claude GitHub App installation to resume.
 
 **Must-fix — the factory's OWN PR must actually get reviewed (discovered live,
 18 Jul 2026, on the first factory-authored PR #34):**
