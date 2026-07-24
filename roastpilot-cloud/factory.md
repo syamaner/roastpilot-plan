@@ -771,9 +771,12 @@ Cloud #71 adds a conventional, human-directed F1-S7 hardening PR because its
 workflow and protected scanner changes are outside the factory implementing
 agent's writable boundary. A standalone step in the existing CI gates job
 runs a dependency-free scanner from `scripts/factory/` before dependency
-installation. The scanner examines every `git ls-files -z` tracked entry whose
-working-tree content is valid UTF-8 text, and fails on every literal Unicode
-`Default_Ignorable_Code_Point`. This categorical boundary includes the
+installation. The scanner examines every regular file and symlink returned by
+`git ls-files -z`, replacement-decodes each byte stream, and fails on every
+decoded literal Unicode `Default_Ignorable_Code_Point`. NUL or malformed UTF-8
+bytes do not fail by themselves, but cannot suppress detection of a valid
+default-ignorable sequence elsewhere in the same tracked entry. This
+categorical boundary includes the
 originally reported U+200B-U+200F, U+202A-U+202E, U+2060-U+2064, and U+FEFF
 ranges plus sibling bidi controls, combining joiners, variation selectors,
 tags, and reserved default-ignorables that have the same invisible-review
