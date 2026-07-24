@@ -901,8 +901,14 @@ Slice 51a shipped in cloud PR #123 (`eec686c2`) with 108 production
 insertions. Local factory-security, QA, and independent triage passed; all
 required CI and `codecov/patch` passed; the exact-head Codex review was clean.
 The intentionally optional Claude review check failed while its App
-installation was suspended. Issue #51 remains open and In Progress for 51b-1
-through 51b-3.
+installation was suspended. Slice 51b-1 shipped in cloud PR #124 (`4d3547f0`)
+with 53 production insertions. Local factory-security, QA, and independent
+triage passed; all required CI and `codecov/patch` passed. Its exact-head Codex
+review incorrectly treated the newly documented job-concurrency `queue: max`
+property as unsupported; independent triage verified the current GitHub schema,
+recorded the accepted 100-item cap and wait-time FIFO semantics, and resolved
+the thread with no code change. Issue #51 remains open and In Progress for
+51b-2 through 51b-3.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
