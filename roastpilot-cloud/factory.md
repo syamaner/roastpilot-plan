@@ -220,7 +220,7 @@ here, where the author is always an agent). The factory never merges.
 | F1-S4 | Review workflow port + repo `AGENTS.md` review rubric section |
 | F1-S5 | `to-issues` skill + dry-run decomposition of C2 (output PM-reviewed, then labelled) |
 | F1-S6 | End-to-end dry run on a sacrificial issue; factory runbook (failure modes, stuck states, cost log) |
-| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101; the structural YAML audit completed in cloud #102 via PR #113 (`5262e77`); #41's immutable local marketplace delivery merged via PR #117 (`4396b1c`); #42's unconditional fail-closed unlicensed-output enforcement merged via PR #118 (`e7fdbd0`); and D112-D113's local-action reference/direct-entrypoint confinement merged via cloud #114 / PR #119 (`377fa77`). Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists and #47 is held while the Claude GitHub App is suspended. Cloud #116 separately tracks the upstream stale-synchronize guard. Cloud #120 (`needs-info`) owns the broader privileged executable-closure decision; no repository-local action may enter a privileged factory job before it is resolved. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
+| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101; the structural YAML audit completed in cloud #102 via PR #113 (`5262e77`); #41's immutable local marketplace delivery merged via PR #117 (`4396b1c`); #42's unconditional fail-closed unlicensed-output enforcement merged via PR #118 (`e7fdbd0`); and D112-D113's local-action reference/direct-entrypoint confinement merged via cloud #114 / PR #119 (`377fa77`). Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists and #47 is held while the Claude GitHub App is suspended. Cloud #116 separately tracks the upstream stale-synchronize guard. The operator approved cloud #120's broader credential-reachability executable boundary in D117; its thirteen thin delivery slices are planned, and no repository-local action may enter a credential-bearing job before the first slice lands. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
 | F1-S9 | **Anti-gaming quality gates** — mutation testing (security-critical Python) + the anti-gaming diff classifier + the **spec-grounded review pipeline** (the §14 "should-add" hardening, now built): a read-only agent judges the PR diff against the linked issue's acceptance criteria and a deterministic publisher turns that verdict into merge-gating comments. See **D107** for the design + security model. Shipped d1–e (cloud #74/#82/#83/#86/#87 read-only-agent + publisher, #91 publish wiring); reconciliation/revalidation completeness is complete through cloud #88/#89/#90 and no longer blocks the factory-bot enable story (#47), which retains its separate enable/security scope. |
 | F1-S8, S10, S11 | Documented in the roastpilot-cloud `docs/state/registry.md` story table (operator order: S5 → S10 → S8 → S9 → S7 → S6 → S11); this §11 table is being caught up incrementally, with F1-S9 and the now-active F1-S7 recorded here. |
 
@@ -1119,3 +1119,161 @@ two-workflow + pwn-request guidance; GMO Flatt/RyotaK CVE (fixed v1.0.94);
 Willison on the lethal trifecta; ImpossibleBench (ICLR 2026); Cursor + Meta on
 reward-hacking + mutation testing; "Play Favorites" / "Nine Judges, Two Effective
 Votes" on cross-family reviewer correlation; Google SRE canarying-releases.
+
+**D117 (25 Jul 2026) — privileged repository execution is bounded by
+credential reachability.** For cloud #120, the operator selected the
+protected-glue policy rather than an immutable-artifact system or a general
+acceptance of protected code delegating to agent/PR-mutable workspace code.
+The policy applies while a secret or a capable GitHub token is reachable, not
+indiscriminately to every step in the same job.
+
+The initial issue inventory found twelve jobs with an explicit `secrets.*`
+reference or write permission. Pre-implementation security review corrected
+that syntactic count: an action step can receive the implicit `github.token`
+when its effective job permissions are non-empty even when the workflow never
+spells `secrets.GITHUB_TOKEN`. The current boundary therefore covers fifteen
+jobs: the eight factory jobs already listed on cloud #120, the DEV Snowflake,
+Dependency Review, and CodeQL jobs, plus all four CI jobs. Future jobs fail
+closed into the same classification when their effective permissions,
+environment, secret expressions, reusable-workflow inputs, containers, or
+runtime token production cannot be proven credential-free.
+
+The trust and reachability model is:
+
+- Repository executables have two explicit trusted-source classes. The general
+  class is glue protected by the implementing-agent patch guard whose bytes
+  come from an exact, already-reviewed revision that the current PR/agent
+  cannot choose or mutate. A path named `scripts/factory/**` from PR head is
+  not trusted merely because its pathname is protected. The only unprotected
+  repository-code class accepted by this decision is `snowflake/**` from an
+  exact, already-reviewed main `github.sha`, in the main-only DEV Environment
+  job after human approval; this does not authorize unprotected code in any PR
+  or agent workflow. Event `base.sha` and that named main `github.sha` are
+  acceptable immutable sources only when checkout and any later restore/copy
+  operation are verified against the same SHA. Any new trusted-source class
+  requires a later operator decision.
+- Credential sources include explicit secrets, the implicit `github.token`,
+  OIDC request capability, App tokens minted into outputs, checkout-persisted
+  credentials and helpers, environment/container/service credentials, and
+  tokens or configuration written through output/state/config files.
+  Permission inheritance, YAML aliases/merge keys, mapped or inherited
+  reusable-workflow secrets, and dynamic secret-context access are part of the
+  classifier. Unknown forms fail closed.
+- Reachability runs in both directions through time. Mutable code before a
+  credentialed step can poison the workspace, `$GITHUB_ENV`, `$GITHUB_PATH`,
+  `NODE_OPTIONS`, package/git configuration, installed tools, background
+  processes, or containers; a credentialed step can leave equivalent state
+  for later mutable execution. A fresh job/runner plus a narrowly validated
+  artifact is the default credential cut. In-job cleanup is not initially
+  treated as proof.
+- Trusted protected code may consume PR/agent-controlled **data** only through
+  a typed, bounded contract that rejects unexpected names, types, sizes,
+  symlinks, configuration, plugins, hooks, modules, or executables. Parsing
+  untrusted diffs, source, coverage, or review artifacts is not itself
+  execution; treating executable/configuration input as "data" is forbidden.
+- Exact-SHA remote actions are explicit trusted delegation boundaries.
+  Repository-local actions are not: `uses: ./...` is forbidden throughout
+  every credential-bearing job because composite and container actions inherit
+  workspace/context channels too broadly for a step-local textual exception.
+  Remote actions that consume workspace data need their own bounded contract.
+- Repository Node closure uses a closed supported grammar, not best-effort
+  tracing. Literal relative static imports/exports must stay within the trusted
+  tree. Dynamic import/`require`/`createRequire`, workers, VM/custom-loader
+  paths, native addons, package/bin/script resolution, and child-process shell
+  forms are rejected unless a structured exact rule proves the target.
+  Approved external commands use a central no-shell executable/argument
+  contract; unknown or computed repository execution fails closed.
+- Ordinary workflow shell and container execution has its own closed structural
+  grammar before any job activates this policy. Aliased or merged `run`,
+  `shell`, `working-directory`, job/action containers, services, workspace
+  mounts, and environment inheritance are resolved first. Direct scripts,
+  `source`/`.`, shell indirection, command substitution, `eval`, package
+  scripts/bins, and repository-path arguments must resolve to a trusted source;
+  unsupported shell syntax fails closed. A pinned remote container/action is an
+  explicit delegation boundary, not evidence that mounted workspace content is
+  non-executable.
+
+This decision is specifically the **repository-local executable** boundary.
+It names, but does not pretend to cryptographically close, the existing
+external trust root: GitHub-hosted runner images, the Actions runner and
+expression engine, exact-SHA remote actions and their documented runtime
+delivery, declared toolchain installers/versions, and package-manager content
+accepted through the existing F1-S7 action-pin, lockfile, install-script,
+dependency-review, and license controls. A future hash-complete external
+supply-chain closure is a separate decision, not an implied property of D117.
+
+Prompt-controlled misuse of an otherwise trusted credentialed tool is also a
+separate capability problem. D117 constrains what repository code can execute;
+it does not claim that the current Claude review job's allowed `gh pr` commands
+are safe from prompt-driven argument misuse. Cloud #47 owns that Bash/tool
+redesign and remains held while the Claude GitHub App is suspended.
+
+Every violation fails the structural CI audit with a source line and no
+partial allow. A job is not called compliant merely because its direct
+entrypoint is protected while its import/process closure is unattested. The
+factory remains paused during this work, and no local action may be introduced
+before the first enforcement slice. Delivery is thirteen serial, independently
+green conventional PRs off current `main`, each below 400 changed production
+lines and each routed through `factory-security-reviewer`, mandatory QA, and
+independent PR triage:
+
+1. **120a — credential classifier and all-job local-action ban.** Add the
+   minimal semantic YAML classifier for effective permissions, explicit and
+   implicit credential sources, environments, aliases/merge keys, reusable
+   workflows, containers, and checkout persistence; reject every local action
+   in every classified job. Apply this immediately to all fifteen live jobs.
+2. **120b — source/reachability/data policy substrate.** Add the typed pure
+   analyzer for immutable source provenance, bidirectional state reachability,
+   fresh-runner cuts, exact-SHA remote delegation, and bounded data crossings.
+   This is analysis substrate only and does not declare a Node entrypoint or
+   live job compliant.
+3. **120c — closed Node import/process verifier.** Add the transitive
+   import/export and process-execution verifier, symlink/realpath containment,
+   cycle handling, exact external-command rules, and fail-closed unsupported
+   dynamic cases. It remains unactivated until each live boundary migration
+   supplies a complete root set.
+4. **120d — workflow-shell/container verifier.** Add the closed whole-step
+   grammar and exact allowlist for ordinary `run` roots, working directories,
+   shell indirection, package scripts/bins, and job/remote-action
+   container/workspace execution. Unknown YAML or shell/container execution
+   forms fail closed before any live-job activation.
+5. **120e — triage workflow activation.** Enforce the completed classifier and
+   closure for `seed`, `triage`, and `apply`: no-checkout inline writes,
+   read-only agent/sanitizer execution, and protected exact-SHA apply glue.
+6. **120f — implementation-agent credential cut.** The credential-bearing
+   pinned Claude action may read and edit the workspace but may not invoke Bash,
+   another process tool, package script, or mutable workspace executable.
+   Environment scrubbing remains defense in depth rather than the trust
+   boundary. Keep agent output as a bounded patch/data artifact and execute the
+   resulting tree only in a fresh credential-free job.
+7. **120g — implementation publisher activation.** Enforce exact trusted-source
+   closure for the write-capable publisher and validate every artifact crossing
+   before protected glue, git, or GitHub APIs consume it.
+8. **120h — Claude review-agent activation.** Enforce source/data/closure
+   contracts for `claude-review` and `spec-grounded-review`, including the
+   immutable plugin checkout and the explicit #47 capability residual.
+9. **120i — spec-grounding publisher activation.** Enforce the base-SHA
+   protected closure and bounded review-artifact contract independently of the
+   read-only review jobs.
+10. **120j — Dependency Review remediation.** Stop executing a PR-head local
+   script in the PR-write job; separate unprivileged validation from a clean
+   write-capable pinned-action/reporting boundary with a bounded result.
+11. **120k — CI and Codecov credential cut.** Remove unnecessary implicit token
+    capability from the four ordinary CI jobs and move Codecov upload to a
+    clean job that consumes only a bounded coverage artifact.
+12. **120l — CodeQL remote-delegation contract.** Record and enforce the
+    exact-SHA remote analyzer as trusted code consuming bounded untrusted source
+    data, with no repository-local executable edge in the write-capable job.
+13. **120m — DEV Snowflake trusted-main boundary.** Require main-only
+    environment approval, exact `github.sha` checkout, and reviewed-source
+    verification for every credential-bearing script/migration input; record
+    package installation as part of D117's named external trust root. This
+    final slice updates state and closes cloud #120.
+
+Slices 120a-120d land the reusable analyzer/enforcement machinery; 120e-120i
+activate the eight factory jobs before 120j-120m remediate the adjacent jobs.
+Pure analyzer slices make no intermediate compliance claim, and activation
+never precedes the closure it depends on. If any measured production diff
+reaches the 400-line hard stop, it splits again at the named job-pattern
+boundary before a PR opens; no permissive exception is used to preserve the
+planned count.
