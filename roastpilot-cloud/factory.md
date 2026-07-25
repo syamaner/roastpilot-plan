@@ -1212,7 +1212,7 @@ Every violation fails the structural CI audit with a source line and no
 partial allow. A job is not called compliant merely because its direct
 entrypoint is protected while its import/process closure is unattested. The
 factory remains paused during this work, and no local action may be introduced
-before the first enforcement slice. Delivery is thirteen serial, independently
+before the first enforcement slice. Delivery is fourteen serial, independently
 green conventional PRs off current `main`, each below 400 changed production
 lines and each routed through `factory-security-reviewer`, mandatory QA, and
 independent PR triage:
@@ -1227,44 +1227,46 @@ independent PR triage:
    fresh-runner cuts, exact-SHA remote delegation, and bounded data crossings.
    This is analysis substrate only and does not declare a Node entrypoint or
    live job compliant.
-3. **120c — closed Node import/process verifier.** Add the transitive
-   import/export and process-execution verifier, symlink/realpath containment,
-   cycle handling, exact external-command rules, and fail-closed unsupported
-   dynamic cases. It remains unactivated until each live boundary migration
-   supplies a complete root set.
-4. **120d — workflow-shell/container verifier.** Add the closed whole-step
+3. **120c-1 — closed Node import/provenance verifier.** Add bounded transitive
+   static import/export closure, exact module resolution, symlink/realpath
+   containment, cycle handling, and canonical closure evidence. It remains
+   unactivated until each live boundary migration supplies a complete root set.
+4. **120c-2 — Node runtime/process capability verifier.** Reject dynamic
+   loaders/code generation and permit only centrally reviewed external process
+   capabilities with closed executable, cwd, environment, and argument rules.
+5. **120d — workflow-shell/container verifier.** Add the closed whole-step
    grammar and exact allowlist for ordinary `run` roots, working directories,
    shell indirection, package scripts/bins, and job/remote-action
    container/workspace execution. Unknown YAML or shell/container execution
    forms fail closed before any live-job activation.
-5. **120e — triage workflow activation.** Enforce the completed classifier and
+6. **120e — triage workflow activation.** Enforce the completed classifier and
    closure for `seed`, `triage`, and `apply`: no-checkout inline writes,
    read-only agent/sanitizer execution, and protected exact-SHA apply glue.
-6. **120f — implementation-agent credential cut.** The credential-bearing
+7. **120f — implementation-agent credential cut.** The credential-bearing
    pinned Claude action may read and edit the workspace but may not invoke Bash,
    another process tool, package script, or mutable workspace executable.
    Environment scrubbing remains defense in depth rather than the trust
    boundary. Keep agent output as a bounded patch/data artifact and execute the
    resulting tree only in a fresh credential-free job.
-7. **120g — implementation publisher activation.** Enforce exact trusted-source
+8. **120g — implementation publisher activation.** Enforce exact trusted-source
    closure for the write-capable publisher and validate every artifact crossing
    before protected glue, git, or GitHub APIs consume it.
-8. **120h — Claude review-agent activation.** Enforce source/data/closure
+9. **120h — Claude review-agent activation.** Enforce source/data/closure
    contracts for `claude-review` and `spec-grounded-review`, including the
    immutable plugin checkout and the explicit #47 capability residual.
-9. **120i — spec-grounding publisher activation.** Enforce the base-SHA
+10. **120i — spec-grounding publisher activation.** Enforce the base-SHA
    protected closure and bounded review-artifact contract independently of the
    read-only review jobs.
-10. **120j — Dependency Review remediation.** Stop executing a PR-head local
+11. **120j — Dependency Review remediation.** Stop executing a PR-head local
    script in the PR-write job; separate unprivileged validation from a clean
    write-capable pinned-action/reporting boundary with a bounded result.
-11. **120k — CI and Codecov credential cut.** Remove unnecessary implicit token
+12. **120k — CI and Codecov credential cut.** Remove unnecessary implicit token
     capability from the four ordinary CI jobs and move Codecov upload to a
     clean job that consumes only a bounded coverage artifact.
-12. **120l — CodeQL remote-delegation contract.** Record and enforce the
+13. **120l — CodeQL remote-delegation contract.** Record and enforce the
     exact-SHA remote analyzer as trusted code consuming bounded untrusted source
     data, with no repository-local executable edge in the write-capable job.
-13. **120m — DEV Snowflake trusted-main boundary.** Require main-only
+14. **120m — DEV Snowflake trusted-main boundary.** Require main-only
     environment approval, exact `github.sha` checkout, and reviewed-source
     verification for every credential-bearing script/migration input; record
     package installation as part of D117's named external trust root. This
@@ -1277,3 +1279,29 @@ never precedes the closure it depends on. If any measured production diff
 reaches the 400-line hard stop, it splits again at the named job-pattern
 boundary before a PR opens; no permissive exception is used to preserve the
 planned count.
+
+**D118 (25 Jul 2026) — Node closure splits at import provenance versus
+runtime capability, with bounded traversal.** The first measured cloud #120
+Node verifier was 563 production lines, beyond the exact 400-line hard stop.
+The operator approved the security-review recommendation to split it before a
+PR: 120c-1 owns static import/export and module provenance; 120c-2 owns dynamic
+loading, code generation, and external process capabilities. Neither slice
+activates a live job, and 120d still owns workflow shell/container launch
+semantics.
+
+The operator also approved exact 120c-1 traversal ceilings after measuring the
+current factory baseline (20 Node files, 18 relative static edges, 844,335
+source bytes total, largest file 103,374 bytes):
+
+- at most **128** canonical source files;
+- at most **512** runtime static import/export edges;
+- at most **1,000,000 bytes** per source file;
+- at most **8,000,000 source bytes** across the closure.
+
+The verifier fails closed when any ceiling is exceeded. It rejects symlink or
+realpath escape, unsupported/non-explicit local resolution, and ambiguous
+external resolution; returns the canonical verified file set so execution-time
+byte evidence can be revalidated; and accepts no caller assertion as proof
+merely because it is truthy. Package resolution remains within D117's named
+lockfile/install external trust root and must resolve to the exact reviewed
+package target, not a repository alias or URL-like specifier.
