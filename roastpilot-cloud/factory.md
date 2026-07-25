@@ -111,17 +111,21 @@ The story issue template (in-repo, `.github/ISSUE_TEMPLATE/story.yml`)
 requires: plan link (which epic §, which plan lines), acceptance criteria as
 checkboxes, in-scope surface (files/areas), out-of-scope statement,
 verification notes (which suite proves it), and a size declaration (target
-≤ ~400 changed lines; bigger means split before labelling). Triage enforces
-this bar: an issue missing any of it comes back `ready-to-spec` or
-`needs-info`, never `ready-to-implement`.
+about 400 changed logic lines; a materially larger unit explains why splitting
+would reduce reviewability; tests are excluded from the estimate and a test
+diff over 600 lines requires pre-open QA). Triage enforces this bar: an issue
+missing any of it comes back `ready-to-spec` or `needs-info`, never
+`ready-to-implement`.
 
 **Plan-small addendum (D104, 19 Jul 2026):** the size declaration is a **PR
-plan**, not a hope — each ready issue maps to exactly ONE thin PR whose
-**logic** diff is under ~400 lines (migrations / generated files / fixtures /
-docs are exempt and get their own issue), and the issue names its
-dependencies/order and the **domain reviewer** its diff triggers (AGENTS.md
-rubric). An issue without the ordered, sized, reviewer-tagged plan is not
-ready-to-implement.
+plan**, not a hope — each ready issue maps to one or more ordered coherent
+review units normally targeting about 400 changed **logic** lines each (tests
+are excluded from the estimate), and the issue names their dependencies/order
+and the **domain reviewer** each diff triggers (AGENTS.md rubric). A materially
+larger unit records why it is more reviewable than the available splits. An
+issue without the ordered, sized, reviewer-tagged plan is not
+ready-to-implement. D119 supersedes D104's original binary size and exact-one
+mapping; the decomposition and reviewer-routing gate remains.
 
 **Dry-run / meta-issue exemption (18 Jul 2026, ruling from the first live
 implement dry-run).** An internal factory-validation / dry-run issue — one
@@ -163,9 +167,10 @@ surface→escalate→adjudicate loop. The exemption is the adjudication.)
 - **`to-issues`** — decomposes a plan epic (C2…C8) into story issues meeting
   §5, as a *draft batch the PM reviews* before anything is labelled
   `ready-to-implement`. This is why C2+ stories are deliberately not
-  pre-created: decomposition is factory work, human-approved. **Per D104 its
-  output is a PR PLAN**: per story — scope, ~logic size (<400, exempt classes
-  split out), dependency order, and the domain reviewer the diff triggers.
+  pre-created: decomposition is factory work, human-approved. **Per D104 as
+  superseded by D119, its output is a PR PLAN**: per story — ordered coherent
+  review units, scope, approximate logic size (normally about 400 lines),
+  dependency order, and the domain reviewer each diff triggers.
 - Implementation conventions (stack rules, gates, PR hygiene) live in the
   repo's `AGENTS.md` (written at C1), which the implementing agent reads
   like any Claude Code session would.
@@ -465,6 +470,8 @@ pipeline, qa/e2e). A story that decomposes into "build X" without this ordered,
 sized, reviewer-tagged PR list is **NOT ready-to-implement** — this is now part
 of §5's intake bar, enforced at the `ready-to-spec → ready-to-implement`
 transition by `triage`. Encoded in the `to-issues` skill + §5/§7 + AGENTS.md.
+**D119 supersedes D104's binary size cutoff and exact-one mapping; its
+decomposition and reviewer-routing requirements remain.**
 
 **D105 (19 Jul 2026) — factory draft-first adopted, with the draft-verdict
 amendment; closes #62/#66.** The publisher opens each factory PR as a **DRAFT**;
@@ -1213,9 +1220,10 @@ partial allow. A job is not called compliant merely because its direct
 entrypoint is protected while its import/process closure is unattested. The
 factory remains paused during this work, and no local action may be introduced
 before the first enforcement slice. Delivery is fourteen serial, independently
-green conventional PRs off current `main`, each below 400 changed production
-lines and each routed through `factory-security-reviewer`, mandatory QA, and
-independent PR triage:
+green conventional PRs off current `main`, each scoped as one coherent review
+unit and normally targeting about 400 changed production lines. Every slice
+routes through `factory-security-reviewer`, mandatory QA, and independent PR
+triage:
 
 1. **120a — credential classifier and all-job local-action ban.** Add the
    minimal semantic YAML classifier for effective permissions, explicit and
@@ -1276,18 +1284,19 @@ Slices 120a-120d land the reusable analyzer/enforcement machinery; 120e-120i
 activate the eight factory jobs before 120j-120m remediate the adjacent jobs.
 Pure analyzer slices make no intermediate compliance claim, and activation
 never precedes the closure it depends on. If any measured production diff
-reaches the 400-line hard stop, it splits again at the named job-pattern
-boundary before a PR opens; no permissive exception is used to preserve the
-planned count.
+materially exceeds the target, the PR plan records whether a responsibility,
+security-boundary, dependency-order, or reviewer-load split improves
+reviewability. It splits when that analysis identifies a coherent boundary; it
+does not split merely to preserve the planned count.
 
 **D118 (25 Jul 2026) — Node closure splits at import provenance versus
 runtime capability, with bounded traversal.** The first measured cloud #120
-Node verifier was 563 production lines, beyond the exact 400-line hard stop.
-The operator approved the security-review recommendation to split it before a
-PR: 120c-1 owns static import/export and module provenance; 120c-2 owns dynamic
-loading, code generation, and external process capabilities. Neither slice
-activates a live job, and 120d still owns workflow shell/container launch
-semantics.
+Node verifier was 563 production lines, beyond the then-exact 400-line hard
+stop. The operator approved the security-review recommendation to split it
+before a PR: 120c-1 owns static import/export and module provenance; 120c-2
+owns dynamic loading, code generation, and external process capabilities.
+Neither slice activates a live job, and 120d still owns workflow
+shell/container launch semantics.
 
 The operator also approved exact 120c-1 traversal ceilings after measuring the
 current factory baseline (20 Node files, 18 relative static edges, 844,335
@@ -1305,3 +1314,20 @@ byte evidence can be revalidated; and accepts no caller assertion as proof
 merely because it is truthy. Package resolution remains within D117's named
 lockfile/install external trust root and must resolve to the exact reviewed
 package target, not a repository alias or URL-like specifier.
+
+**D119 (25 Jul 2026) — PR size is a reviewability guide, not a binary
+cutoff.** The operator superseded D104's binary size and exact-one mapping plus
+the size-only parts of D117-D118: PR plans normally target about 400 changed
+logic lines, but slice boundaries are chosen by coherent responsibility,
+security boundary, dependency order, and reviewer load. A materially larger
+slice records in its story plan and PR body why it is more reviewable than the
+available splits, then passes the applicable domain reviewers and independent
+pre-open triage. A large unexplained diff is replanned; a justified cohesive
+diff may proceed. Tests remain excluded from the logic estimate. Docs,
+fixtures, generated files, and data are excluded only when placed in their own
+PR where independently reviewable or at least a dedicated non-logic commit;
+atomic deletion remains excluded. The repositories' exact test-volume QA
+trigger remains in force. D118's 120c-1/120c-2 split is retained because static
+module provenance and runtime/process capability are distinct security
+boundaries, not because the original combined draft crossed a line-count
+threshold.
