@@ -977,8 +977,21 @@ factory-security, mandatory QA, and independent triage passed; all required CI
 and `codecov/patch` passed; the final exact-head Codex verdict was clean. The
 intentionally optional Claude review was skipped while its App installation
 was suspended. The factory was paused and verified drained immediately before
-merge and remains paused for the remaining rollout. Issue #51 remains open and
-In Progress for 51b-2b-ii-b and 51b-3.
+merge and remains paused for the remaining rollout. Slice 51b-2b-ii-b shipped
+in cloud PR #128 (`fb18fc0b`) with 69 changed production lines including the
+validator trust-boundary doc update. It adds current-main per-issue manual
+dispatch, rejects non-canonical targets before privileged writes, threads the
+seed-validated target through triage and apply, and documents serial backfill
+with exact readiness/final-generation verification. Pre-open QA added
+behavior-level execution of the validation shell and documented `jq`
+verifiers. Independent triage corrected retry guidance to require a fresh
+dispatch rather than a downstream-only re-run whose seed generation remains
+from attempt 1. Local factory-security, QA, and independent triage passed; all
+required CI and `codecov/patch` passed; the exact-head Codex verdict was clean.
+The intentionally optional Claude review check failed while its App
+installation was suspended. The factory was paused and verified drained
+immediately before merge and remains paused for 51b-3. Issue #51 remains open
+and In Progress for 51b-3.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
