@@ -97,6 +97,7 @@ Exactly one readiness label on every open issue (the seed job guarantees it):
 |---|---|
 | `needs-triage` | Inbox state; seeded on open, replaced by triage |
 | `ready-to-implement` | Specced, thin, verifiable; the factory may build it |
+| `ready-for-conventional-implementation` | Specced and verifiable for conventional/interactive delivery; deliberately does not authorize the factory workflow |
 | `ready-to-spec` | Sound idea, needs decomposition/spec before building |
 | `needs-info` | Triage could not proceed; question posted, human answers |
 | `wait-to-implement` | Specced but held (dependencies, M1-deadline rule, sequencing) |
@@ -126,6 +127,22 @@ larger unit records why it is more reviewable than the available splits. An
 issue without the ordered, sized, reviewer-tagged plan is not
 ready-to-implement. D119 supersedes D104's original binary size and exact-one
 mapping; the decomposition and reviewer-routing gate remains.
+
+**Execution-path boundary (D120, 25 Jul 2026).** D119's size guide governs
+conventional/interactive review units. The current automated publisher cannot
+run independent pre-open review or produce multiple commits, so
+`factory-dispatchable` issues retain an exact fail-closed technical envelope:
+one issue/commit/PR, at most 400 changed logic lines, at most 600 changed test
+lines, no binary patch, and no mix of data/fixtures/generated/docs with logic
+or tests. Migrations are logic. The privileged publisher classifies the
+applied scratch-index diff, not the agent's patch text, before any push.
+Anything materially larger, mixed, or otherwise requiring pre-open `qa` routes
+to conventional execution and receives
+`ready-for-conventional-implementation`, never the factory-authorizing
+`ready-to-implement` label. Factory data plus logic remains separate issues/PRs
+until multi-commit publishing exists. This exact automated envelope is a
+temporary capability constraint, not a reversal of D119's general
+reviewability guide.
 
 **Dry-run / meta-issue exemption (18 Jul 2026, ruling from the first live
 implement dry-run).** An internal factory-validation / dry-run issue — one
@@ -1317,9 +1334,9 @@ package target, not a repository alias or URL-like specifier.
 
 **D119 (25 Jul 2026) — PR size is a reviewability guide, not a binary
 cutoff.** The operator superseded D104's binary size and exact-one mapping plus
-the size-only parts of D117-D118: PR plans normally target about 400 changed
-logic lines, but slice boundaries are chosen by coherent responsibility,
-security boundary, dependency order, and reviewer load. A materially larger
+the size-only parts of D117-D118: conventional PR plans normally target about
+400 changed logic lines, but slice boundaries are chosen by coherent
+responsibility, security boundary, dependency order, and reviewer load. A materially larger
 slice records in its story plan and PR body why it is more reviewable than the
 available splits, then passes the applicable domain reviewers and independent
 pre-open triage. A large unexplained diff is replanned; a justified cohesive
@@ -1331,3 +1348,11 @@ trigger remains in force. D118's 120c-1/120c-2 split is retained because static
 module provenance and runtime/process capability are distinct security
 boundaries, not because the original combined draft crossed a line-count
 threshold.
+
+**D120 (25 Jul 2026) — execution path is an authorization boundary.**
+Conventional-ready work uses the non-authorizing
+`ready-for-conventional-implementation` label. Only factory-dispatchable work
+may receive `ready-to-implement`. Until the automated publisher gains
+independent pre-open review and multi-commit support, it deterministically
+enforces the exact factory envelope recorded in §5 against its applied
+scratch-index diff and rejects any out-of-envelope patch before push.
