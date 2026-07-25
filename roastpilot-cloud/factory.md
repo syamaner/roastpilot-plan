@@ -990,8 +990,25 @@ from attempt 1. Local factory-security, QA, and independent triage passed; all
 required CI and `codecov/patch` passed; the exact-head Codex verdict was clean.
 The intentionally optional Claude review check failed while its App
 installation was suspended. The factory was paused and verified drained
-immediately before merge and remains paused for 51b-3. Issue #51 remains open
-and In Progress for 51b-3.
+immediately before merge and remained paused for 51b-3. Slice 51b-3 shipped in
+cloud PR #129 (`9f49ae73`) with 152 changed production lines. It captures the
+unique exact bot-owned final dotted generation before the implementation agent
+starts and re-checks the complete canonical history under the shared publisher
+lock before any branch or PR write; absent, duplicate, legacy, hold, malformed,
+stale, and wrongly-owned history fails closed. Local factory-security, mandatory
+QA, and independent triage passed; 1,639 tests passed with one intentional skip,
+all changed executable lines were covered, and every required remote check
+passed. `codecov/patch` did not post during the worker stall and was non-required
+under the temporary operator decision. The spec-grounded review's six
+current-head threads were independently dismissed as cross-slice false
+positives after verifying the cumulative #123-#128 delivery. Codex's current-head
+pagination finding was independently dismissed after a live API trace and the
+official GitHub CLI v2.76.0 source confirmed that `gh issue view --json comments`
+exhausts the comments connection before returning. All threads were resolved.
+The intentionally optional Claude review check failed while its App installation
+was suspended. The factory was paused and verified drained immediately before
+merge and remains paused; no live triage-agent backfill runs while the Claude App
+is suspended. Issue #51 is closed and its project item is Done.
 
 This split was required when the settled 51a+51b draft reached 399 production
 insertions before a final exact-head review found the protected-filter,
