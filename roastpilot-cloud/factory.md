@@ -1383,3 +1383,28 @@ docs. Path categories remain only to enforce the separate-issue/PR rule for
 mixed output plus logic/tests. The publisher's existing 2 MiB captured-patch
 limit is also an authorization/intake constraint; work expected to exceed it
 routes to conventional execution rather than failing only after implementation.
+
+**D123 (26 Jul 2026) — Node external processes are adapter capabilities, not
+per-call exceptions.** The public 120c-1 import verifier remains strict and
+continues to reject `node:child_process` everywhere. The combined executable
+closure verifier may privately recognize that module only in one exact,
+protected central process adapter. No other repository source receives a raw
+process API exception.
+
+The adapter exposes typed named capabilities backed by a central reviewed
+registry. Each capability closes the executable identity, canonical working
+directory, explicit environment, validated argument grammar, and `shell:
+false`; callers cannot supply or override raw spawn options. Exact capability
+rules are part of the verified executable closure, and an unknown capability,
+executable, argument, directory, environment entry, or computed target fails
+closed.
+
+The initial supported runtime grammar rejects dynamic `import`, `require`,
+`createRequire`, `eval`, `Function` and equivalent code constructors,
+`node:vm`, workers, custom loaders/module registration, `process.dlopen`,
+native addons, and raw `spawn`/`exec`/`fork` or equivalent external-process
+paths outside the protected adapter. A later capability requires its own
+reviewed registry rule; it is never authorized by a local call-site allowlist.
+120d still owns workflow shell syntax, containers, startup flags, package
+scripts/bins, and workflow environment inheritance. This analyzer slice
+activates no live job and makes no compliance claim.
