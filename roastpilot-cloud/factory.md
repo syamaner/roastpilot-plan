@@ -1484,8 +1484,12 @@ unexpected output type, or output above the ceiling fails closed through a
 sanitized capability error and never echoes child stderr.
 
 The executable-closure analyzer admits one raw `spawnSync` call only in this
-exact adapter capability and validates the executable, argv, environment,
-cwd binding, lifecycle, and output-bound rule structurally. Aliasing,
+exact adapter capability. It pins the adapter's executable TypeScript tokens
+with a SHA-256 registry over the trivia-free scanner token stream, so
+whitespace and comments may change but executable helpers, dataflow, returns,
+and process use may not. The analyzer also retains explicit structural checks
+for the exact child-process import, capability call, executable, argv,
+environment, cwd binding, lifecycle, and output-bound rule. Aliasing,
 re-export, duplicate calls, computed registry access, alternate values, or
 raw process use anywhere else remains rejected. This is capability substrate:
 it neither activates a workflow nor declares a job compliant.
