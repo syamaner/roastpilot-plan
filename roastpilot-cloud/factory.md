@@ -1453,3 +1453,33 @@ properties use exact minimal allowlists derived from the current factory
 corpus. The 120c-2a synthetic adapter fixture may prove only the exact protected
 named import; every use of its raw process binding remains rejected until
 120c-2b adds and verifies the first concrete named capability.
+
+**D126 (26 Jul 2026) — the first process capability is exact Git tracked-path
+enumeration.** The operator approved `/usr/bin/git` as the exact executable
+identity for 120c-2b. The protected adapter exposes only the typed
+`listTrackedPaths(repositoryRoot)` capability and migrates only the
+pre-install invisible-format scanner. The publisher's broader Git command
+surface remains outside this slice.
+
+The capability canonicalizes the supplied repository root with `realpath`,
+requires it to be a directory, and immediately before spawning revalidates
+both that canonical working directory and `/usr/bin/git`; the executable's
+realpath must remain exactly `/usr/bin/git`. It runs exactly
+`["ls-files", "-z"]` with `shell: false`, a 30-second timeout, `SIGKILL`,
+ignored stdin, captured stdout/stderr, a 16 MiB output ceiling, and no
+caller-supplied spawn option.
+
+The child receives a fresh environment containing only `LC_ALL=C`,
+`GIT_CONFIG_NOSYSTEM=1`, `GIT_CONFIG_GLOBAL=/dev/null`,
+`GIT_OPTIONAL_LOCKS=0`, and `GIT_TERMINAL_PROMPT=0`; it inherits no `PATH`,
+Git routing variable, credential, or other parent state. Nonzero exit,
+signal termination, timeout/spawn error, unexpected output type, or output
+above the ceiling fails closed through a sanitized capability error and never
+echoes child stderr.
+
+The executable-closure analyzer admits one raw `spawnSync` call only in this
+exact adapter capability and validates the executable, argv, environment,
+cwd binding, lifecycle, and output-bound rule structurally. Aliasing,
+re-export, duplicate calls, computed registry access, alternate values, or
+raw process use anywhere else remains rejected. This is capability substrate:
+it neither activates a workflow nor declares a job compliant.
