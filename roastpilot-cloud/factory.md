@@ -1408,3 +1408,29 @@ reviewed registry rule; it is never authorized by a local call-site allowlist.
 120d still owns workflow shell syntax, containers, startup flags, package
 scripts/bins, and workflow environment inheritance. This analyzer slice
 activates no live job and makes no compliance claim.
+
+**D124 (26 Jul 2026) — runtime analysis precedes the first callable process
+capability.** Pre-implementation factory-security review split D118's 120c-2
+at a coherent security boundary:
+
+1. **120c-2a** adds one stable-read traversal shared by static provenance and
+   a closed, binding-aware repository runtime grammar. The combined verifier
+   recognizes the hard-coded protected adapter path and exact allowed
+   `node:child_process` import shape in synthetic fixtures only. It does not
+   add a production adapter or raw process import.
+2. **120c-2b** adds the protected adapter together with its first real named
+   capability and migrates one consumer. The executable, canonical working
+   directory, fresh explicit environment, command-specific bounded arguments,
+   no-shell spawn options, timeout/output/lifecycle behavior, and immediate
+   pre-spawn path revalidation are therefore reviewed against a concrete use,
+   not an empty registry or generic runner.
+
+The combined verifier analyzes the same canonical path, stable source bytes,
+decoded text, and AST for both passes; it never calls the public import
+verifier and then re-reads. The adapter identity is internal policy, not a
+caller-selected exception, and the public import-only contract remains
+universally strict. External locked packages remain terminal exact-resolution
+delegations under D117's named lockfile/install trust root, so this repository
+AST grammar claims closure over repository-triggered runtime capabilities, not
+inspection of arbitrary dependency internals. Both slices remain unactivated
+analysis/capability substrate and preserve 120d's separate workflow grammar.
