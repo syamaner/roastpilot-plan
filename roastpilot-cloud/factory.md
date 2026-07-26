@@ -1494,3 +1494,42 @@ environment, cwd binding, lifecycle, and output-bound rule. Aliasing,
 re-export, duplicate calls, computed registry access, alternate values, or
 raw process use anywhere else remains rejected. This is capability substrate:
 it neither activates a workflow nor declares a job compliant.
+
+**D127 (26 Jul 2026) — workflow execution evidence precedes exact
+authorization.** The operator approved the pre-implementation
+factory-security recommendation to split 120d at a responsibility boundary:
+
+1. **120d-1** adds a bounded workflow execution-surface canonicalizer. It
+   strictly parses YAML with merge-key and alias resolution, then emits typed
+   evidence for jobs, run and action steps, exact effective run text, explicit
+   or inherited shell and working-directory values, effective environment and
+   action inputs, reusable-workflow references, and job/service container
+   configuration. A malformed, ambiguous, excessive, or unknown execution
+   shape fails closed and erases success evidence. This slice authorizes no
+   execution.
+2. **120d-2** matches that canonical evidence against protected exact
+   whole-step capabilities and trusted-target contracts. Matching shell text
+   alone never authorizes a mutable package script, binary, sourced file, or
+   repository path. Exact-SHA remote actions remain trusted delegation
+   boundaries, but their workspace access requires its own reviewed contract.
+
+The canonicalizer admits at most **1 MiB** of UTF-8 workflow source,
+**256 jobs**, **2,048 total steps**, **4,096 effective environment/input
+bindings**, and **100 YAML alias expansions**. A `run` value may contain at
+most GitHub's documented **21,000 Unicode characters**. The current maxima
+are 65,045 source bytes, four jobs, 28 steps, 22 environment bindings, and no
+workflow-level default, job container, or service.
+
+The initial authorization grammar in 120d-2 accepts only explicit
+`shell: bash`, with static `run`, `shell`, and `working-directory` fields.
+GitHub's implicit Linux shell is not equivalent: it uses `bash -e` with an
+`sh` fallback, whereas explicit Bash uses a no-profile, no-rc,
+`-eo pipefail` invocation. Workflow/job `defaults.run`, non-Bash or custom
+shells, job containers, and services are initially unsupported and fail
+closed. The 120d-1 evidence still detects and represents those forms so the
+policy cannot miss them. Container actions are likewise not presumed safe:
+GitHub automatically mounts `GITHUB_WORKSPACE`, so a pin proves source
+identity rather than non-execution of mounted repository content.
+
+This is a responsibility/security split, not a line-count split. Both slices
+remain analyzer-only, activate no live workflow, and make no compliance claim.
