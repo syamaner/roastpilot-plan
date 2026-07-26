@@ -1434,3 +1434,22 @@ delegations under D117's named lockfile/install trust root, so this repository
 AST grammar claims closure over repository-triggered runtime capabilities, not
 inspection of arbitrary dependency internals. Both slices remain unactivated
 analysis/capability substrate and preserve 120d's separate workflow grammar.
+
+**D125 (26 Jul 2026) — repository runtime analysis is bounded and uses closed
+property grammar.** The 120c-2a analyzer admits at most **100,000 AST nodes**
+and **256 levels of AST depth** per source file, inside D118's byte ceilings.
+The measured current factory maxima are 5,969 nodes and depth 25, so the limits
+leave more than 16× node and 10× depth headroom while bounding parser and
+analysis amplification. Parser, traversal, or analyzer failure returns a
+structured violation and erases all success evidence; it never escapes as an
+uncaught availability failure.
+
+Erased ambient declarations do not establish runtime bindings, and default
+parameter environments are distinct from function-body `var` bindings.
+Non-literal computed member reads, computed destructuring, reflection/code
+constructor paths, and identity recovery through `global`, `globalThis`,
+`module`, `Object`, or `process` fail closed. Direct `process` and `Object`
+properties use exact minimal allowlists derived from the current factory
+corpus. The 120c-2a synthetic adapter fixture may prove only the exact protected
+named import; every use of its raw process binding remains rejected until
+120c-2b adds and verifies the first concrete named capability.
