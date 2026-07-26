@@ -1462,20 +1462,26 @@ pre-install invisible-format scanner. The publisher's broader Git command
 surface remains outside this slice.
 
 The capability canonicalizes the supplied repository root with `realpath`,
-requires it to be a directory, and immediately before spawning revalidates
-both that canonical working directory and `/usr/bin/git`; the executable's
-realpath must remain exactly `/usr/bin/git`. It runs exactly
+requires it to be a directory, and records its device/inode identity. It also
+records `/usr/bin/git` as a regular file whose realpath is exactly that path.
+Immediately before spawning it revalidates both realpaths, object kinds, and
+device/inode identities. The result carries the canonical repository root,
+which the scanner must use for every subsequent working-tree load; the
+caller-supplied lexical or symlink path is not reused. It runs exactly
 `["ls-files", "-z"]` with `shell: false`, a 30-second timeout, `SIGKILL`,
 ignored stdin, captured stdout/stderr, a 16 MiB output ceiling, and no
 caller-supplied spawn option.
 
 The child receives a fresh environment containing only `LC_ALL=C`,
 `GIT_CONFIG_NOSYSTEM=1`, `GIT_CONFIG_GLOBAL=/dev/null`,
-`GIT_OPTIONAL_LOCKS=0`, and `GIT_TERMINAL_PROMPT=0`; it inherits no `PATH`,
-Git routing variable, credential, or other parent state. Nonzero exit,
-signal termination, timeout/spawn error, unexpected output type, or output
-above the ceiling fails closed through a sanitized capability error and never
-echoes child stderr.
+`GIT_OPTIONAL_LOCKS=0`, `GIT_TERMINAL_PROMPT=0`, and the exact protected
+`GIT_CONFIG_COUNT=1` / `GIT_CONFIG_KEY_0=core.fsmonitor` /
+`GIT_CONFIG_VALUE_0=false` override. The override prevents a repository-local
+`core.fsmonitor` setting from executing an external hook during `ls-files`.
+The child inherits no `PATH`, Git routing variable, credential, or other
+parent state. Nonzero exit, signal termination, timeout/spawn error,
+unexpected output type, or output above the ceiling fails closed through a
+sanitized capability error and never echoes child stderr.
 
 The executable-closure analyzer admits one raw `spawnSync` call only in this
 exact adapter capability and validates the executable, argv, environment,
