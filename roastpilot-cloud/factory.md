@@ -128,12 +128,13 @@ issue without the ordered, sized, reviewer-tagged plan is not
 ready-to-implement. D119 supersedes D104's original binary size and exact-one
 mapping; the decomposition and reviewer-routing gate remains.
 
-**Execution-path boundary (D120-D121, 25-26 Jul 2026).** D119's size guide
+**Execution-path boundary (D120-D122, 25-26 Jul 2026).** D119's size guide
 governs conventional/interactive review units. The current automated publisher
 cannot run independent pre-open review or produce multiple commits, so
 `factory-dispatchable` issues retain an exact fail-closed technical envelope:
-one issue/commit/PR; at most 400 combined changed logic-and-test lines; no
-binary patch; and no mix of allowlisted inert
+one issue/commit/PR; at most 400 combined changed textual lines across every
+path category; a captured patch artifact no larger than 2 MiB; no binary patch;
+and no mix of allowlisted inert
 data/fixtures/generated/design-doc output with logic or tests. Migrations and
 operational or unknown documentation are logic. The
 privileged publisher classifies both the captured patch encoding and the
@@ -1370,3 +1371,15 @@ a larger patch routes to conventional execution, where the existing test-volume
 QA trigger still applies. A larger pure-test factory allowance may be
 reconsidered after executable-closure enforcement proves test roots are
 unreachable from production entrypoints.
+
+**D122 (26 Jul 2026) — every textual factory path shares the ceiling, and
+intake exposes the artifact cap.** A path-only inert-output allowlist cannot
+prove runtime inertness: an earlier small logic PR can import or read an
+allowlisted JSON, fixture, or design document, after which a later output-only
+patch changes production behavior. Until executable-closure enforcement exists,
+every non-binary changed line therefore contributes to the same 400-line factory
+ceiling, including allowlisted data, fixtures, generated output, and design
+docs. Path categories remain only to enforce the separate-issue/PR rule for
+mixed output plus logic/tests. The publisher's existing 2 MiB captured-patch
+limit is also an authorization/intake constraint; work expected to exceed it
+routes to conventional execution rather than failing only after implementation.
