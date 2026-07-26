@@ -1484,10 +1484,11 @@ unexpected output type, or output above the ceiling fails closed through a
 sanitized capability error and never echoes child stderr.
 
 The executable-closure analyzer admits one raw `spawnSync` call only in this
-exact adapter capability. It pins the adapter's executable TypeScript tokens
-with a SHA-256 registry over the trivia-free scanner token stream, so
-whitespace and comments may change but executable helpers, dataflow, returns,
-and process use may not. The analyzer also retains explicit structural checks
+exact adapter capability. It pins the adapter with a SHA-256 registry over the
+exact UTF-8 source bytes. Any source change,
+including whitespace or comments, requires an explicit registry update and
+review; this retains line terminators that can affect JavaScript semantics.
+The analyzer also retains explicit structural checks
 for the exact child-process import, capability call, executable, argv,
 environment, cwd binding, lifecycle, and output-bound rule. Aliasing,
 re-export, duplicate calls, computed registry access, alternate values, or
