@@ -1533,3 +1533,35 @@ identity rather than non-execution of mounted repository content.
 
 This is a responsibility/security split, not a line-count split. Both slices
 remain analyzer-only, activate no live workflow, and make no compliance claim.
+
+**D128 (26 Jul 2026) — ordinary shell evidence precedes delegated execution
+context.** Actual-diff factory-security review reproduced an evidence collision
+in D127's first implementation shape. Two workflows varied only a
+`strategy.matrix` payload, passed that payload into a pinned action input, and
+produced byte-identical canonical evidence despite executing different
+JavaScript. The same draft also accepted non-finite and unsafe YAML numbers
+whose JavaScript values collapse during serialization. Neither class may reach
+an exact authorization registry.
+
+The operator-approved 120d-1/120d-2 boundary is therefore refined at a second,
+security-relevant responsibility boundary:
+
+1. **120d-1a** canonicalizes bounded ordinary `run` jobs only: strict YAML,
+   exact runner labels, workflow/job/step environment precedence, run defaults,
+   step controls, exact run text, shell, and working directory. Action steps,
+   reusable-workflow jobs, strategy/matrix, job outputs/needs/environment or
+   lifecycle controls, containers, services, and every other unmodeled
+   execution/context producer fail closed with no success evidence. Scalar
+   evidence rejects non-finite or unsafe numeric values.
+2. **120d-1b** adds the delegated/context surfaces as typed, bounded,
+   injective evidence: action inputs, reusable-workflow inputs/secrets,
+   expression producers and job controls, containers/services, and remote
+   workspace delegation. It must prove that execution-affecting accepted fields
+   cannot vary while serialized evidence remains equal.
+3. **120d-2** remains the exact whole-step authorization policy and does not
+   activate until both evidence slices are complete.
+
+This split is not driven by the draft's 1,258 production lines. It isolates the
+delegation/context machinery where a concrete collision existed. The
+intermediate ordinary-shell canonicalizer is independently safe because it
+authorizes nothing and rejects, rather than ignores, every deferred form.
