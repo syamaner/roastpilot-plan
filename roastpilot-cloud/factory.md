@@ -1565,3 +1565,18 @@ This split is not driven by the draft's 1,258 production lines. It isolates the
 delegation/context machinery where a concrete collision existed. The
 intermediate ordinary-shell canonicalizer is independently safe because it
 authorizes nothing and rejects, rather than ignores, every deferred form.
+
+**D129 (26 Jul 2026) — workflow identity is canonical execution evidence.**
+Independent pre-open triage of 120d-1a reproduced a second identity collision:
+two byte-identical accepted workflow bodies at different repository paths
+produced equal evidence even though GitHub exposes the path through
+`GITHUB_WORKFLOW_REF`; when top-level `name` is absent, `GITHUB_WORKFLOW` also
+falls back to the workflow path. Content-only evidence is therefore
+insufficient for an exact authorization registry.
+
+The 120d-1a canonicalizer must take a bounded, validated repository-relative
+path directly under `.github/workflows/`, include that exact path in success
+evidence, and fail closed when the path is absent or malformed. Tests must prove
+that named and unnamed byte-identical bodies at different paths cannot collide.
+The path does not authorize the workflow: 120d-2 still owns exact whole-surface
+authorization, after 120d-1b completes delegated/context evidence.
