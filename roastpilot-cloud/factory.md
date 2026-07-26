@@ -128,16 +128,18 @@ issue without the ordered, sized, reviewer-tagged plan is not
 ready-to-implement. D119 supersedes D104's original binary size and exact-one
 mapping; the decomposition and reviewer-routing gate remains.
 
-**Execution-path boundary (D120, 25 Jul 2026).** D119's size guide governs
-conventional/interactive review units. The current automated publisher cannot
-run independent pre-open review or produce multiple commits, so
+**Execution-path boundary (D120-D121, 25-26 Jul 2026).** D119's size guide
+governs conventional/interactive review units. The current automated publisher
+cannot run independent pre-open review or produce multiple commits, so
 `factory-dispatchable` issues retain an exact fail-closed technical envelope:
-one issue/commit/PR, at most 400 changed logic lines, at most 600 changed test
-lines, no binary patch, and no mix of data/fixtures/generated/docs with logic
-or tests. Migrations are logic. The privileged publisher classifies the
-applied scratch-index diff, not the agent's patch text, before any push.
-Anything materially larger, mixed, or otherwise requiring pre-open `qa` routes
-to conventional execution and receives
+one issue/commit/PR; at most 400 combined changed logic-and-test lines; no
+binary patch; and no mix of allowlisted inert
+data/fixtures/generated/design-doc output with logic or tests. Migrations and
+operational or unknown documentation are logic. The
+privileged publisher classifies both the captured patch encoding and the
+applied scratch-index diff before any push. Anything materially larger,
+mixed-output, or otherwise requiring pre-open `qa` routes to conventional
+execution and receives
 `ready-for-conventional-implementation`, never the factory-authorizing
 `ready-to-implement` label. Factory data plus logic remains separate issues/PRs
 until multi-commit publishing exists. This exact automated envelope is a
@@ -1356,3 +1358,15 @@ may receive `ready-to-implement`. Until the automated publisher gains
 independent pre-open review and multi-commit support, it deterministically
 enforces the exact factory envelope recorded in §5 against its applied
 scratch-index diff and rejects any out-of-envelope patch before push.
+
+**D121 (26 Jul 2026) — factory logic and tests share one 400-line ceiling.**
+Every factory patch containing logic or test-source churn is capped at 400
+combined changed lines. A changed file under a test root can become
+production-reachable through a logic import from either the same patch or an
+earlier PR, and the current privileged publisher intentionally does not add a
+second, fragile import parser merely to preserve D120's former 600-line
+pure-test allowance. This is a conservative temporary authorization boundary:
+a larger patch routes to conventional execution, where the existing test-volume
+QA trigger still applies. A larger pure-test factory allowance may be
+reconsidered after executable-closure enforcement proves test roots are
+unreachable from production entrypoints.
