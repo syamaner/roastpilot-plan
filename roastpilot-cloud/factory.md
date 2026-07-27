@@ -1972,3 +1972,24 @@ execution unless the operator explicitly changes the issue contract. A defect
 found in 14h produces a new coherent fix slice and a repeated evidence run;
 baseline data remains separate from logic. Until 14a resolves these gates #14
 stays `Not started`/`wait-to-implement`.
+
+**D137 (27 Jul 2026) - same-PR registry updates use merge-relative
+wording.** D135's first use in cloud PR #138 exposed a timing defect: a row
+that says a slice "is active" is accurate while reviewing the branch but
+becomes stale at the instant that same PR merges. The post-merge API check
+reported the discrepancy on cloud #120 and stopped the transition as D135
+requires.
+
+Future slice PRs describe the state that becomes true when the PR lands:
+delivery is complete *through* the slice, the next planned slice is named,
+and any pause/authorization boundary is restated. The row includes the current
+PR in its merged link list. This proposed branch wording does not alter the
+live authority before merge because only the default-branch registry is live;
+on merge it becomes true atomically with the implementation.
+
+One reviewed mechanism-repair PR is required to correct #138's first-use drift
+and record this rule. It is not precedent for routine status-only catch-up
+commits: later drift remains a D135 process failure, must be reported, and
+stops the transition. Post-merge verification still checks PR state, issue
+state, labels, project item, registry wording, and links before the next slice
+begins.
