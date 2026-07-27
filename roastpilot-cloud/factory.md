@@ -2308,3 +2308,49 @@ table) is unaffected and is not restated here.
 D142 changes no execution boundary. It corrects the documented trigger model
 and the D103 draft-phase rationale; no repository setting, secret,
 Environment, or branch-protection configuration is altered.
+
+**D143 (27 Jul 2026) - F1-S6's ratchet, audit, and review-lens gates are
+settled.** Three of D136's five contract gates are decided by the operator,
+which unblocks slice 9b. The remaining two, the accepted Codex event channels
+and the `@claude question|task` grammar with its eligible PR, branch, and fork
+set, stay open and continue to block 9c/9d and 9e respectively.
+
+**Confidence method: a Wilson 95 percent lower bound on the triage-agreement
+rate, with at least three distinct issue types before any promotion step.** The
+ratchet advances only when the lower bound clears the threshold, not when a raw
+count does. This replaces the under-powered counting gate D136 already
+criticised: n=5 with zero overrides cannot distinguish an eighty percent agent
+from a fifty percent one, and a lower bound is honest at small n rather than
+flattering. Triage override rate stays weighted above first-pass green, because
+green rate is agent-movable and override rate is not. The first observed sample
+(27 Jul 2026, recorded on cloud #9) illustrates why diversity is a hard
+requirement rather than a preference: it covered one hardening slice, one
+security fix, and one documentation reconciliation, with no feature, migration,
+or schema work, so a count-based reading of it would have been meaningless.
+
+**Audit sampling: one hundred percent of PRs touching the security surface plus
+approximately ten percent random with a rotated auditor, and the sampling is
+ENFORCED rather than conventional.** A required check fails when an audit is
+owed and no audit record exists. An unenforced audit rule is the same defect
+class D141 had to correct for model pins, where a documented default that
+nothing enforced was not a default. The 27 Jul session produced two independent
+cases of a green signal that meant nothing ran, so a convention-only audit rule
+has a measured poor record in this repository specifically.
+
+**A working Claude review lens IS a hard acceptance prerequisite for the
+supervised 9h session, and cloud #146 must be fixed before it.** The fix has two
+parts, and the second is load-bearing: close the allowlist gap so the review
+loop holds the tools it needs, and make the job FAIL when it terminates without
+posting findings or a summary, rather than reporting success. Observed 27 Jul on
+cloud PR #150: the job exited zero after four permission denials, having
+completed two of five steps, while its own comment read "Claude finished" and
+the check rendered green. A control run on PR #152 hit denials too and degraded
+gracefully by disclosing exactly what it could not verify, which narrows the
+defect to a denial landing on the core review loop with no obligation to report
+being blocked. The supervised session is precisely where the review pipeline
+should be proven rather than excused, so no operator exception is granted.
+
+D143 changes no execution boundary. It settles product and security contract
+gates, adds cloud #146 as a 9h prerequisite, and alters no repository setting,
+secret, Environment, or branch-protection configuration. The factory remains
+paused and `FACTORY_PAUSED` stays exactly `true`.
