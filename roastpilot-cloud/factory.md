@@ -1748,3 +1748,79 @@ documents `single` and `max`, calls `single` the default, and forbids
 to fail closed on the field until the operator confirms that this documented
 fixed default satisfies the rule above. An unrecognized or held field is never
 silently erased from evidence.
+
+**D134 (27 Jul 2026) - 120d-1b2 admits repository actions only.** The
+operator approved one 120d-1b2 slice, **120d-1b2a**, for the repository-action
+step union covering the 46 live action steps and 117 declared inputs.
+The proposed reusable-workflow sub-slice is cut because the repository has no
+live reusable-workflow call. Reusable-workflow jobs remain unconditionally
+rejected until a real call is introduced; that introduction owns its evidence
+slice rather than pre-building an unused delegation model.
+
+The action-step grammar is closed: `uses`, `with`, `env`, `if`,
+`continue-on-error`, `timeout-minutes`, `id`, and `name` are the only accepted
+keys. A step with both `run` and `uses`, neither execution key, or any other key
+fails closed. There is no held or accept-but-ignore form. Reusable-workflow
+jobs, local or dynamic references, direct `docker://` references, mutable refs,
+and malformed targets remain rejected with no evidence.
+
+An accepted repository target has exactly
+`owner/repository[/action/path]@40-hex-sha`. Parsing is anchored: one `@`,
+exactly 40 hexadecimal characters, no empty, dot, or dot-dot segment, no
+backslash or repeated separator, and no expression marker. Owner, repository,
+and SHA case normalize to lowercase because they are identity components;
+action-path case is preserved because it names repository content. 120d-1b2a
+matches 120a's case-insensitive owner/repository/SHA comparison for case
+variants. The existing 120a Claude-action pin audit also accepts backslash and
+repeated-separator spellings after path normalization; 120d-1b2a deliberately
+rejects those spellings. That divergence is fail closed on the execution
+surface side, is pinned in both suites, and does not change 120a as a side
+effect.
+
+Declared action inputs use a mapping whose portable-ASCII identifiers are
+sorted in ascending ECMAScript UTF-16 code-unit order with `<` and `>`. Input
+order is not execution-significant, unlike matrix declaration order, and
+sorting never uses locale or case-insensitive comparison. Identifiers use the
+bounded portable grammar and fail closed on case-fold collision. Values
+preserve exact typed strings, booleans, safe integers, or null. Null is
+distinct from the empty string and an input key is never silently dropped.
+Expressions remain exact opaque strings, including secret-referencing
+expressions. The acceptance corpus includes an otherwise-identical pair with
+and without a secret-referencing input, plus a pair differing only in the
+referenced secret name, and requires distinct evidence for both. Absent `with`
+and an explicit empty mapping normalize to the same empty richer form and
+consume the same budget because the no-input default is fixed by the SHA-pinned
+action declaration. The canonical-value budget charges the input mapping
+collection once, then one key and one typed value per declared input. Each
+declared input separately consumes one of the shared 4,096 bindings.
+
+Every accepted repository action carries unconditional
+`workspaceCapability: "read-write"` and
+`githubTokenMaterialAccessible: true` metadata. Both are conservative
+over-approximations, not observations that a particular target reads or writes
+the workspace or explicitly binds the token. They do not replace exact input
+evidence, and no analyzer-authored `trusted`, `safe`, or `authorized` assertion
+is permitted.
+
+Run and repository-action steps, and ordinary and any future delegated jobs,
+use explicit discriminants before 120d-2 has a live evidence consumer. The
+discriminants change the serialized schema but not verdicts or canonical
+counts. **Only source-derived canonical values consume D131's value/depth
+budget; analyzer-emitted type tags, capability metadata, and other fixed schema
+keys do not.** Tests pin unchanged live-corpus verdicts and counts across that
+schema change, and every union variant receives its discriminant in the same
+commit.
+
+The cut reusable-workflow design remains recorded for future use: a remote
+call would require an exact full-SHA
+`owner/repository/.github/workflows/file.yml@40-hex-sha` or
+`owner/repository/.github/workflows/file.yaml@40-hex-sha` target, the
+documented closed call-job key set, sorted typed inputs, a distinct
+named-secrets versus `inherit` union, effective permission evidence, and
+separate caller-context and caller-token delegation markers. It would claim
+neither shared caller workspace nor successful checkout. None of that evidence
+is implemented until a real call exists.
+
+120d-1b2a remains conventional and analyzer-only. Any violation or resource
+limit erases the whole success surface. 120d-2 remains the sole authorization
+owner, and the factory stays paused.
