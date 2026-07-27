@@ -1905,12 +1905,19 @@ acceptance and every other non-availability S7 control are not waivable:
    artifacts, expected assertions, and observed results. #9 and #11 close only
    when every required live assertion succeeds.
 
-Every new 9d/9e/9g job must pass D117-D134 executable-closure evidence and be
-added to 120d-2 exact authorization in the same slice before it can activate.
-It also remains `FACTORY_PAUSED`-gated and inactive until the supervised 9h
-window. Evidence-session defects produce a new coherent fix slice and a fresh
-9h run; 9h never mixes a code fix into operational evidence. Generated baseline
-data is delivered separately from logic under the repository hygiene rule.
+Under D140, D117-D134 analyzer output remains drift-detection evidence rather
+than an authorization/admission gate, and 120d-2 is not required. Before any
+new 9d/9e/9g job activates, the operator must ratify that job's platform
+disposition: remove the credentialed path; disable the job; place an
+Environment-only named secret behind required reviewers where that actually
+withholds the credential; establish another base-controlled non-bypassable
+boundary; or admit a manual path only with an explicit trusted-ref, authorized
+identity, approval, and mutable-data/execution contract. An Environment
+attachment does not durably gate the built-in `GITHUB_TOKEN`. Each job remains
+`FACTORY_PAUSED`-gated and inactive until the supervised 9h window.
+Evidence-session defects produce a new coherent fix slice and a fresh 9h run;
+9h never mixes a code fix into operational evidence. Generated baseline data
+is delivered separately from logic under the repository hygiene rule.
 
 Before 9b/9c/9e, the operator must decide the exact `@claude question|task`
 grammar and eligible PR/branch/fork set; the accepted Codex event channels
@@ -1956,8 +1963,15 @@ F1-S11 follows S6 and is delivered serially:
    crosses the drift threshold for the intended scorer before completing the
    registry transition; product-PM, factory-security, and QA.
 
-Every new 14d-14g job must pass D117-D134 executable-closure evidence and be
-added to 120d-2 exact authorization in the same slice before activation. 14a
+Under D140, D117-D134 analyzer output remains drift-detection evidence rather
+than an authorization/admission gate, and 120d-2 is not required. Before any
+new 14d-14g job activates, the operator must ratify that job's platform
+disposition: remove the credentialed path; disable the job; place an
+Environment-only named secret behind required reviewers where that actually
+withholds the credential; establish another base-controlled non-bypassable
+boundary; or admit a manual path only with an explicit trusted-ref, authorized
+identity, approval, and mutable-data/execution contract. An Environment
+attachment does not durably gate the built-in `GITHUB_TOKEN`. In addition, 14a
 must decide whether those jobs honor `FACTORY_PAUSED` or a separate fail-closed
 eval pause; no eval job activates without one of those explicit pause gates.
 The 14g path remains manual/inactive through the supervised 14h proof and may
@@ -2093,3 +2107,80 @@ normalized forbidden-path result.
 D139 neither authorizes, retires, nor schedules 120d-2. The separately held
 operator decision remains controlling; the generic producer/consumer rule
 cannot revise D127, D128, or D136 by implication.
+
+**D140 (27 Jul 2026) - workflow analyzers freeze as drift detection and
+platform disposition owns activation.** The operator ratifies the proposed
+revision to D127, D128, and D136 with one residual-risk amendment.
+
+The workflow analyzer track freezes at merged 120d-1b2a. Merged 120a, 120b,
+120d-1a, 120d-1b1, and 120d-1b2a stay in service as evidence-only drift
+detection for new credential-reachable workflow surfaces. They authorize no
+execution and make no compliance claim. Reusable-workflow jobs remain
+unconditionally rejected under D134, and job container/service forms remain
+unconditionally rejected under D138. 120d-1b3 stays cut. 120d-2 is held: it is
+not started or designed further.
+
+Activation enforcement moves to an operator-ratified platform disposition for
+each credential-reachable job. The disposition removes the credentialed path;
+disables the job; places an Environment-only named secret behind required
+reviewers where that actually withholds the credential; establishes another
+base-controlled non-bypassable boundary; or admits a manual path only with an
+explicit trusted-ref, authorized identity, approval, and mutable-data/execution
+contract. `workflow_dispatch` alone is not a security boundary: it can execute
+workflow code from a selected ref. Analyzer output informs the disposition as
+drift evidence; it is not an exact-authorization prerequisite. This decision
+authorizes no repository setting, secret-scope, Environment, or
+branch-protection change.
+
+The measured non-Environment-gatable residual is accepted at its current
+size, rather than reopening 120d-2:
+
+- fork pull requests receive no secrets and a read-only token under GitHub's
+  platform behavior, so that external threat is closed by the platform;
+- for actors who already have repository push access, the operator accepts the
+  current built-in repository-scoped `GITHUB_TOKEN` authority as no escalation
+  over pushing directly. This equivalence does not apply to external
+  identities such as Claude provider OAuth/OIDC-derived material or the
+  Codecov upload credential; those remain separately accepted residuals; and
+- the genuine remaining sub-case is a restricted factory actor, bounded by
+  the applied-tree protected-path denies, attempting to exceed those bounds.
+  Direct workflow/glue edits are only one route: allowed application or test
+  code can still execute in current PR jobs, influence credentialed actions,
+  or poison shared job state without touching a protected path. The denies are
+  partial containment, not closure. Human merge limits what lands but is
+  downstream of pre-merge execution. Exact `FACTORY_PAUSED=true` is what makes
+  the restricted factory author unreachable today.
+
+This residual acceptance is **conditional on the factory remaining paused**.
+The current implementation runs when `FACTORY_PAUSED != 'true'`, so absence,
+deletion, misspelling, an indeterminate API read, or any value other than the
+literal `true` also reopens the residual and blocks factory dispatch pending
+#47; the switch is not fail-closed on absence. Before cloud issue #120 closes,
+the owner must verify through the GitHub API that the value is exactly `true`.
+That read does not cancel a queued or already-running job, which retains its
+existing operator cancellation requirement. Re-evaluating the complete
+current inventory is a named prerequisite of cloud issue #47 before the
+factory-bot enable decision makes the restricted-actor case live. That review
+must cover read-only and PR-write/security-events built-in token capabilities,
+the Codecov upload credential, Claude OAuth/OIDC-derived identity, and mutable
+application/test/action-input execution or data reachability; it is not limited
+to direct workflow self-grant. It is not a prerequisite of cloud issue #120,
+which closes after the ratification and state records reconcile. This
+acceptance is limited to the measured current surfaces; a new job, credential,
+identity, or execution class requires its own operator disposition and cannot
+inherit D140 by analogy. A separate operator decision to unpause into
+unsupervised dispatch also reopens the residual.
+
+The credential inventory established two corrections that remain explicit.
+Moving `FACTORY_PUBLISHER_PRIVATE_KEY` or
+`SNOWFLAKE_PREVIEW_PRIVATE_KEY` to Environment scope is not a current
+pre-merge control because neither secret is referenced by a PR-triggered job.
+Attaching an Environment cannot durably gate the built-in `GITHUB_TOKEN`:
+PR-head workflow YAML can remove the attachment while the job token still
+exists.
+
+D136's 9d/9e/9g and 14d-14g activation clauses are revised accordingly:
+120d-2 exact authorization is no longer required. Each job instead requires
+the operator-ratified platform disposition above, plus its existing pause and
+supervised-evidence gates. F1-S6 remains eight ordered slices and becomes the
+next implementation backlog item only after separate operator confirmation.
