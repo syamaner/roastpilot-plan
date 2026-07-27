@@ -2184,3 +2184,55 @@ D136's 9d/9e/9g and 14d-14g activation clauses are revised accordingly:
 the operator-ratified platform disposition above, plus its existing pause and
 supervised-evidence gates. F1-S6 remains eight ordered slices and becomes the
 next implementation backlog item only after separate operator confirmation.
+
+**D141 (27 Jul 2026) - agent topology, harness allocation, and enforced model
+pins.** Two changes make the previous sub-agent roster insufficient, and a
+third adds an axis.
+
+Codex moves off implementation duty. The interactive agent becomes both author
+and lead on its own PRs, which removes D23's independence: the author must
+never decide what counts as resolved. The `pr-triage` role referenced by
+`AGENTS.md` did not exist as a definition. It is added, pinned `sonnet`, and is
+a Claude sub-agent rather than Codex - triage is adjudication against a known
+rubric, whereas Codex's diverse-lens value is in finding, so its capped quota is
+better spent there.
+
+Sub-agent model pins become enforced rather than documented. An agent
+definition with no `model:` inherits the parent, so an unpinned definition
+spawned from an Opus main loop silently runs Opus across an entire fan-out.
+`tests/factory/agent-model-pin.test.ts` asserts that every definition carries an
+explicit `model:` from the allowed set, that `factory-security-reviewer` and
+`schema-migration-reviewer` remain `opus`, that a required adversarial reviewer
+cannot be removed, and that an empty roster fails rather than passing
+vacuously. This is the same claim-versus-enforcement correction D139 applied to
+the calibration rules.
+
+The roster is two tiers, `opus` and `sonnet`. No Haiku tier is introduced:
+nothing in this repository is both high-volume and correctness-insensitive, and
+mechanical extraction is better served by `gh` or `grep` than by a third model.
+
+The Opus triggers are not narrowed to reduce cost. Both adversarial reviewers
+fire on F1-S6's first slice, because #58 changes a workflow file and grants.
+The operator accepts that: quality and safety lead. Narrowing a security
+trigger is a permissive scope change under D139's direction test and therefore
+requires an explicit operator decision supported by evidence, not a cost
+argument. The position is monitored and re-evaluated, not pre-emptively
+relaxed.
+
+Codex is available locally as an MCP server and as `codex review --base
+<branch>`, drawing on a separate weekly-capped subscription. Allocation follows
+the observed cost behaviour: Codex spends its budget on ambiguity rather than
+volume, shipping settled contracts efficiently while an unsettled contract costs
+a full design round. Decisions, contracts, and ambiguous design therefore stay
+with the interactive agent; fully-specified implementation may be delegated;
+pre-open `codex review` is reserved for diffs touching the credential or
+pipeline boundary, because the same findings arriving post-open become
+merge-blocking threads requiring stale re-posts to be hand-resolved. A local
+`codex review` never satisfies the Codex merge wait, which requires a
+bot-authored verdict naming the exact head sha. Below roughly twenty percent
+remaining quota, implementation delegation stops and the remainder is reserved
+for pre-open review.
+
+D141 changes no execution boundary. The factory remains paused, D140's
+residual acceptance is unaffected, and no repository setting, secret,
+Environment, or branch protection is altered.
