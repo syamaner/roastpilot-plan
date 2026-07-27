@@ -1993,3 +1993,23 @@ commits: later drift remains a D135 process failure, must be reported, and
 stops the transition. Post-merge verification still checks PR state, issue
 state, labels, project item, registry wording, and links before the next slice
 begins.
+
+**D138 (27 Jul 2026) - unused container and service evidence is rejected,
+not pre-built.** The operator cuts 120d-1b3. The measured live workflow corpus
+contains zero job containers and zero service containers, so a dedicated
+evidence slice would model a producer with no current consumer. The existing
+canonicalizer's unconditional rejection is the complete fail-closed behavior
+for those forms.
+
+This applies the direction test: rejecting an unused execution form may create
+a future false positive when a real container job is proposed, but it cannot
+admit an unmodeled credential-reachable surface. Pre-building container,
+service, mount, and workspace evidence would add maintenance and review load
+without reducing current exposure. If a real container or service job is
+introduced, that change must first own a new evidence contract and adversarial
+acceptance tests; it cannot weaken or bypass the rejection as a side effect.
+
+The workflow analyzer track therefore ends at the merged 120d-1b2a evidence
+surface for now. This retirement does not authorize any workflow, activate any
+factory path, or adjudicate the separately held 120d-2 policy decision. The
+factory remains paused.
