@@ -1622,3 +1622,50 @@ remain conventional, analyzer-only, activate no workflow, make no compliance
 claim, and cannot resume the paused factory. **120d-2 remains the sole owner of
 authorization.** Every 120d-1b slice references cloud issue #120 and receives
 factory-security, QA, and independent pre-open triage.
+
+**D131 (27 Jul 2026) — trigger normalization, emission accounting, and token
+presence clarify D130.** This decision clarifies D130 without reversing it.
+The injectivity requirement is one-way: materially different execution
+surfaces must not collide, while materially identical spellings should
+canonicalize identically so an authorization rule cannot be evaded by syntax.
+
+For trigger declarations only, an event with a null body and the same event
+with an empty mapping have the same no-filter execution surface and normalize
+to the same canonical event declaration. The equivalent sequence spelling
+does too: `on: [push, pull_request]` equals a mapping whose `push` and
+`pull_request` values are null/empty. This is a per-construct rule, never a
+global `null == {}` rule. Every construct that admits both forms requires its
+own explicit tested decision; otherwise the unfamiliar form fails closed.
+In particular, absent `permissions:` remains distinct from `permissions: {}`
+and from every declared permission map.
+
+The per-workflow-file **16,384 canonical-value** limit counts each emitted
+collection, scalar/null, and mapping key. Root depth is **1**. Traversal counts
+the expanded canonical emission incrementally and aborts at the first crossing;
+an anchor referenced N times costs N emissions. It never builds an unbounded
+intermediate structure and measures it afterward. Exactly 16,384 values and
+depth 32 are accepted; value 16,385 and depth 33 are rejected independently.
+Equivalent trigger spellings that normalize to the same evidence also consume
+the same count. The existing 4,096-binding and 1 MiB source/evidence ceilings
+remain independent backstops. Whichever ceiling binds first returns one
+bounded `resource-limit` violation, no evidence, and no truncation.
+
+Permission evidence has two orthogonal axes. **Token material presence** is
+true for every job because GitHub creates a job token and exposes it through
+`github.token`, including when declared repository permissions are empty or
+read-only. **Declared repository capability** is the axis already used by
+120a's `permissionsCarryCredential`: an empty/all-`none` declaration has no
+declared repository capability, while a non-`none`, unresolved-default, or
+malformed declaration is conservatively capable. 120d-1b1 adds the presence
+axis; it does not re-label 120a as having classified token material.
+
+One shared resolver supplies both axes to 120a and 120d-1b1. It preserves
+120a's existing fixture verdicts, applies one byte-identical unknown-key
+failure rule, and emits a distinct typed `unresolved-default` variant when
+permissions are absent rather than fabricating a concrete map. A job
+declaration replaces rather than merges with a workflow declaration. The
+acceptance corpus includes absent versus declared-equal-to-current-default,
+workflow inheritance, explicit empty job override, read/write token presence,
+unknown keys, and permission-map reorder normalization. Malformed permissions
+remain conservatively capable for 120a but make 120d-1b1 unanalyzable with no
+success evidence.
