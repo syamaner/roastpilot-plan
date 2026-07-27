@@ -1669,3 +1669,38 @@ workflow inheritance, explicit empty job override, read/write token presence,
 unknown keys, and permission-map reorder normalization. Malformed permissions
 remain conservatively capable for 120a but make 120d-1b1 unanalyzable with no
 success evidence.
+
+**D132 (27 Jul 2026) — 120d-1b1 closes the ordinary run-step grammar.** This
+clarifies D130's scope without changing the 120d-1b responsibility boundary.
+120d-1b1 owns exactly these ordinary run-step keys: `run`, `if`, `env`,
+`continue-on-error`, `timeout-minutes`, `working-directory`, `shell`, `id`,
+and `name`. The list covers both the live corpus and GitHub's documented
+ordinary run-step grammar. Any other step key fails closed. In particular,
+`uses` and `with` remain delegated-action fields: b1 rejects the whole step,
+and b2 may later reuse the context helpers only after accepting the distinct
+action-step union.
+
+Step-level `if` is included for **evidence injectivity**, not because its
+absence would under-approximate reachability. Without it, two workflows that
+differ only in whether an ordinary run step executes emit identical canonical
+evidence. Rejecting every conditioned step would also be fail closed, but
+would exclude thirteen current run steps and leave the ordinary surface
+needlessly incomplete.
+
+Condition evidence is descriptive and never exculpatory. The analyzer records
+an `if` but never marks the step non-executing, and no later consumer,
+including 120d-2, may prune the execution surface from that condition without
+a separate contract. Conditions such as boolean `false` and
+`github.event.pull_request.head.repo.fork == false` remain part of the
+execution surface because runtime contexts may vary and may be
+attacker-influenced.
+
+Expression syntax is preserved, not interpreted or normalized. A bare
+condition and a `${{ ... }}` spelling carry distinct typed markers and exact
+source strings; structural normalization is reserved for constructs whose
+equivalence is decidable without expression semantics, such as D131's trigger
+null/empty rule. Boolean `true`/`false` conditions are accepted as typed
+booleans and remain distinct from the strings `"true"`/`"false"`. Safe
+integer conditions remain typed integers; fractions, unsafe/non-finite
+numbers, negative zero, collections, and null fail closed under D130's scalar
+rules.
