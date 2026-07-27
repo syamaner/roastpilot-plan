@@ -2298,8 +2298,8 @@ posted `pull_request_review` with inline threads counting as findings, and
 never arming auto-merge on green CI alone) is unchanged and stays recorded
 once, in the cloud repo's `AGENTS.md` PR Merge Policy section; this decision
 only replaces "the signal must postdate the final-commit trigger" with "the
-signal must correspond to the current head AND postdate the
-`ready_for_review` transition" (a `Reviewed commit:` sha matching the PR
+signal must correspond to the current head AND postdate the event that
+started this PR's automatic review" (a `Reviewed commit:` sha matching the PR
 head, or a 👍 reaction, which carries no sha and is valid only while the head
 is unchanged), because a ready PR's first review has no manual trigger for a
 signal to postdate. CORRECTED IN PLACE, same day, after Codex raised it as a
@@ -2308,7 +2308,18 @@ only a head match, which is NOT sufficient. A manually requested review on a
 DRAFT posts findings against the very same sha, so where nothing needed
 changing before marking ready, a head-match-only rule would let that
 pre-ready verdict satisfy the wait while the automatic review the ready
-transition just started was still in flight. Both conditions are required.
+transition just started was still in flight. Both conditions are required. CORRECTED AGAIN, same day (Codex P1 on cloud
+#155): the boundary event is not always `ready_for_review`. A PR CREATED
+ready, which every factory-authored PR is, emits `opened` and never emits
+`ready_for_review` at all, so naming that transition as the sole boundary
+would be unsatisfiable and would block every untouched factory PR
+permanently. The boundary is therefore per PR shape: `opened` for a PR
+created ready, `ready_for_review` for a draft marked ready, and the fresh
+single re-trigger on the new final commit after any later push. The same
+review also corrected an over-categorical claim that Codex does not review
+drafts at all: that holds for the AUTOMATIC trigger only, while a manual
+`@codex review` on a draft does run and post findings, exactly as D105
+recorded. Both facts stand together.
 Claude Code Review's own
 workflow-edit skip (#139, already recorded in that same `AGENTS.md` roster
 table) is unaffected and is not restated here.
