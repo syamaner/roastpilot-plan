@@ -1858,3 +1858,117 @@ treated as success. Plan epic tables contain stable scope plus a registry link
 rather than duplicating live delivery narratives. This normalization changes
 tracking mechanics only; it does not authorize a workflow, alter issue
 acceptance criteria, or unpause the factory.
+
+**D136 (27 Jul 2026) - F1-S6 and F1-S11 are ordered before
+implementation.** The operator's S6 additions are part of the stable #9
+contract: the first supervised DEV dispatch, owner-only PR question/task
+feedback, an advisory Codex-verdict status, #58's remaining optional
+hardening, the confidence-based ratchet, a shadow/draft audit rung, and the
+permanent security-plus-random human spot audit. They are not one
+implementation unit.
+
+After the D135 migration and #120 complete, F1-S6 is delivered serially. Any
+remaining live-review/S7 prerequisite must complete before activation. Only
+external review/App availability or another explicitly named acceptance-only
+dependency may receive an operator waiver in 9b; #47's security/exfiltration
+acceptance and every other non-availability S7 control are not waivable:
+
+1. **9a / #58 - remaining DEV-grant/workflow hardening** (about 10-40 logic
+   lines). L1's delimiter-safe boundary is already present; decide L3
+   explicitly and either move L2's `umask` before `mktemp` or remove the dead
+   defense. Schema-migration, factory-security, and QA review.
+2. **9b - metrics, ratchet, audit, and capture contract** (0-200 logic lines).
+   Define issue-type diversity, confidence threshold, override-first
+   promotion, shadow/draft audit, permanent sampling, a repeatable capture
+   helper, and the runbook skeleton. Product-PM, factory-security, and QA.
+3. **9c - pure Codex-verdict reducer** (250-350 TypeScript logic lines).
+   Identity, commit SHA, trigger, staleness, and accepted signal evidence;
+   factory-security and QA. Missing, stale-head, wrong-identity,
+   unsupported-channel, malformed, or API-indeterminate evidence yields an
+   explicit unknown/pending result, never clean/success, and is ineligible for
+   the ratchet.
+4. **9d - advisory status publisher/workflow** (200-300 logic lines), consuming
+   9c. It never becomes a required check; factory-security and QA.
+5. **9e - owner-command intake and question path** (300-400 logic lines).
+   Closed command grammar, eligible PR/branch checks, read-only agent, and
+   bounded comment publisher; factory-security and QA.
+6. **9f - existing-PR task publisher substrate** (250-350 logic lines).
+   Exact-head authorization, existing self-modification/anti-gaming guards,
+   and idempotent publish; factory-security and QA.
+7. **9g - task workflow extension** (250-350 logic lines), producing a bounded
+   patch artifact through the read-only agent for 9f; factory-security and QA.
+8. **9h - supervised evidence session** (zero logic; docs/evidence only).
+   Run the sacrificial issue/PR, first live DEV dispatch, question, task, and
+   advisory-status paths; then record the observed runbook, baseline, plan
+   feedback, and registry transition. Human PM, factory-security, and QA.
+   A per-path evidence manifest pins run identifiers, PR/head SHAs, bounded
+   artifacts, expected assertions, and observed results. #9 and #11 close only
+   when every required live assertion succeeds.
+
+Every new 9d/9e/9g job must pass D117-D134 executable-closure evidence and be
+added to 120d-2 exact authorization in the same slice before it can activate.
+It also remains `FACTORY_PAUSED`-gated and inactive until the supervised 9h
+window. Evidence-session defects produce a new coherent fix slice and a fresh
+9h run; 9h never mixes a code fix into operational evidence. Generated baseline
+data is delivered separately from logic under the repository hygiene rule.
+
+Before 9b/9c/9e, the operator must decide the exact `@claude question|task`
+grammar and eligible PR/branch/fork set; the accepted Codex event channels
+(GitHub Actions has no native reaction event); the confidence method,
+threshold, and issue-type diversity; audit sampling/enforcement; and whether
+Claude review availability is an S6 acceptance prerequisite. These are
+contract gates, not implementation discretion.
+
+F1-S11 follows S6 and is delivered serially:
+
+1. **14a - eval authorization/product contract** (decision-only). Pin the
+   model and base-SHA semantics, expected-label isolation, scorer tolerance,
+   credential boundary, and baseline-update authority. Missing cases,
+   provider/OAuth failure, malformed or partial output, exact-base mismatch,
+   scorer failure, retry/tolerance exhaustion, or an absent baseline is
+   non-pass and cannot update the baseline. Define immutable as-of issue input
+   snapshots and a case manifest; physical input/expectation separation; the
+   producer's network and repository-history access; an isolation test proving
+   it cannot read scorer expectations; per-case and aggregate score algebra,
+   case floors, timeout/retry aggregation, the drift threshold, and baseline
+   comparison.
+2. **14b - held-out corpus** (data-only PR). About twelve issue-type-diverse
+   historical cases with exact base SHAs and expected outcomes kept outside
+   the agent workspace; product-PM and QA.
+3. **14c - bounded schema/loader and deterministic scorers** (300-400 logic
+   lines). Triage-label and PR outcome scoring under 14a's exact algebra;
+   factory-security and QA.
+4. **14d - publisher/GitHub-write-credential-free triage replay producer**
+   (300-400 logic lines), consuming 14b/14c. A provider credential is admitted
+   only under 14a's explicit contract; factory-security and QA.
+5. **14e - implementation patch-artifact replay producer** (300-400 logic
+   lines). No publish/write credential; factory-security and QA.
+6. **14f - fresh-checkout outcome runner** (250-350 logic lines). Deterministic
+   compile, test, diff-bound, and mutation-score checks using existing gates;
+   factory-security and QA.
+7. **14g - orchestration and drift gate** (300-400 logic lines). Skill,
+   prompt, and model-path triggers; baseline comparison and bounded report;
+   factory-security and QA.
+8. **14h - supervised baseline proof** (zero logic; data/evidence only).
+   Pin run identifiers, inputs, model/prompt versions, artifacts, score
+   components, and assertions; prove the unchanged positive control reproduces
+   the baseline within 14a's tolerance and a targeted deliberate degradation
+   crosses the drift threshold for the intended scorer before completing the
+   registry transition; product-PM, factory-security, and QA.
+
+Every new 14d-14g job must pass D117-D134 executable-closure evidence and be
+added to 120d-2 exact authorization in the same slice before activation. 14a
+must decide whether those jobs honor `FACTORY_PAUSED` or a separate fail-closed
+eval pause; no eval job activates without one of those explicit pause gates.
+The 14g path remains manual/inactive through the supervised 14h proof and may
+activate only in a separate explicit transition after that proof succeeds.
+
+14a must resolve whether replay calls the pinned provider or consumes recorded
+outputs; safe OAuth use on PR-triggered changes; stochastic tolerance/retry;
+historical exact-base checkout; expected-answer isolation; and who may approve
+baseline updates. Recorded outputs may test the harness but cannot alone satisfy
+#14's model/prompt regression acceptance; that requires pinned-provider
+execution unless the operator explicitly changes the issue contract. A defect
+found in 14h produces a new coherent fix slice and a repeated evidence run;
+baseline data remains separate from logic. Until 14a resolves these gates #14
+stays `Not started`/`wait-to-implement`.
