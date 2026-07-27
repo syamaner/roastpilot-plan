@@ -2013,3 +2013,83 @@ The workflow analyzer track therefore ends at the merged 120d-1b2a evidence
 surface for now. This retirement does not authorize any workflow, activate any
 factory path, or adjudicate the separately held 120d-2 policy decision. The
 factory remains paused.
+
+**D139 (27 Jul 2026) - factory rigor is calibrated by failure direction and
+live exposure.** Security rigor remains mandatory, but implementation depth is
+chosen proportionally rather than by accumulating hypothetical forms or
+finding counts. Every factory kickoff and review applies these rules:
+
+1. **Direction test.** State whether a rejected or deferred form can create a
+   false negative (unsafe admission), a false positive (safe work rejected), or
+   only loss of availability. Unknown execution, source provenance,
+   credential/identity/permission derivation, persisted state, and
+   data-crossing schema forms fail closed; a false-positive reopen is cheaper
+   than silently admitting an unmodeled privileged surface. Classify a failure
+   as availability-only only after proving it cannot skip or bypass an
+   authoritative gate.
+2. **Reject what is not used.** Measure the live corpus first. An execution
+   class with zero instances remains unconditionally rejected until the change
+   that introduces its first real use owns the reviewed contract and
+   adversarial tests.
+3. **Static constraint before computed decision.** Prefer a simpler
+   base-controlled platform or structural constraint when it provides the
+   required property. Do not build a computed policy producer before its
+   enforcing consumer exists; if there is no consumer, do not build the
+   producer yet. A required-reviewer Environment durably withholds an
+   Environment-only named secret, but attaching an Environment is not by
+   itself a base-controlled gate for built-in `GITHUB_TOKEN` permissions:
+   PR-head YAML can remove the attachment and retain that token.
+4. **Blast radius uses two axes.** Assess both the data exposed and the
+   identity/capability that can act. Evaluate data confidentiality, integrity,
+   and sensitivity separately from principal scope, lifetime, and
+   revocability. Read-only public data with a short-lived token is not
+   equivalent to a publisher key, provider credential, or write-capable
+   principal even when every case remains credential-reachable.
+5. **Kickoff stopping rule.** Enumerate the live surface and the cited closed
+   grammar once, decide every key/form in that boundary, then stop. A new
+   zero-instance or speculative class requires an explicit scope decision; it
+   is not folded one spelling at a time. Record the base/head SHA, deterministic
+   query or source paths, observed counts, and the closed key/form table, then
+   revalidate that evidence at final head after any rebase or relevant surface
+   change.
+6. **Triage by failure direction, not severity count.** One credible
+   fail-open or credential-identity finding outweighs many availability or
+   false-positive findings. Counts never substitute for adjudicating the
+   mechanism and reachable consequence.
+7. **Scope-creep tripwire.** A finding that introduces a new execution class,
+   consumer, credential, identity, or operator action stops the current slice
+   for re-scoping. Adjacent hardening does not enter merely because it is
+   nearby.
+
+For every newly admitted or claimed-compliant path, the non-negotiable floor
+is unchanged: unknown forms fail closed; evidence and state are never silently
+dropped or truncated; credentials never cross into unreviewed mutable
+execution; a human still merges; applicable full gates and domain reviews run;
+and tests assert real behavior rather than the implementation's internal
+shape. The accepted Claude OAuth, Codecov, and built-in-token paths inventoried
+on cloud issue #120 are explicit held residuals, not evidence that the live
+corpus already satisfies this admission floor.
+
+Because trusted runtime instructions and live state determine what the
+privileged publisher may attempt, the untrusted implementing-agent patch
+artifact is denied from instruction/configuration basenames `AGENTS.md`,
+`AGENTS.override.md`, `CLAUDE.md`, `CLAUDE.local.md`, `.claudeignore`,
+`.mcp.json`, and `.npmrc` at any repository depth; all of `.claude/` and
+`.codex/`; and exact `docs/state/registry.md` by the publisher's applied-tree
+path guard. This closes the direct alias, nested-instruction, and project-config
+bypass found in pre-open review rather than protecting root `AGENTS.md` alone.
+Conventional human-directed PRs may still change those paths under the normal
+review policy.
+
+Recognized runtime instruction/configuration paths remain wholly outside
+untrusted agent-authored output. A registry update may enter a factory PR only
+through trusted deterministic state-transition logic or a conventional
+human-directed amendment in that same PR. Until trusted transition logic
+exists, no factory-generated slice PR may land without that same-PR amendment;
+D135 is never waived. Tests must pin the basename/exact/prefix path predicate
+(including nested positives and near-miss negatives) and the publisher-facing
+normalized forbidden-path result.
+
+D139 neither authorizes, retires, nor schedules 120d-2. The separately held
+operator decision remains controlling; the generic producer/consumer rule
+cannot revise D127, D128, or D136 by implication.
