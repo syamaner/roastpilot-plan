@@ -2298,10 +2298,18 @@ posted `pull_request_review` with inline threads counting as findings, and
 never arming auto-merge on green CI alone) is unchanged and stays recorded
 once, in the cloud repo's `AGENTS.md` PR Merge Policy section; this decision
 only replaces "the signal must postdate the final-commit trigger" with "the
-signal must correspond to the current head" (a `Reviewed commit:` sha
-matching the PR head, or a 👍 reaction, which carries no sha and is valid
-only while the head is unchanged), because a ready PR's first review has no
-manual trigger for a signal to postdate. Claude Code Review's own
+signal must correspond to the current head AND postdate the
+`ready_for_review` transition" (a `Reviewed commit:` sha matching the PR
+head, or a 👍 reaction, which carries no sha and is valid only while the head
+is unchanged), because a ready PR's first review has no manual trigger for a
+signal to postdate. CORRECTED IN PLACE, same day, after Codex raised it as a
+P1 on the agent repo's port (#682): the first draft of this decision required
+only a head match, which is NOT sufficient. A manually requested review on a
+DRAFT posts findings against the very same sha, so where nothing needed
+changing before marking ready, a head-match-only rule would let that
+pre-ready verdict satisfy the wait while the automatic review the ready
+transition just started was still in flight. Both conditions are required.
+Claude Code Review's own
 workflow-edit skip (#139, already recorded in that same `AGENTS.md` roster
 table) is unaffected and is not restated here.
 
