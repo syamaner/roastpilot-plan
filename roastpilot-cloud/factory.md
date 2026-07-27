@@ -237,17 +237,23 @@ here, where the author is always an agent). The factory never merges.
 
 ## 11. F1 epic — stories
 
+Stable story scope is listed below. The cloud
+[state registry](https://github.com/syamaner/roastpilot-cloud/blob/main/docs/state/registry.md)
+is the sole source of live status.
+
 | Story | Scope |
 |---|---|
-| F1-S1 | Labels, issue templates, milestones, story issues for C1/F1 — **done at prep, 16 Jul 2026** (no issue; this doc is the record) |
+| F1-S1 | Labels, issue templates, milestones, and story issues for C1/F1 |
 | F1-S2 | `triage-issues.yml` + triage skill (seed/triage/apply, JSON contract, concurrency) |
 | F1-S3 | `implement-ready-issues.yml` (read-only agent + privileged publisher, dispatch-first) |
 | F1-S4 | Review workflow port + repo `AGENTS.md` review rubric section |
 | F1-S5 | `to-issues` skill + dry-run decomposition of C2 (output PM-reviewed, then labelled) |
 | F1-S6 | End-to-end dry run on a sacrificial issue; factory runbook (failure modes, stuck states, cost log) |
-| F1-S7 | **Pipeline supply-chain + self-modification hardening — in progress.** Action-pin/explicit-allowlist hardening and agent-influenced `--ignore-scripts` coverage merged as cloud #100; the deterministic protected-path guard was already present and its matching CODEOWNERS file merged as #101; the structural YAML audit completed in cloud #102 via PR #113 (`5262e77`); #41's immutable local marketplace delivery merged via PR #117 (`4396b1c`); #42's unconditional fail-closed unlicensed-output enforcement merged via PR #118 (`e7fdbd0`); and D112-D113's local-action reference/direct-entrypoint confinement merged via cloud #114 / PR #119 (`377fa77`). Per D108, code-owner enforcement stays off until a second independently eligible reviewer exists and #47 is held while the Claude GitHub App is suspended. Cloud #116 separately tracks the upstream stale-synchronize guard. The operator approved cloud #120's broader credential-reachability executable boundary in D117; its thirteen thin delivery slices are planned, and no repository-local action may enter a credential-bearing job before the first slice lands. Native GitHub secret/dependency gates satisfy the former scanner slice under D100. |
-| F1-S9 | **Anti-gaming quality gates** — mutation testing (security-critical Python) + the anti-gaming diff classifier + the **spec-grounded review pipeline** (the §14 "should-add" hardening, now built): a read-only agent judges the PR diff against the linked issue's acceptance criteria and a deterministic publisher turns that verdict into merge-gating comments. See **D107** for the design + security model. Shipped d1–e (cloud #74/#82/#83/#86/#87 read-only-agent + publisher, #91 publish wiring); reconciliation/revalidation completeness is complete through cloud #88/#89/#90 and no longer blocks the factory-bot enable story (#47), which retains its separate enable/security scope. |
-| F1-S8, S10, S11 | Documented in the roastpilot-cloud `docs/state/registry.md` story table (operator order: S5 → S10 → S8 → S9 → S7 → S6 → S11); this §11 table is being caught up incrementally, with F1-S9 and the now-active F1-S7 recorded here. |
+| F1-S7 | Pipeline supply-chain and self-modification hardening |
+| F1-S8 | DEV Snowflake secret isolation behind a human-gated Environment |
+| F1-S9 | Anti-gaming quality gates: mutation testing, test-edit classification, and spec-grounded review |
+| F1-S10 | Factory operational safety: kill switch, idempotency guards, and provenance trailer |
+| F1-S11 | Held-out factory regression-evaluation harness |
 
 Sequencing: C1 (conventional) → F1 → C2+ (factory). The M2 timing rule is
 unchanged: none of this starts while it would compete with the M1 harness
@@ -1824,3 +1830,31 @@ is implemented until a real call exists.
 120d-1b2a remains conventional and analyzer-only. Any violation or resource
 limit erases the whole success surface. 120d-2 remains the sole authorization
 owner, and the factory stays paused.
+
+**D135 (27 Jul 2026) - one live status authority replaces duplicated
+narratives.** Effective when the cloud registry/issue-pointer migration lands,
+the operator designates
+`roastpilot-cloud/docs/state/registry.md` as the single source of truth for
+current story and slice status. GitHub issue bodies retain stable scope,
+acceptance criteria, contracts, verification expectations, and a pointer to
+the registry; they do not carry live merged/active status. Issue comments may
+record dated outcomes, but they are historical evidence rather than a second
+status source.
+
+Each normalized registry status cell contains one status label from `Not
+started`, `In progress`, `Blocked`, `Deferred`, or `Done`; one current-state
+sentence; and compact links to the relevant merged PRs and decision numbers.
+Detailed rationale remains in these append-only decision records. The PR that
+lands a slice updates its registry row in the same PR; catch-up status commits
+are not an accepted operating path.
+
+Before changing status, the owner verifies merged PRs, issue open/closed state,
+status labels, and the project item against the GitHub API. Discrepancies found
+before merge are reported in the PR body. After merge the owner reads those
+same fields again, writes a dated reconciliation comment on the story issue,
+and only then completes the project transition. An API read or write failure
+is reported at that location and stops the status transition; it is never
+treated as success. Plan epic tables contain stable scope plus a registry link
+rather than duplicating live delivery narratives. This normalization changes
+tracking mechanics only; it does not authorize a workflow, alter issue
+acceptance criteria, or unpause the factory.
