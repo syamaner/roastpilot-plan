@@ -2236,3 +2236,75 @@ for pre-open review.
 D141 changes no execution boundary. The factory remains paused, D140's
 residual acceptance is unaffected, and no repository setting, secret,
 Environment, or branch protection is altered.
+
+**D142 (27 Jul 2026) - Codex's ready-transition trigger, and the review
+roster it belongs to, correct D103's rationale.** Operator-confirmed against
+PR #150 (roastpilot-cloud, 27 Jul 2026): Codex reviews automatically the
+moment a PR is opened ready-for-review, or the moment a draft is marked
+ready; it does not trigger on opening a draft. A manual `@codex review`
+comment is not needed for that first review; it remains the mechanism to
+re-trigger a review on a new head after the automatic one, exactly as the
+once-on-final-commit discipline already requires.
+
+The trigger is not Codex-specific. Marking a PR ready fires the whole review
+roster, not one lens: on PR #150, while the PR sat in draft, `claude-review`,
+`Spec-grounded review (read-only)`, and `Publish spec-grounded review
+(privileged)` all reported SKIPPED, and Codex did not review. The moment it
+was marked ready, a new Claude Code Review run started, spec-grounded review
+ran to SUCCESS, the privileged publish step started, and Codex's automatic
+review became due. Meanwhile the build/correctness gates, CI (lint,
+typecheck, unit), Playwright, Snowflake migrations (offline), CodeQL,
+dependency review, and codecov, plus mutation testing, ran on every draft
+push throughout. The accurate model is therefore a clean split: **draft**
+runs the build/correctness gates and suppresses the review roster; **ready**
+fires the review roster on that head in one step.
+
+This corrects D103's rationale, not its conclusion. D103 (19 Jul 2026)
+justified opening as a draft as the way to fold Codex before ready, via an
+explicit `@codex review` comment on the draft. That mechanism does not
+survive, for two reasons: a local `codex review --base <branch>` gives the
+cross-family lens even earlier, before the branch is pushed at all; and the
+ready-transition trigger established above means a draft cannot converge the
+review roster even in principle, because the roster does not run there.
+D105's 19 Jul finding, that an explicit `@codex review` comment left on a
+draft still produced a findings-review without ever completing to a clean
+verdict, is not re-tested by this decision; PR #150 observed the default
+path with no manual comment, so the two observations describe different
+mechanisms and neither retracts the other. What D142 changes is the reason
+draft is still correct: not to fold Codex early, but because draft is the
+only window in which the runner-only gates can be folded without spending
+any review lens, and marking ready is what commits the whole roster to that
+head. Mark ready only once the head is expected to hold.
+
+PR #150 supplies both the general proof and a supporting illustration. The
+general proof is its own mutation-gate failure: the baseline was
+environment-dependent (a mutant on `shutil.which("schemachange")` is
+behaviourally invisible on the runner, because pip installs the console
+script exactly where the code's fallback looks), so five identical local
+runs still produced the wrong number, and only the runner could reveal it;
+it was found and fixed on the draft before any review lens had been spent.
+The supporting illustration is the Codex-spend count: opening ready
+immediately would have had Codex review head `07f1802`, then the mutation
+gate failure would have forced a push to `4d26670`, stranding that verdict
+on a dead head and requiring a manual re-trigger, two spends against the
+weekly-capped subscription. Opening as a draft let the mutation failure
+surface and fold first, so Codex reviewed only `4d26670` once ready, one
+spend. The spend count is illustrative, not the rule; the rule is the
+draft/ready split above.
+
+The wait-for-verdict rule itself (bot-authorship on both channels, the 👀
+in-progress bound, the 👍/`Reviewed commit:` clean-verdict definitions, a
+posted `pull_request_review` with inline threads counting as findings, and
+never arming auto-merge on green CI alone) is unchanged and stays recorded
+once, in the cloud repo's `AGENTS.md` PR Merge Policy section; this decision
+only replaces "the signal must postdate the final-commit trigger" with "the
+signal must correspond to the current head" (a `Reviewed commit:` sha
+matching the PR head, or a 👍 reaction, which carries no sha and is valid
+only while the head is unchanged), because a ready PR's first review has no
+manual trigger for a signal to postdate. Claude Code Review's own
+workflow-edit skip (#139, already recorded in that same `AGENTS.md` roster
+table) is unaffected and is not restated here.
+
+D142 changes no execution boundary. It corrects the documented trigger model
+and the D103 draft-phase rationale; no repository setting, secret,
+Environment, or branch-protection configuration is altered.
