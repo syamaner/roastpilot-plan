@@ -1704,3 +1704,47 @@ booleans and remain distinct from the strings `"true"`/`"false"`. Safe
 integer conditions remain typed integers; fractions, unsafe/non-finite
 numbers, negative zero, collections, and null fail closed under D130's scalar
 rules.
+
+**D133 (27 Jul 2026) — structurally equivalent job-control spellings use one
+richer evidence shape.** This extends D131's per-construct normalization rule.
+Where GitHub defines a scalar as shorthand for a one-element richer
+declaration, 120d-1b1 canonicalizes both spellings to the richer shape and
+charges the expanded canonical emission identically. Specifically,
+`needs: prep` equals `needs: [prep]`; `runs-on: X` equals `runs-on: [X]`;
+`environment: prod` equals the single-key map
+`environment: {name: prod}`; and scalar `concurrency: group` equals the
+single-key map `concurrency: {group: group}`. Each pair requires equal-evidence
+and equal-count tests.
+
+These equivalences are narrow. A runner group/labels map remains rejected in
+1b1. An environment map carrying `url` or any other additional field remains
+materially distinct and must not collide with the scalar spelling; normalized
+environment names still pass through 120d-1a's portable-ASCII and case-fold
+collision admission path. A concurrency map carrying
+`cancel-in-progress: true` is materially distinct. Explicit
+`cancel-in-progress: false` may normalize to omission because `false` is a
+fixed platform default.
+
+The runner normalization is evidence-only and deliberately diverges from
+120a's conservative credential-reachability predicate:
+`runs-on: ubuntu-latest` is approved there, while
+`runs-on: [ubuntu-latest]` remains credential-carrying because every
+non-string runner declaration fails closed. 120a does not change in this
+slice. Both analyzer suites pin that exact divergent pair so neither model can
+drift silently; the array conservatism is a possible false positive, not a
+fail-open defect.
+
+Default collapsing is permitted only when the platform specification fixes
+the default and repository or organization state cannot change it.
+`cancel-in-progress: false` qualifies. Permissions do not: absent
+`permissions:` remains D131's distinct `unresolved-default` variant because
+repository defaults are mutable external state.
+
+`concurrency.queue` remains held from normalization pending an explicit
+operator confirmation. GitHub's current
+[concurrency specification](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency)
+documents `single` and `max`, calls `single` the default, and forbids
+`queue: max` with `cancel-in-progress: true`; nevertheless, 1b1 must continue
+to fail closed on the field until the operator confirms that this documented
+fixed default satisfies the rule above. An unrecognized or held field is never
+silently erased from evidence.
