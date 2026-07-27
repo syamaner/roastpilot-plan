@@ -1580,3 +1580,45 @@ evidence, and fail closed when the path is absent or malformed. Tests must prove
 that named and unnamed byte-identical bodies at different paths cannot collide.
 The path does not authorize the workflow: 120d-2 still owns exact whole-surface
 authorization, after 120d-1b completes delegated/context evidence.
+
+**D130 (27 Jul 2026) — ordered context evidence is injective and
+fail-closed.** The operator approved all five 120d-1b contracts and the
+pre-implementation factory-security decomposition:
+
+1. **120d-1b1** adds a bounded ordered canonical-value grammar; complete
+   trigger declarations; exact opaque expression/template strings; effective
+   workflow/job permissions and concurrency; and ordinary-job
+   `needs`, `if`, matrix, outputs, environment, runner, and lifecycle context.
+2. **120d-1b2** adds static full-SHA remote action and reusable-workflow
+   delegation evidence, including ordered inputs/secrets, workspace-capability
+   markers, and a separate reusable caller-token delegation marker.
+3. **120d-1b3** adds job containers, service containers, and mounted-workspace
+   evidence.
+
+The five contracts are: ordered canonical values preserve every
+execution-significant mapping and sequence distinction; expressions remain
+exact opaque strings rather than being parsed or evaluated; matrix evidence
+preserves the exact declarative specification without expansion; delegated
+execution uses distinct typed unions with no analyzer-authored `trusted`
+assertion; and effective permissions are canonical evidence using the same
+resolution semantics as 120a's credential classifier. In particular, absent
+`permissions:` resolves to that conservative default, and a read-effective
+action step still carries the implicit `github.token`.
+
+Injectivity is a hard acceptance property: two materially different accepted
+execution surfaces, including a near-miss differing only in a
+security-relevant field, must never serialize to identical evidence. Evidence
+admits at most **16,384 canonical values**, **32 levels of canonical-value
+depth**, **256 services**, **4,096 effective bindings**, and D127's **1 MiB**
+source ceiling. Unsafe integers, fractions, malformed values, or any exceeded
+bound produce an explicit conservative `unanalyzable` / `over-limit`
+violation and erase all success evidence; no path truncates, skips, or emits a
+partial success surface.
+
+Local or dynamic `uses` remain rejected. Every accepted action or container is
+marked workspace-capable, reusable calls carry their separate caller-token
+marker, and the analyzer never asserts that a target is trusted. These slices
+remain conventional, analyzer-only, activate no workflow, make no compliance
+claim, and cannot resume the paused factory. **120d-2 remains the sole owner of
+authorization.** Every 120d-1b slice references cloud issue #120 and receives
+factory-security, QA, and independent pre-open triage.
