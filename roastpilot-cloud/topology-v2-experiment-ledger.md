@@ -96,20 +96,32 @@ Tokens (output / cache-create):
 | Findings | 0 |
 | Delegations / tokens | none (orchestrator review + merge only) |
 
-### #157 (claude-review write-scoped App token) — IN PROGRESS
+### PR #166 — issue #157 (claude-review write-scoped App token) — MERGED
 | Field | Value |
 |---|---|
-| Path | conventional; `.github/workflows/**` + `.claude/**` + AGENTS.md |
-| Status | implementing (impl-157) as of last update |
-| Notable | two planners ran (delivery flakiness): planner-157 **opus** (spawned pre-fable-provisioning) and planner-157b **fable** (backup). **The fable contract was more complete** — it caught a silent fail-open (pr-triage.md author filter) the opus contract missed. See #159. |
+| Path | conventional/interactive; `.github/workflows/**` + `.claude/**` + AGENTS.md |
+| Open → merge | **26 min** (2026-07-28 21:47:01Z → 22:13:06Z), draft-first |
+| Offline review turns | 2× local `codex review` (both CLEAN) + 1 `factory-security-reviewer` (CONFIRMED-SOUND) + 1 `qa` (PASS) |
+| Online review turns | **1** Codex-connector round: clean 👍, no inline findings |
+| Findings folded pre-open | 2 LOW (fsr test-enumerator gaps: case-insensitive `uses`, scalar `write-all` fail-closed) + 1 CI (CodeQL `js/file-system-race` in the test's dir-walk, fixed at source) |
+| Findings folded post-open | 0 (connector clean) |
+| Implementer | `implementer` agent (opus), 1 fold cycle + the CodeQL fix |
+| Models | planner opus (planner-157) + fable (planner-157b); implementer/fsr opus; qa sonnet |
+| Notable | **live end-to-end validated in production** — unlike #165, the action's workflow-edit skip did not fire, so claude-review reviewed this PR **green**, authored as `github-actions[bot]`, step B passed: direct proof the token/author change works. Two planners ran (delivery flakiness): **the fable contract was more complete** — caught a silent pr-triage fail-open the opus one missed. |
 
-Tokens so far (output / cache-create):
+Tokens (output / cache-create):
 | Delegation | Model | Turns | Output | Cache-create |
 |---|---|--:|--:|--:|
 | planner-157 | opus | 85 | 43,599 | 1,577,387 |
 | planner-157b | fable | 60 | 38,596 | 483,709 |
-| impl-157 (partial) | opus | 171 | 98,117 | 651,883 |
-| **#157 subagent total (partial)** | | | **180,312** | **2,712,979** |
+| impl-157 | opus | 265 | 146,226 | 3,240,244 |
+| fsr-157 | opus | 61 | 44,891 | 437,858 |
+| qa-157 | sonnet | 55 | 17,337 | 286,605 |
+| **#157 subagent total** | | 526 | **290,649** | **6,025,803** |
+
+**#157 vs #146 — the headline efficiency result:** #157 (a comparable pipeline-security credential fix) cost **~½ the tokens** (291K vs 591K output; 6.0M vs 15.3M cache-create) and **~⅓ the wall-clock** (26 min vs 1h 23m), with **0 post-open review rounds** (vs #146's 2). The difference is contract completeness: #146's marathon came from the speculative G4 producer + step-A extraction churn discovered *at review*; #157's contract was complete up front (it even named the coupled step-B/pr-triage author break the issue text didn't), so `impl-157` ran 265 turns vs `impl-146`'s 680. Complete spec ⇒ tight execution — the core topology-v2 hypothesis, observed.
+
+_(triage-165, the pr-triage lens, adjudicated both #165 and #166: 105 turns, 74,542 output / 2,934,673 cache-create — shared adjudication overhead.)_
 
 ### Session-level (as of ~22:13Z, ~5.75h in)
 | Bucket | Output | Cache-create |
