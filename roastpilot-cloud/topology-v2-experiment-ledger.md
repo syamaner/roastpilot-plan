@@ -172,6 +172,36 @@ Tokens (output / cache-create):
 
 **#173 — the amortisation, MEASURED (the answer to "does the leaf pay off").** Same story family as #170 (attacker-text sanitisation on a publisher surface), one slice later, reusing the leaf slice 1 built and hardened. The implementer cost **~1/5 the output (78K vs 357K) and ~1/11 the cache-create (1.18M vs 13.4M) across 233 turns vs 709**, with **0 fold cycles and 0 post-open review rounds vs slice 1's 9 and 3**. Whole-slice subagent total: 171K output / 2.0M cache-create vs slice 1's 682K / 18.8M — roughly **a quarter the output, a ninth the cache-create**. This is learning 8's downhill side made numeric: the *emergent-subtlety* rounds (surrogate split, evidence-floor truncation, log ordering) were paid ONCE, in the primitive; slice 2 only had to WIRE it into four sinks + fold #172, and the diverse-lens floor found nothing to fold. The keystone's cost is front-loaded and amortises across the slices that reuse it.
 
+### PR #174 — issue #158 slice 3 (triage-verdict publisher, `Closes #158`) — MERGED
+
+| Field | Value |
+|---|---|
+| Path | conventional/interactive; `scripts/factory/apply-triage-verdict-*` + the leaf + tests |
+| Open → merge | ~50 min (2026-07-29 07:17Z ready → 08:05:56Z), draft-first; 7 commits |
+| Offline review turns | **4** local `codex review` (r1 CLEAN; r2/r3 each caught a disclosure-completeness P2; r4 CLEAN) + `factory-security-reviewer` ×1 (CONFIRMED-SOUND, all 6 attack classes through the real markdown-it) |
+| Online review turns | **2** Codex-connector rounds: round 1 = 1 P2 (silent backtick-strip); round 2 (after the folds) = CLEAN 👍 + "Didn't find any major issues" |
+| Findings folded | 1 pre-open contract-accuracy (G6 EOL-normalise rationale) + 4 disclosure-completeness (backtick-silent → disclose; truncated-path accuracy; categorical class fix; connector's own). 0 security-surface folds |
+| Implementer | `implementer` agent (opus), **4 fold cycles** (all in the new primitive's disclosure logic) |
+| Models | planner **fable**; implementer/fsr **opus**; no qa (test diff 449 < 600) |
+
+Tokens (output / cache-create):
+| Delegation | Model | Turns | Output | Cache-create |
+|---|---|--:|--:|--:|
+| planner-158-s3 | fable | 43 | 36,437 | 458,116 |
+| impl-158-s3 | opus | 395 | 167,566 | 2,642,873 |
+| fsr-158-s3 | opus | 70 | 39,568 | 387,060 |
+| **PR #174 subagent total** | | 508 | **243,571** | **3,488,049** |
+
+### #158 COMPLETE — the amortisation curve across three slices
+
+| Slice (PR) | new work | impl output | impl cache-create | impl turns | fold cycles | post-open connector rounds |
+|---|---|--:|--:|--:|--:|--:|
+| 1 (#170) | build + harden the leaf | 357K | 13.4M | 709 | 9 | 3 |
+| 2 (#173) | wire 4 sinks + fold #172 | 78K | 1.18M | 233 | 0 | 0 |
+| 3 (#174) | **new** multiline primitive + wire 3 sinks | 168K | 2.64M | 395 | 4 | 1 (→CLEAN on re-review) |
+
+The three slices are the topology-v2 hypothesis drawn as a curve. Slice 1 front-loads the whole cost (build the primitive + pay every emergent-subtlety round on it). Slice 2, pure reuse, is the floor: ~1/5 slice-1's impl cost, zero folds. Slice 3 sits between: it introduced ONE new primitive (a multi-line fenced-block renderer) and paid emergent subtlety **only on that new surface** — four folds, ALL in its disclosure logic (silent backtick-strip → tilde-defuse → the whole content-modifying-transform class), while its security surface (fence-escape / trigger / marker / ceiling) was CONFIRMED-SOUND first-pass and the reused helpers cost nothing. **The cost scales with NEW primitive surface, not with lines wired.** Learning 8 confirmed: contract completeness can't pre-empt the emergent-subtlety rounds a new primitive carries, but reuse pays zero. Also observed on #174: the *local* codex review caught r2/r3's disclosure gaps before the re-push, so the connector's re-review landed CLEAN in one round — shift-left keeping connector spend to the single unavoidable round.
+
 ### Session-level (as of ~03:45Z 29 Jul, ~11.3h in — after #170 merge)
 | Bucket | Turns | Output | Cache-create | Cache-read |
 |---|--:|--:|--:|--:|
