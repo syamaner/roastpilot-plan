@@ -150,12 +150,13 @@ Tokens (output / cache-create):
 
 **#170 — the security-keystone counter-example to #157.** Where #157 showed "complete spec ⇒ 0 post-open rounds", #170 shows the ceiling of that lever: **7 total review rounds** (4 pre-open + 3 post-open), impl at **709 turns / 357K output / 13.4M cache-create across 9 fold cycles** — *more* than #146's marathon, on a slice whose contract (planner-158, a tight 65-turn fable pass) was NOT the problem. The findings that drove the post-open rounds were **subtle evidence-floor interactions** (a surrogate split that only shows on astral input at the clamp boundary; a 200-char clamp silently truncating authoritative rejection reasons; the full-evidence log running *after* a fallible POST) that no spec completeness prevents — they only surface under adversarial execution + the diverse cloud lens. Contract completeness collapses the *speculative-churn* rounds (#146's G4), not the *emergent-subtlety* rounds a security keystone carries.
 
-### Session-level (as of ~22:13Z, ~5.75h in)
-| Bucket | Output | Cache-create |
-|---|--:|--:|
-| Orchestrator main loop (opus, xhigh) | 1,533,737 | 2,147,116 |
-| All sub-agents (1502 turns) | 775,755 | 18,567,626 |
-| Model-resolution diagnostic (5 modeltest agents) | 4,056 | 511,860 |
+### Session-level (as of ~03:45Z 29 Jul, ~11.3h in — after #170 merge)
+| Bucket | Turns | Output | Cache-create | Cache-read |
+|---|--:|--:|--:|--:|
+| Orchestrator main loop (opus, xhigh) | 1,094 | 2,875,283 | 8,558,956 | 518,855,274 |
+| All sub-agents (21 agents) | 3,126 | 1,612,020 | 42,010,492 | 657,519,859 |
+
+_Prior snapshot (~22:13Z, ~5.75h): main loop 1,533,737 output / 2,147,116 cache-create; sub-agents 775,755 / 18,567,626._ The ~2h14m #170 slice-1 marathon roughly **doubled** both the main-loop output (1.53M → 2.88M — the orchestrator drove 7 review rounds) and the sub-agent cache-create (18.6M → 42.0M — impl-158-s1's 9 fold cycles at 13.4M dominate). **Cache-read is the volume driver** (main loop 519M, sub-agents 658M) but priced ~0.1×; output + cache-create are the cost. This is the concrete per-keystone spend the +24h checkpoint (#159) weighs against the safety bought (a P1 floor violation + a CI-bypass caught).
 
 ---
 
