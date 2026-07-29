@@ -202,6 +202,28 @@ Tokens (output / cache-create):
 
 The three slices are the topology-v2 hypothesis drawn as a curve. Slice 1 front-loads the whole cost (build the primitive + pay every emergent-subtlety round on it). Slice 2, pure reuse, is the floor: ~1/5 slice-1's impl cost, zero folds. Slice 3 sits between: it introduced ONE new primitive (a multi-line fenced-block renderer) and paid emergent subtlety **only on that new surface** — four folds, ALL in its disclosure logic (silent backtick-strip → tilde-defuse → the whole content-modifying-transform class), while its security surface (fence-escape / trigger / marker / ceiling) was CONFIRMED-SOUND first-pass and the reused helpers cost nothing. **The cost scales with NEW primitive surface, not with lines wired.** Learning 8 confirmed: contract completeness can't pre-empt the emergent-subtlety rounds a new primitive carries, but reuse pays zero. Also observed on #174: the *local* codex review caught r2/r3's disclosure gaps before the re-push, so the connector's re-review landed CLEAN in one round — shift-left keeping connector spend to the single unavoidable round.
 
+### PR #175 — issue #171 (commit-surface CI-skip-token bypass + modelId autolink) — MERGED
+
+| Field | Value |
+|---|---|
+| Path | conventional/interactive; `scripts/factory/**` (commit surface) + tests |
+| Open → merge | ~1h (2026-07-29 ~08:5xZ draft → 10:0xZ), draft-first; 5 commits |
+| Offline review turns | 2 local `codex review` (r1 CLEAN, r2 CLEAN post-fold) + `factory-security-reviewer` ×2 (r1 EXPLOITABLE → r2 CONFIRMED-SOUND) |
+| Online review turns | 1 Codex-connector round: CLEAN 👍 + "Didn't find any major issues" |
+| Findings folded | 1 pre-open `qa`-class none; **1 fsr BLOCKER post-hand-back, pre-open** (nested-bracket CI-skip bypass — reached `git push` with a live token); a 2-line implementer deviation (backtick-preserving normaliser to make neutralize-LAST testable) |
+| Implementer | `implementer` agent (opus), 1 security fold + the doc-verification (§0 closed by orchestrator via WebFetch of GitHub's docs) |
+| Models | planner **fable** (planner-171); implementer/fsr **opus** |
+
+Tokens (output / cache-create):
+| Delegation | Model | Turns | Output | Cache-create |
+|---|---|--:|--:|--:|
+| planner-171 | fable | 63 | 43,208 | 1,207,852 |
+| impl-171 | opus | 316 | 172,195 | 2,228,131 |
+| fsr-171 | opus | 61 | 27,175 | 708,259 |
+| **PR #175 subagent total** | | 440 | **242,578** | **4,144,242** |
+
+**#171 — two sharp findings.** (1) **The ADVERSARIAL lens is distinct from the CORRECTNESS lens.** `factory-security-reviewer` reached `git push` with a live GitHub-honoured `[skip ci]` via a nested title `[oops [skip ci]` — the guard extracted the outer bracket group and mis-keyed it, while GitHub does a literal substring search. The local `codex review` (CLEAN), the author's full L/N/E/M suite (all green), AND my own orchestrator trace all PASSED it; only the agent *trying to break it* found it. On a gate-bypass fix the adversarial red-team is the load-bearing lens, not the correctness lens — same lesson as the cloud-connector catches (learning 1/7), now for fsr specifically. The fix realigned detection with the enforcing consumer (per-token literal regexes matching what GitHub matches, not a re-derivation of it). (2) **The fix's own commit message skipped its CI.** The commit prose describing the vulnerability contained the literal `[skip ci]`, so GitHub skipped every required workflow on the PR (mergeState BLOCKED, no runs at all) — the sharpest possible demonstration that the token is a plain substring honoured anywhere. Resolved by rewording the HEAD commit message token-free (tree identical) and force-pushing; a squash-merge writes a clean message onto `main`.
+
 ### Session-level (as of ~03:45Z 29 Jul, ~11.3h in — after #170 merge)
 | Bucket | Turns | Output | Cache-create | Cache-read |
 |---|--:|--:|--:|--:|
