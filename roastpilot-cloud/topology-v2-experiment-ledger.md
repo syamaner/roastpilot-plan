@@ -224,11 +224,13 @@ Tokens (output / cache-create):
 
 **#171 — two sharp findings.** (1) **The ADVERSARIAL lens is distinct from the CORRECTNESS lens.** `factory-security-reviewer` reached `git push` with a live GitHub-honoured `[skip ci]` via a nested title `[oops [skip ci]` — the guard extracted the outer bracket group and mis-keyed it, while GitHub does a literal substring search. The local `codex review` (CLEAN), the author's full L/N/E/M suite (all green), AND my own orchestrator trace all PASSED it; only the agent *trying to break it* found it. On a gate-bypass fix the adversarial red-team is the load-bearing lens, not the correctness lens — same lesson as the cloud-connector catches (learning 1/7), now for fsr specifically. The fix realigned detection with the enforcing consumer (per-token literal regexes matching what GitHub matches, not a re-derivation of it). (2) **The fix's own commit message skipped its CI.** The commit prose describing the vulnerability contained the literal `[skip ci]`, so GitHub skipped every required workflow on the PR (mergeState BLOCKED, no runs at all) — the sharpest possible demonstration that the token is a plain substring honoured anywhere. Resolved by rewording the HEAD commit message token-free (tree identical) and force-pushing; a squash-merge writes a clean message onto `main`.
 
-### Session-level (as of ~03:45Z 29 Jul, ~11.3h in — after #170 merge)
+### Session-level (as of ~10:00Z 29 Jul, ~17.5h in — after #175/#171 merge, experiment autonomous run complete)
 | Bucket | Turns | Output | Cache-create | Cache-read |
 |---|--:|--:|--:|--:|
-| Orchestrator main loop (opus, xhigh) | 1,094 | 2,875,283 | 8,558,956 | 518,855,274 |
-| All sub-agents (21 agents) | 3,126 | 1,612,020 | 42,010,492 | 657,519,859 |
+| Orchestrator main loop (opus, xhigh) | 1,510 | 3,621,493 | 9,659,831 | 835,754,022 |
+| All sub-agents (~4,411 turns) | 4,411 | 2,259,455 | 51,318,180 | — |
+
+_Prior: ~11.3h main loop 2.88M output / 8.56M cache-create; ~5.75h 1.53M / 2.15M._ Across the full run: **6 security PRs** (#165/#166/#170/#173/#174/#175), every finding folded or tracked pre-merge, zero bad merges. The +24h keep/adjust/revert summary is posted on #159. The remaining F1 backlog (#164/#167/#160/#162/#163) needs operator decisions (pipeline security architecture, artifact drop-vs-gate, live branch-protection state), so the autonomous run ended here.
 
 _Prior snapshot (~22:13Z, ~5.75h): main loop 1,533,737 output / 2,147,116 cache-create; sub-agents 775,755 / 18,567,626._ The ~2h14m #170 slice-1 marathon roughly **doubled** both the main-loop output (1.53M → 2.88M — the orchestrator drove 7 review rounds) and the sub-agent cache-create (18.6M → 42.0M — impl-158-s1's 9 fold cycles at 13.4M dominate). **Cache-read is the volume driver** (main loop 519M, sub-agents 658M) but priced ~0.1×; output + cache-create are the cost. This is the concrete per-keystone spend the +24h checkpoint (#159) weighs against the safety bought (a P1 floor violation + a CI-bypass caught).
 
