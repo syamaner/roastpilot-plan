@@ -150,6 +150,28 @@ Tokens (output / cache-create):
 
 **#170 — the security-keystone counter-example to #157.** Where #157 showed "complete spec ⇒ 0 post-open rounds", #170 shows the ceiling of that lever: **7 total review rounds** (4 pre-open + 3 post-open), impl at **709 turns / 357K output / 13.4M cache-create across 9 fold cycles** — *more* than #146's marathon, on a slice whose contract (planner-158, a tight 65-turn fable pass) was NOT the problem. The findings that drove the post-open rounds were **subtle evidence-floor interactions** (a surrogate split that only shows on astral input at the clamp boundary; a 200-char clamp silently truncating authoritative rejection reasons; the full-evidence log running *after* a fallible POST) that no spec completeness prevents — they only surface under adversarial execution + the diverse cloud lens. Contract completeness collapses the *speculative-churn* rounds (#146's G4), not the *emergent-subtlety* rounds a security keystone carries.
 
+### PR #173 — issue #158 slice 2 (spec-grounding publishers, `Closes #172`) — MERGED
+
+| Field | Value |
+|---|---|
+| Path | conventional/interactive; `scripts/factory/publish-spec-grounding-*` + tests |
+| Open → merge | **~40 min** (2026-07-29 05:36Z draft → 06:16:49Z), draft-first; 3 commits |
+| Offline review turns | **1** local `codex review` (CLEAN) + `factory-security-reviewer` ×1 (CONFIRMED-SOUND, all 6 attack classes defeated through the real builders) |
+| Online review turns | **1** Codex-connector round: CLEAN 👍 (no findings, no fold) |
+| Findings folded | **0 pre-open, 0 post-open** — clean on the first pass |
+| Implementer | `implementer` agent (opus), **0 fold cycles** |
+| Models | planner **fable** (planner-158-s2); implementer/fsr **opus**; no qa (test diff 255 < 600) |
+
+Tokens (output / cache-create):
+| Delegation | Model | Turns | Output | Cache-create |
+|---|---|--:|--:|--:|
+| planner-158-s2 | fable | 53 | 39,146 | 418,116 |
+| impl-158-s2 | opus | 233 | 77,969 | 1,180,534 |
+| fsr-158-s2 | opus | 88 | 53,458 | 409,979 |
+| **PR #173 subagent total** | | 374 | **170,573** | **2,008,629** |
+
+**#173 — the amortisation, MEASURED (the answer to "does the leaf pay off").** Same story family as #170 (attacker-text sanitisation on a publisher surface), one slice later, reusing the leaf slice 1 built and hardened. The implementer cost **~1/5 the output (78K vs 357K) and ~1/11 the cache-create (1.18M vs 13.4M) across 233 turns vs 709**, with **0 fold cycles and 0 post-open review rounds vs slice 1's 9 and 3**. Whole-slice subagent total: 171K output / 2.0M cache-create vs slice 1's 682K / 18.8M — roughly **a quarter the output, a ninth the cache-create**. This is learning 8's downhill side made numeric: the *emergent-subtlety* rounds (surrogate split, evidence-floor truncation, log ordering) were paid ONCE, in the primitive; slice 2 only had to WIRE it into four sinks + fold #172, and the diverse-lens floor found nothing to fold. The keystone's cost is front-loaded and amortises across the slices that reuse it.
+
 ### Session-level (as of ~03:45Z 29 Jul, ~11.3h in — after #170 merge)
 | Bucket | Turns | Output | Cache-create | Cache-read |
 |---|--:|--:|--:|--:|
