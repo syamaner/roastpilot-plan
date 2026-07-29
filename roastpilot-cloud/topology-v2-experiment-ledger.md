@@ -123,6 +123,33 @@ Tokens (output / cache-create):
 
 _(triage-165, the pr-triage lens, adjudicated both #165 and #166: 105 turns, 74,542 output / 2,934,673 cache-create — shared adjudication overhead.)_
 
+### PR #170 — issue #158 slice 1 (sanitise attacker-controlled text before the publisher posts) — MERGED
+
+| Field | Value |
+|---|---|
+| Path | conventional/interactive; `scripts/factory/**` (publisher glue) + tests |
+| Open → merge | **2h 14m** (2026-07-29 01:26:47Z draft → 03:41:00Z), draft-first; 9 commits |
+| Offline review turns | **7** local `codex review` (r1–r7) + `factory-security-reviewer` across 4 rounds (~2.4M cumulative fuzz) + `qa` ×2 + `pr-triage` (multi-round) |
+| Online review turns | **3** Codex-connector rounds (`@codex review` re-triggers): round 1 = surrogate P2 + skip-token P2 + modelId low; round 2 = reasons-clamp P1; round 3 = CLEAN 👍 + "Didn't find any major issues" |
+| Findings folded pre-open | 4 real (P1 zero-width title; **BLOCKER** backtick-reconstruction; **BLOCKER** clamp-resynthesis; P2 title-length DoS) + a vacuous-test + docstring |
+| Findings folded post-open | 4 (surrogate-split P2; reasons-clamp evidence-loss **P1**; qa omitted-count + weak test; log-ordering evidence-loss P2) |
+| Deferred to issues | #171 (commit-surface skip-token bypass + trailer autolink), #172 (spec-grounding `sanitizeReasonForDisplay`, slice 2), #168 (fullwidth-letter homoglyph), #169 (`safeClamp` robust-by-construction) |
+| Implementer | `implementer` agent (opus), **9 fold cycles** |
+| Models | planner **fable** (planner-158); implementer/fsr **opus**; qa/pr-triage **sonnet** |
+
+Tokens (output / cache-create):
+| Delegation | Model | Turns | Output | Cache-create |
+|---|---|--:|--:|--:|
+| planner-158 | fable | 65 | 36,353 | 435,803 |
+| impl-158-s1 | opus | 709 | 356,734 | 13,387,385 |
+| fsr-158-s1 | opus | 142 | 148,437 | 1,609,764 |
+| qa-158-s1 | sonnet | 138 | 44,894 | 1,074,894 |
+| qa-158-s1b | sonnet | 155 | 33,181 | 688,901 |
+| triage-170 | sonnet | 138 | 62,524 | 1,578,932 |
+| **PR #170 subagent total** | | 1,347 | **682,123** | **18,775,679** (cache-read ~301M) |
+
+**#170 — the security-keystone counter-example to #157.** Where #157 showed "complete spec ⇒ 0 post-open rounds", #170 shows the ceiling of that lever: **7 total review rounds** (4 pre-open + 3 post-open), impl at **709 turns / 357K output / 13.4M cache-create across 9 fold cycles** — *more* than #146's marathon, on a slice whose contract (planner-158, a tight 65-turn fable pass) was NOT the problem. The findings that drove the post-open rounds were **subtle evidence-floor interactions** (a surrogate split that only shows on astral input at the clamp boundary; a 200-char clamp silently truncating authoritative rejection reasons; the full-evidence log running *after* a fallible POST) that no spec completeness prevents — they only surface under adversarial execution + the diverse cloud lens. Contract completeness collapses the *speculative-churn* rounds (#146's G4), not the *emergent-subtlety* rounds a security keystone carries.
+
 ### Session-level (as of ~22:13Z, ~5.75h in)
 | Bucket | Output | Cache-create |
 |---|--:|--:|
@@ -154,3 +181,20 @@ _(triage-165, the pr-triage lens, adjudicated both #165 and #166: 105 turns, 74,
 6. **Codex-MCP-as-implementer de-scoped for this repo** (operator): the whole F1
    backlog is protected/security → faithful routing keeps it on the `implementer`
    agent; that experiment arm moves to the pilot-agent codebase.
+7. **The cloud Codex connector is the highest-yield lens on a security keystone —
+   confirmed a second time (#170).** After the pre-open floor (7 local `codex
+   review` rounds + `factory-security-reviewer` at ~2.4M fuzz + `qa`) all passed,
+   the connector still found three real EVIDENCE-FLOOR issues across its rounds: a
+   surrogate-pair split (invalid wire UTF-8 → PR-create 422), a 200-char clamp
+   **silently truncating authoritative rejection reasons** (a direct AGENTS.md
+   floor violation), and the full-evidence log running *after* the fallible
+   comment POST. The pre-open lenses framed trigger/breakout/resynthesis; the
+   connector framed *evidence preservation*. Distinct lens, reinforces learning 1.
+8. **Contract completeness has a ceiling (#157 vs #170).** #157 proved a complete
+   spec ⇒ 0 post-open rounds. #170 is the counter-example: planner-158 was a tight,
+   correct fable pass, yet the slice still took 4 pre-open + 3 post-open rounds and
+   *more* impl cost than #146's marathon. The driver was **emergent subtlety** —
+   floor-interactions that only surface under adversarial execution + the diverse
+   lens, which no up-front spec enumerates. Completeness collapses *speculative-churn*
+   rounds (#146's no-consumer G4), not *emergent-subtlety* rounds. Budget a security
+   keystone for multiple review rounds regardless of contract quality.
