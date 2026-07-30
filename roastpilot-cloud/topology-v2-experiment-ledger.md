@@ -431,6 +431,39 @@ Tokens (output / cache-create):
 
 **Process note (topology v2 held end to end):** planner options-analysis contract (operator-decided the option) → D104-verified + all cross-file citations spot-checked (the load-bearing security fact — "Claude finished" survives truncation in the pr150 fixture — verified directly) → implementer in its own worktree with a pre-flight passthrough verification (traced through the action source) → pre-open floor + adversarial fsr on the isolated review worktrees → draft-first until CI green → connector verdict → 2 folds (qa symmetry + connector P2), each re-run through the local codex floor and CI, connector re-triggered once on the new final head → independent pr-triage (FIX-FIRST → MERGEABLE) → autonomous merge on fully-clean. Zero bad merges preserved.
 
+### Session close (30 Jul evening) — handover state
+
+**Merged this session:** #154 → PR #182 (`cc6e6d1`), #183 → PR #185 (`8e940ff`). Both
+factory-pipeline security controls, full topology-v2 flow, zero bad merges. Ledger
+rows + learnings 16-18 above; **all ledger commits are LOCAL/unpushed** (operator
+pushes).
+
+**In flight at handover:** **#80** (spec-grounded review criteria-derivation +
+trigger completeness) — `planner-80` drafting the D104 contract; the orchestrator
+will verify + post it and label the issue `ready-for-conventional-implementation`.
+A fresh session drives #80 **from the posted contract** (skip re-verification):
+implementer → `factory-security-reviewer` mandatory + qa + local codex → draft →
+CI → connector (trust the auto-👍) → pr-triage → merge. #80's crux: parse the
+union of {PR body, all branch commit messages} for closing keywords, inclusive by
+design (under-inclusion = gate bypass, over-inclusion = fail-safe extra review;
+match GitHub's real close semantics, #171 lesson).
+
+**Filed this session:** #183 (specced+shipped), #184 (pre-existing checklist-branch
+quoted-ticked-box fail-open, `ready-to-spec`).
+
+**Operator-owned / flagged:** an **AGENTS.md accuracy correction** — the #140
+"workflow-edit PR self-skips claude-review" note is stale at action v1.0.176 (see
+learning 18; protected-file conventional change). Parked, decision-gated:
+#167 (env-scrub credential-adjacent), #178 (config-guard block-vs-flag), #162
+(retrieval read-scoping), #146 step 3 (credential-adjacent), #47 (factory-PR
+Claude-review lens; #80/#77 are its criteria-freshness prerequisites). Lower-priority
+`ready-to-spec`: #77, #52, #69 (C2-gated), #181 (low).
+
+**Guardrails held:** `FACTORY_PAUSED` untouched; no settings/secrets/branch-protection/
+Environment changes; protected branches untouched; merges only on fully-clean
+(required checks via check-runs API, bot-authored connector CLEAN on head, threads
+resolved, independent pr-triage on security PRs); merged branches left on origin.
+
 ---
 
 ## Findings / learnings so far
