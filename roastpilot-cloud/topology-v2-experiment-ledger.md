@@ -441,9 +441,16 @@ pushes).
 **In flight at handover:** **#80** (spec-grounded review criteria-derivation +
 trigger completeness) — `planner-80` drafting the D104 contract; the orchestrator
 will verify + post it and label the issue `ready-for-conventional-implementation`.
-A fresh session drives #80 **from the posted contract** (skip re-verification):
-implementer → `factory-security-reviewer` mandatory + qa + local codex → draft →
-CI → connector (trust the auto-👍) → pr-triage → merge. #80's crux: parse the
+A fresh session drives #80 **from the posted contract** (skip re-verification).
+**Credit-conservation pivot (operator, 30 Jul evening, supersedes learning 6):**
+Claude credits scarce / Codex credits plentiful, so **implementation goes to Codex
+MCP** (`mcp__codex__codex` + `codex-reply`, fed the full contract in its own worktree;
+Codex may call the `claude` CLI for specific agents). The **safety floor stays on
+Claude and is not cut for credits**: orchestrator D104-verify → Codex implements →
+`factory-security-reviewer` mandatory (opus — the cross-family diverse lens now that
+Codex authors) + qa + local codex review + connector → draft → CI green → connector
+(trust the auto-👍) → independent `pr-triage` (D23, never Codex) → merge on fully-clean.
+#80's crux: parse the
 union of {PR body, all branch commit messages} for closing keywords, inclusive by
 design (under-inclusion = gate bypass, over-inclusion = fail-safe extra review;
 match GitHub's real close semantics, #171 lesson).
