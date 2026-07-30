@@ -319,6 +319,83 @@ Squash `dc8cfb9`, `Closes #168` + `Closes #169`. Conventional/interactive. Both 
 
 ---
 
+## Session 30 Jul (afternoon, cont.) — #154 (PR #182)
+
+### PR #182 — issue #154 (workflow expression guard: audit `shell:` + `with.script` sinks, not only `run:`) — MERGED
+
+Squash `cc6e6d1`, `Closes #154`. Conventional/interactive. A triage-of-#153
+residual (zero live instances). One file, `tests/factory/workflow-run-expression-injection.test.ts`.
+
+| Metric | Value |
+|---|---|
+| Open→merge wall-clock | **~1h18m** (draft 12:35Z → merged 13:53:54Z), draft-first; 1 post-open fold |
+| Pre-open floor | local `codex review` CLEAN; `factory-security-reviewer` **CONFIRMED-SOUND** (no bypass, no live FP); `qa` **PASS** |
+| Post-open review rounds | **1** CCR nit (low) folded; connector CLEAN both heads (auto on `ccc03b4`, `@codex review` re-trigger on `7c69ce6` → comment-channel "Didn't find any major issues" + fresh 👍, head-matched). Median-≤1 met |
+| Findings folded pre-open | **0** — clean floor (all three lenses first-pass clean) |
+| Findings folded post-open | **1** (CCR low nit: leftover `run expression corpus` empty-corpus string, class-complete at 2 sites → sink-generic) |
+| Implementer | `implementer` (opus), build + 1 fold cycle |
+| Domain reviewers | `factory-security-reviewer` ×1 (CONFIRMED-SOUND); `qa` ×1 (PASS); `pr-triage` ×1 (MERGEABLE, independently re-verified the benign claude-review red) |
+| Residual flagged | **claude-review completion-assertion checklist-shape false-negative** (learning 16 below) — follow-up filed |
+
+Tokens (output / cache-create):
+| Delegation | Model | Turns | Output | Cache-create |
+|---|---|--:|--:|--:|
+| planner-154 | fable | 19 | 32,114 | 294,577 |
+| impl-154 (build + fold) | opus | 139 | 38,021 | 1,121,560 |
+| fsr-154 | opus | 56 | 36,505 | 380,919 |
+| qa-154 | sonnet | 44 | 18,529 | 274,411 |
+| triage-182 | sonnet | 31 | 20,417 | 505,969 |
+| **PR #182 subagent total** | | 289 | **145,586** | **2,577,436** (cache-read ~22.4M) |
+
+**#154 — the cheap-slice datapoint (amortisation thesis, other extreme).** impl-154
+cost **38K output / 1.12M cache-create across 139 turns** — roughly **1/9 the
+output and 1/12 the cache-create of the #170/#160 security keystones**, and the
+whole PR (5 delegations) totalled 146K / 2.6M. The driver is the same one
+learnings 8/12/14 name: **cost tracks NEW primitive surface**, and #154
+introduced essentially none — it reused the existing recursion, `${{ }}`
+extractor, and closed allow-list, adding only a `SINK_KEYS` set + a `.toLowerCase()`
+fold on the already-present arm. The security surface (merge-key synthesis,
+duplicate-key ordering, non-sink leaves, unscoped-`script`) was fsr
+CONFIRMED-SOUND **first-pass** with no folds; the one post-open fold was a
+cosmetic leftover string, not the guard. A class-fix (run→sink identifier rename)
+that CCR caught one un-swept sibling of — folded class-complete (2 sites), and
+the connector re-review confirmed clean in one round.
+
+**#154 — learning 16: the connector re-review is the robust CLEAN channel, but
+the `claude-review` completion-assertion has a checklist-shape false-negative on
+a prose re-review.** After the post-open fold, the CCR re-review (run 30547564749)
+genuinely completed and was CLEAN ("Prior nit — confirmed fixed… No new issues
+found", a full logic re-trace, no unticked boxes, no truncation), but it posted a
+`### Review summary` **prose** shape instead of the `- [x]` **checklist** shape the
+first automatic review used. The #146 completion-assertion (step 8) is pinned to the
+checklist shape, so it tripped "this run's tracking comment has no tracking
+checklist" and failed the `claude-review` **job** — a benign false-negative in the
+**safe direction** (a complete review flagged incomplete, the opposite of the
+misleading-green #146 exists to prevent). Merge-safe because (a) `claude-review` is
+**not** a required status check (verified live: required list is
+CI/Playwright/Snowflake-offline/CodeQL/dep-review/mutation), so `mergeStateStatus`
+was `UNSTABLE` not `BLOCKED`, and (b) both the orchestrator AND independent
+`pr-triage` read the *full* tracking-comment body and confirmed the review was
+genuinely complete-and-clean, not degraded — the red was believed benign only after
+reading the content, never on faith. Contrast the connector, whose re-trigger
+produced the **robust comment-channel signal** ("Didn't find any major issues" +
+head-matching `Reviewed commit`), the reliable one when the stale 👍 is idempotent
+(learning re #164). Follow-up filed against #146's mechanism (accept the prose
+"Claude finished + no unticked boxes + explicit verdict" shape, or have the action
+always use the checklist shape) so the noise doesn't recur on every post-fold
+re-review.
+
+**Process note (topology v2 held end to end):** planner contract D104-verified +
+all cross-file citations spot-checked (corpus greps, pin-audit manifest scope,
+`.toLowerCase()` precedent, `merge:true` asymmetry, the confirmed-untested
+alias-bound catch → T13); implementer in its own worktree; isolated fsr/qa review
+worktrees (mutation-isolation rule); pre-open floor + adversarial fsr; draft-first
+until CI green; `@codex review` single re-trigger on the new final head after the
+fold; connector comment-channel verdict verified bot-authored + head-matched;
+independent pr-triage; autonomous merge on fully-clean. Zero bad merges preserved.
+
+---
+
 ## Findings / learnings so far
 
 1. **Local `codex review` ≠ the cloud Codex connector.** On #146 the connector
