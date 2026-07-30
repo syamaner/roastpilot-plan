@@ -396,6 +396,43 @@ independent pr-triage; autonomous merge on fully-clean. Zero bad merges preserve
 
 ---
 
+## Session 30 Jul (evening, operator-directed) — #183 (PR #185)
+
+Operator picked the #183 fix option (**C**, terminal completion sentinel) off the planner's options analysis, then directed the drive.
+
+### PR #185 — issue #183 (completion-assertion fails closed on a complete prose review) — MERGED
+
+Squash `8e940ff`, `Closes #183`. Conventional/interactive. MODIFIES a factory-pipeline security control (the `claude-review` completion-assertion). 5 commits (fixtures → workflow → C-T1..C-T11 → C-T12 → C-T11-exact-fix).
+
+| Metric | Value |
+|---|---|
+| Open→merge wall-clock | **~1h05m** (ready 18:23:13Z → merged 19:23:43Z), draft-first; 2 post-open folds |
+| Pre-open floor | local `codex review` CLEAN ×2; `factory-security-reviewer` **CONFIRMED-SOUND** (could not admit a truncated review; mawk/gawk byte-identical; precedence/byte-equality hold); `qa` PASS → 1 fold (C-T12 no-heading accept coverage) |
+| Post-open review rounds | **1** connector round with a finding (C-T11 P2) → folded; then a fresh connector pass CLEAN (comment-channel + 👍, head-matched) |
+| Findings folded pre-open | 1 (qa C-T12: no-heading widening accept-path had no positive test — availability-symmetry on a security harness) |
+| Findings folded post-open | 1 (**connector P2**: C-T11 lockstep used `toContain`, not byte-equality → a suffix-drift on the instruction marker would pass the test yet red every prose review at runtime; availability-direction, not fail-open. Fixed to exact `toBe`) |
+| Implementer | `implementer` (opus), build + 2 folds |
+| Domain reviewers | `factory-security-reviewer` ×1 (re-confirmed on final head); `qa` ×1; `pr-triage` ×1 (FIX-FIRST on the P2 → **MERGEABLE** on the fixed final head) |
+| Residual filed | **#184** (pre-existing checklist-branch quoted-ticked-box fail-open, out of scope) |
+
+Tokens (output / cache-create):
+| Delegation | Model | Turns | Output | Cache-create |
+|---|---|--:|--:|--:|
+| planner-183 | fable | 25 | 31,027 | 753,329 |
+| impl-183 (build + 2 folds) | opus | 201 | 117,344 | 2,687,763 |
+| fsr-183 | opus | 73 | 44,175 | 1,016,432 |
+| qa-183 | sonnet | 85 | 21,276 | 568,035 |
+| triage-185 | sonnet | 67 | 42,545 | 1,613,209 |
+| **PR #185 subagent total** | | 451 | **256,367** | **6,638,768** |
+
+**#183 — learning 17: the connector's AUTOMATIC clean-signal is a 👍 reaction; a MANUAL `@codex review` can out-find it, but is not free.** Operator-confirmed mechanism (the connector's own "About" text): after an auto review it **comments if it has suggestions, otherwise reacts 👍**. On #185 the automatic pass left a clean 👍 (captured live at 18:25:41Z). The orchestrator, over-cautious about a "bare" 👍, posted a manual `@codex review` — which re-reviewed the SAME head and **posted a real P2** (the C-T11 lockstep weakness) that the auto-👍, fsr, qa, local codex AND the claude-review pass all missed, and **withdrew the auto-👍** (so a watcher checking after saw no 👍 at all — the #164 reaction-volatility hazard, now observed in the withdraw-on-re-review direction). Two lessons: **(a)** the manual re-trigger isn't purely redundant — LLM review is non-deterministic, and a second diverse pass genuinely found a real defect (learnings 1/7/11/14 again); **(b)** but it costs Codex budget and extends the cycle, so **trust the auto-👍 on routine PRs and reserve the manual re-trigger for security-gate changes** — here (a change to the completion-assertion itself) the extra pass paid off, so the calibration is "scrutinise the gate, trust the routine." The robust signal remains the comment channel with a head-matching `Reviewed commit` (the 👍 is withdraw-volatile).
+
+**#183 — learning 18: the fix self-validated in production, and the AGENTS.md #140 "workflow-edit self-skip" is stale at action v1.0.176.** The PR body initially carried the documented caveat that a workflow-edit PR reds `claude-review` because the action self-skips (#140). It did **not**: at the pinned action `700e7f8`/v1.0.176 the action ran a **real** review of #185 under the *new* workflow (a `pull_request` run uses the PR head's workflow), the model **received the `--append-system-prompt` sentinel instruction and emitted it as its final line**, and the **new** completion-assertion passed a genuinely-complete checklist+sentinel review ("No blocking issues found"). So #185 self-validated Option C end-to-end in production (passthrough works; the new branch accepts a real complete review). The PR body was corrected. **Operator follow-up flagged:** the AGENTS.md/roster note that "the Claude action step skips and reports SUCCESS on a workflow-edit PR (#140)" and "a workflow-edit PR can never verify its own review path" is now stale for this action version — worth an AGENTS.md accuracy correction (a protected-file conventional change, not folded here).
+
+**Process note (topology v2 held end to end):** planner options-analysis contract (operator-decided the option) → D104-verified + all cross-file citations spot-checked (the load-bearing security fact — "Claude finished" survives truncation in the pr150 fixture — verified directly) → implementer in its own worktree with a pre-flight passthrough verification (traced through the action source) → pre-open floor + adversarial fsr on the isolated review worktrees → draft-first until CI green → connector verdict → 2 folds (qa symmetry + connector P2), each re-run through the local codex floor and CI, connector re-triggered once on the new final head → independent pr-triage (FIX-FIRST → MERGEABLE) → autonomous merge on fully-clean. Zero bad merges preserved.
+
+---
+
 ## Findings / learnings so far
 
 1. **Local `codex review` ≠ the cloud Codex connector.** On #146 the connector
