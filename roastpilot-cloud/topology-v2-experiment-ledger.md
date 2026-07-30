@@ -224,7 +224,34 @@ Tokens (output / cache-create):
 
 **#171 — two sharp findings.** (1) **The ADVERSARIAL lens is distinct from the CORRECTNESS lens.** `factory-security-reviewer` reached `git push` with a live GitHub-honoured `[skip ci]` via a nested title `[oops [skip ci]` — the guard extracted the outer bracket group and mis-keyed it, while GitHub does a literal substring search. The local `codex review` (CLEAN), the author's full L/N/E/M suite (all green), AND my own orchestrator trace all PASSED it; only the agent *trying to break it* found it. On a gate-bypass fix the adversarial red-team is the load-bearing lens, not the correctness lens — same lesson as the cloud-connector catches (learning 1/7), now for fsr specifically. The fix realigned detection with the enforcing consumer (per-token literal regexes matching what GitHub matches, not a re-derivation of it). (2) **The fix's own commit message skipped its CI.** The commit prose describing the vulnerability contained the literal `[skip ci]`, so GitHub skipped every required workflow on the PR (mergeState BLOCKED, no runs at all) — the sharpest possible demonstration that the token is a plain substring honoured anywhere. Resolved by rewording the HEAD commit message token-free (tree identical) and force-pushing; a squash-merge writes a clean message onto `main`.
 
-### Session-level (as of ~10:00Z 29 Jul, ~17.5h in — after #175/#171 merge, experiment autonomous run complete)
+### PR #176 — issue #164 (implement-transcript artifact exposure → minimal model_id handoff) — MERGED
+
+| Field | Value |
+|---|---|
+| Path | conventional/interactive; `.github/workflows/**` + `scripts/factory/**` + tests |
+| Open → merge | ~57m (2026-07-29 23:47Z draft → 2026-07-30 00:44Z), draft-first; 2 commits |
+| Offline review turns | 1 local `codex review` (CLEAN) + `factory-security-reviewer` ×1 (CONFIRMED-SOUND, empirical bash+jq probes) |
+| Online review turns | 1 Codex-connector round — automatic signal UNSTABLE (a bare 👍, no comment, later withdrawn); `@codex review` fallback → CLEAN 👍 + "Didn't find any major issues" (Reviewed commit head-matched) |
+| Findings folded | **ZERO at any stage** — clean pre-open floor, clean post-open. The one implementer deviation (jq `[[:cntrl:]]` reject to keep trailing-newline rejection, vs bash `$( )` stripping) was fsr-confirmed as part of what makes GITHUB_OUTPUT injection impossible, not a fix |
+| Implementer | `implementer` agent (opus), 0 folds; independent `pr-triage` (sonnet) → MERGEABLE |
+| Models | planner **fable** (planner-164); implementer/fsr **opus**; pr-triage **sonnet** |
+
+Tokens (output / cache-create):
+| Delegation | Model | Turns | Output | Cache-create |
+|---|---|--:|--:|--:|
+| planner-164 | fable | 72 | 67,879 | 653,271 |
+| impl-164 | opus | 309 | 136,647 | 1,541,456 |
+| fsr-164 | opus | 62 | 35,661 | 302,656 |
+| triage-176 | sonnet | 46 | 25,709 | 192,770 |
+| **PR #176 subagent total** | | 489 | **265,896** | **2,690,153** |
+
+**#164 — the clean-pass counter-example to learning 8, plus a Codex-connector reliability note.** (1) A tight fable contract + a structurally simple, non-emergent slice (drop an artifact, re-route one field) produced **zero review rounds at any stage** — the first fully-clean pass of the run. Where #170 was emergent-subtlety-heavy (learning 8), #164 introduced **no new primitive surface** (it reused the #171 model-id allowlist and the #158 sanitisation), so the amortisation thesis held: cost tracks new surface, and there was none. (2) **The connector's automatic signal was unstable on a human-authored conventional PR.** The automatic review left a bare 👍 reaction (no verdict comment) which then *vanished* before a manual `@codex review` produced the full comment-backed verdict. A reaction is single-slot-per-content-type, so a withdrawn/re-issued 👍 loses history: a watcher polling only comments/reviews misses it entirely, and one polling only the current reaction set can't distinguish a withdrawn-then-reissued 👍 from a fresh one. The robust signal is the **"Didn't find any major issues" comment with a head-matching `Reviewed commit`**, not the reaction — and when the automatic signal is ambiguous/bare, the `@codex review` fallback is correct even though something "arrived", because it produces the unambiguous comment.
+
+### Continued autonomous run (30 Jul, operator away for the day)
+
+The ~10:00Z snapshot below called the first run complete because the remaining backlog needed operator decisions. Those were taken: operator agreed tonight's queue (#164 → #160 → #163; #167 **design-writeup only**; autonomous merge on fully-clean, same gates). Progress this run: **#167** re-scoping writeup posted + parked (recommends converging the main review job onto the Bash-free spec-grounding pattern to close #167 + #146-completion-forgery with no new execution class). **#164 → PR #176 MERGED** (above). **#160** (protect the writable-alarm enforcement-test class) in pre-open review — planner-160/impl-160 done, fsr-160/qa-160 running, one codex-review P2 (C4 placement detector covers only ~4 of the guard's protected surfaces) queued for a consolidated fold. **#163** next. Topology v2 flow held throughout (spec-first, pre-open floor + adversarial fsr, draft-first, connector verdict, independent pr-triage). Session-level totals for this run land when #160/#163 close.
+
+### Session-level (as of ~10:00Z 29 Jul, ~17.5h in — after #175/#171 merge, first autonomous run complete)
 | Bucket | Turns | Output | Cache-create | Cache-read |
 |---|--:|--:|--:|--:|
 | Orchestrator main loop (opus, xhigh) | 1,510 | 3,621,493 | 9,659,831 | 835,754,022 |
