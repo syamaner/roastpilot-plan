@@ -2373,3 +2373,62 @@ D143 changes no execution boundary. It settles product and security contract
 gates, adds cloud #146 as a 9h prerequisite, and alters no repository setting,
 secret, Environment, or branch-protection configuration. The factory remains
 paused and `FACTORY_PAUSED` stays exactly `true`.
+
+## D145: Codex-MCP is the default factory implementer; Claude is PM plus the safety floor (credit pivot)
+
+**Decision (operator, evening 30 July 2026; recorded here 31 July):
+implementation delegation defaults to Codex-MCP, and the scarce Claude budget is
+reserved for orchestration and the review floor.** Anthropic credits are the
+scarce resource and the Codex subscription is weekly-capped but comparatively
+plentiful, so the expensive, high-volume work, writing the code and tests from a
+ratified contract, goes to Codex (`mcp__codex__codex` / `codex-reply`), each task
+in its own git worktree off `origin/main`, with the orchestrator driving the
+commits because the Codex sandbox blocks its git-metadata writes. This supersedes
+ledger learning 6, which had kept implementation on the Claude `implementer`
+agent on the reasoning that the whole F1 backlog is protected or
+security-adjacent; the pivot routes that same protected work to Codex and moves
+the Claude spend onto the review floor instead.
+
+**The safety floor is NOT a credit variable, and it becomes the load-bearing
+cross-family lens precisely because Codex now authors.** Every PR keeps the same
+pre-open floor and independent triage: a local `codex review --base origin/main`,
+a mandatory `factory-security-reviewer` (opus) pass on any protected or security
+diff, a `qa` pass where test quality is load-bearing, and an independent
+`pr-triage` (never Codex, D23) before merge. The same-family author and its own
+review are one lens; the opposite-family adversarial reviewer is the interlock,
+and the interlock is the family boundary, not the head count. A resource
+optimisation on the actuator must not thin the sensor. That floor is currently
+enforced by the ORCHESTRATOR, which re-derives reviewers from the real diff's
+content and adds the appropriate Claude DOMAIN reviewer (`factory-security-
+reviewer` for the factory pipeline, `schema-migration-reviewer` for schema and
+grants, `privacy-auditor` for the app's reviewer-data and deletion surface) so
+the cross-family lens fits the change rather than being a floor in name only. A
+security-sensitive change under none of those domains is orchestrator judgment
+today, and making that mechanical before reviewer routing is autonomous is
+tracked with #47, so this interlock is orchestrator-enforced, not yet
+path-mechanical.
+
+**The Claude `implementer` (opus) agent is retained as the FALLBACK, not the
+default.** It is used when Codex is unavailable, or when the Codex weekly
+allowance drops below the Axis-A budget stop threshold (roughly twenty percent),
+at which point implementation delegation stops routing to Codex and the whole
+remainder is reserved for the every-PR review floor, the last thing the budget
+cuts. The orchestrator still never implements under topology v2 in either case.
+
+**Evidence: proven across two hard security PRs.** On cloud #80 (PR #186) and #77
+sub-problem B (PR #187), Codex authored every implementation line from the D104
+contracts; the Claude opus `factory-security-reviewer` independently reproduced
+fail-opens that the author's own same-family review saw only in part or missed
+entirely, a mutable-title publisher bypass on #80, and on #187 a legacy-form
+retirement fail-open plus a linked-issue revert-race fail-open, the second of
+which the reviewer had itself passed on an earlier round and had to withdraw. The
+pivot's premise, that the diverse Claude lens earns its cost even when Codex does
+the writing, is the measured result, not an assumption.
+
+D145 changes no execution boundary. It records a credit-allocation and
+delegation-default decision, alters no repository setting, secret, Environment,
+or branch-protection configuration, and does not change which agent may write
+which path: the pipeline-self-modification protections and the permanent human
+merge are unchanged, so a protected agent-instruction or workflow file is still
+never touched by any implementing agent, Codex included. The factory remains
+paused and `FACTORY_PAUSED` stays exactly `true`.
