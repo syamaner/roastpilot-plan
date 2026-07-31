@@ -639,3 +639,43 @@ reviewer, orchestrator-enforced today, with mechanical routing tracked for #47. 
 saga is the pivot's own thesis doing work — Codex authored nothing here (protected
 doc), yet the diverse review lens still earned its cost by sharpening the security
 framing four times. All D145/ledger commits are LOCAL/unpushed (operator pushes).
+
+---
+
+## Session 31 Jul (evening) — #77 sub-problem A, PR-2 (PR #189) — MERGED
+
+Fresh session, Codex-implements credit-pivot. A has three deliverables (record +
+surface `updated_at` provenance; safe orphan-retirement). A D104 contract for
+deliverables 1+2 already existed on #77 (posted a prior session, base `eea7c4e`);
+deliverable 3 (safe retirement, added to scope only after #187's saga converged)
+had none. Orchestrator D104-verified the existing contract's citations against
+current `origin/main` (`d9186a4`, post-#187/#188 — only trivial line drift, 952→955
+etc.), then commissioned `story-planner` for a scoped addendum covering deliverable
+3 only. Both posted as one combined addendum comment on #77, including a routing
+correction: the addendum's own recommendation (Claude `implementer` opus, "security-
+adjacent → not Codex") was based on pre-D145 policy: current `AGENTS.md` makes Codex
+MCP the default even for protected/security work. Addendum also **split A into two
+PRs**: PR-2 (deliverables 1+2) and PR-3 (deliverable 3), on the addendum's own
+reasoning — deliverable 3 re-opens the exact privileged-DELETE capability class that
+took #187 four rounds to converge, so an isolated diff keeps a repeat revert a
+one-PR rollback.
+
+### PR #189 — #77-A deliverables 1+2 (`Refs #77`, squash `dc9da06`) — MERGED
+
+| Metric | Value |
+|---|---|
+| Delivered | `GitHubIssue`/`fetchIssue` capture each linked issue's API `updated_at`; optional `linkedIssueProvenance` spine field (parser-validated: positive-integer issueNumber, no dupes, `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$` grammar, 1000 cap); publisher always renders a "Criteria provenance" section on every `hasCriteria:true` verdict (clean or blocker), loud fallback for legacy spines |
+| Logic lines | ~150 (2 commits: ~107 initial + ~45 fold) |
+| Pre-open floor | **2 rounds each** — local `codex review` (r1: P2 "provenance not cross-checked against entries" → folded; r2: CLEAN) + `factory-security-reviewer` (r1: **MEDIUM** — unconditional 1000-element cap could exceed GitHub's comment limit, causing an uncaught throw with NO try/catch above `main()`, silencing the whole review (no summary, no fallback) — exactly the failure the fallback comment exists to prevent → folded; r2: CONFIRMED-SOUND, empirically re-reproduced both old-throw and new-bounded behaviour, 16 cross-entry-invariant probes, full protected-surface delta re-check) + `qa` (NEEDS-WORK: uncovered non-array branch, no end-to-end test through real `main()` wiring, weak negative assertions → all 3 folded) |
+| Post-open | **0 rounds with findings** — `claude-review` job went red (advisory, not required) but genuinely incomplete (2 denied tool calls, Bash+Skill, mid-run; checklist only 3/7 ticked; "Assert the review actually completed" correctly caught it, not a hidden finding); Codex-connector 👍 (bot-authored, postdates ready boundary, head-matched) |
+| Implementer | Codex MCP (2 build/fold cycles, both self-reported gates green, both independently re-verified by the orchestrator directly, not accepted on faith) |
+| Domain reviewers | `factory-security-reviewer` ×2 (MEDIUM→CONFIRMED-SOUND); `qa` ×1 (NEEDS-WORK→folded); `pr-triage` ×1 (MERGEABLE, re-derived from the actual sub-agent transcripts + Codex logs on disk, not the PR body) |
+| Merge state | required 6/6 green (check-runs API); 0 inline threads; Codex 👍 verified bot-authored+boundary-correct+head-matched; independent pr-triage MERGEABLE; **autonomous merge on fully-clean** |
+
+**Learning 27: a security-adjacent PR earned its two-round floor honestly — both real findings were genuinely different lenses, not redundant.** Local `codex review`'s P2 (provenance not cross-checked against which issues have criteria entries — a corrupted/manipulated artifact could show provenance for the WRONG issue while the actually-reviewed issue has none) and `factory-security-reviewer`'s MEDIUM (an unconditional cap → uncaught-throw → total review silence) are different failure classes on the same new surface: one is a data-integrity/misattribution defect, the other is an availability/fail-shape defect. Neither lens would have found the other's issue — confirms learning 1/7/11 (distinct lenses, not redundant) on a slice that never touched the delete path at all, so this isn't just a "security keystone" artifact; it's the baseline cost of shipping ANY new privileged-surface primitive, however small.
+
+**Learning 28: independent verification (both orchestrator's own re-runs and `pr-triage`'s) is not theatre — it caught real gaps a self-report would have missed.** Codex's own gate report after the fold said "all green, no new uncovered lines"; the orchestrator's own independent `npm run test -- --coverage` re-run agreed. `pr-triage` went further: it located and read the actual local session logs (sub-agent transcripts, `codex review` log files) to CONFIRM the routed reviewers (`factory-security-reviewer`, `qa`) genuinely ran with genuine findings, rather than trusting the PR body's summary — flagging as a process gap that **nothing GitHub-native records that they ran at all** (no PR comment, check run, or artifact); this time the local evidence happened to still exist, but that's fragile. Worth a follow-up: post pre-open floor results as a PR comment for durability, so a future `pr-triage` (or a human) doesn't have to reach into ephemeral session logs to confirm the gate actually fired.
+
+**Learning 29 (process): pre-existing contracts should be reused, not redrafted, when their substance survives a citation refresh.** The task briefing for this session assumed no D104 contract existed for #77-A; one already did (posted the prior session), with only trivial line-number drift from #187 landing in between. Re-verifying + posting a citation-refresh addendum, rather than re-running `story-planner` from scratch, is the credit-disciplined move (D145) when substance holds — reserve the planner spend for genuinely new design surface (here, deliverable 3, which the existing contract had never covered).
+
+**Guardrails held:** `FACTORY_PAUSED` untouched; no settings/secrets/branch-protection/Environment changes; protected branches untouched; merged branch `feature/77-criteria-provenance` left on origin (deletion is the operator's); the implementation + review worktrees removed post-merge. Merge on fully-clean (required via check-runs API, bot-authored connector 👍 verified, threads N/A, independent pr-triage). #77 stays OPEN (`Refs #77`, not `Closes`) — PR-3 (deliverable 3, safe orphan-retirement) is next and completes it.
