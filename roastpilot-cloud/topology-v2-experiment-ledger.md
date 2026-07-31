@@ -607,3 +607,35 @@ Claude sub-agent tokens (output / cache-create; Codex impl = Codex credits):
 **Learning 25 (process): the orchestrator's LOCAL main lagged origin by 3 commits — the planner read the stale tree.** `story-planner` (read-only, reads the orchestrator's checkout) drafted against `dc8cfb9` while origin/main was `eea7c4e` (post-#154/#80/#183). Citations for the 6 changed files were line-shifted; the B-core files (`spec-grounding-runner-logic.mts`, `publish-spec-grounding-blocker-logic.mts`, `spec-grounding-verdict-schema.mts`) were byte-identical dc8cfb9..eea7c4e so line-accurate. Caught at citation-verification (the load-bearing orchestrator step): verify every citation against `git show origin/main:`, AND check the base the planner actually read. Substance held at the true base; a base-correction addendum was posted with the contract.
 
 **Guardrails held:** `FACTORY_PAUSED` untouched; no settings/secrets/branch-protection/Environment changes; protected branches untouched; every commit CI-skip-scanned pre-push (one detached-HEAD footgun caught + reconciled when the fix-fix landed on a detached HEAD after `codex review` detached the worktree — re-attached via `checkout -B`, origin corrected). Codex impl in its own worktree; fsr/qa in their own isolated worktrees (mutation-isolation). Merged on **explicit operator authorization** (`c3fcf04`, 31 Jul 12:48Z) after surfacing — the connector triaged-not-clean + the disposition-(b) walk-back were operator-visibility-worthy, so autonomous-merge-on-fully-clean correctly did NOT fire and the human made the merge call. Worktrees removed post-merge; merged-feature-branch deletion stays the operator's.
+
+### Credit-pivot formalized — factory.md D145 + PR #188 (`d9186a4`)
+
+Operator directive after #187: formalise the Codex-implements credit pivot.
+**factory.md D145** now records it as a ratified plan-repo decision (Codex is the
+default implementer including protected/security work; Claude is PM + the safety
+floor, not cut for credits; the `implementer` opus agent is the fallback; #80/#187
+as proof). **PR #188** (`d9186a4`, doc-only, conventional, orchestrator-authored
+under human direction because implementing agents may not touch protected
+agent-instruction files, fsr CONFIRMED-SOUND) reflected D145 across the three
+agent-facing routing sites AGENTS.md drift left. (D144 was renumbered → D145: a
+stale task had reserved D144 for the required-reviews.sh work.)
+
+**Learning 26: the diverse lens finds framing imprecision even on a doc reflecting
+a settled decision — and each catch was about the pivot's SECURITY-REVIEW model, not
+the routing.** #188 took FOUR local-codex/connector passes: (1) the `story-planner`
+routing site the initial 2-site sweep missed (class-fix incompleteness, again); (2)
+the two "cross-family lens" LABELS on the Codex-review paths, which the pivot INVERTS
+— Codex now authors, so its own review is same-family; the cross-family lens is the
+Claude reviewer; (3) the interlock CLAIM — D145 said "mandatory fsr on any security
+diff" but the routing rubric only mechanically routes the enumerated
+factory/schema/privacy paths, so the interlock was claimed-not-enforced for a
+security-adjacent change outside them (the "documented default nothing enforces"
+principle, turned on D145 itself); (4) the reviewer SCOPE — the honesty note's first
+draft named `factory-security-reviewer` for all security changes, but its threat model
+is factory-pipeline-specific, so a non-factory security diff needs the appropriate
+DOMAIN reviewer (schema-migration-reviewer / privacy-auditor). Converged (learning 9)
+with a precise statement: the cross-family floor is the appropriate Claude domain
+reviewer, orchestrator-enforced today, with mechanical routing tracked for #47. The
+saga is the pivot's own thesis doing work — Codex authored nothing here (protected
+doc), yet the diverse review lens still earned its cost by sharpening the security
+framing four times. All D145/ledger commits are LOCAL/unpushed (operator pushes).
