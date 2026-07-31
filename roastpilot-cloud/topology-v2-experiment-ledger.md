@@ -512,3 +512,59 @@ resolved, independent pr-triage on security PRs); merged branches left on origin
    lens, which no up-front spec enumerates. Completeness collapses *speculative-churn*
    rounds (#146's no-consumer G4), not *emergent-subtlety* rounds. Budget a security
    keystone for multiple review rounds regardless of contract quality.
+
+---
+
+## Session 31 Jul — #80 (PR #186) MERGED — first full Codex-implements drive
+
+Credit-pivot live: **Codex MCP authored every implementation** (runner half, enforcement half, base-retarget fold, two test-quality folds); Claude ran PM + the safety floor (planner, fsr, qa, pr-triage) as the cross-family lens. Supersedes learning 6.
+
+### PR #186 — issue #80 (spec-grounded review: criteria-derivation + trigger completeness, both review AND enforcement) — MERGED
+
+Squash `eea7c4e`, `Closes #80`. Conventional/interactive. Touches the factory-pipeline protected surface (`scripts/factory/**` runner + privileged publisher, `.github/workflows/claude-code-review.yml`). 8 commits. Spanned 2 sessions (planner-80 runner-half contract prior session; this session: runner build + enforcement half + fold + merge).
+
+| Metric | Value |
+|---|---|
+| Open→merge wall-clock | **~8h42m** (ready 30 Jul 22:02:38Z → merged 31 Jul 06:44:11Z), draft-first; dominated by ONE post-open round = a full base-retarget fold (planner→Codex→re-floor→re-push→connector→triage) |
+| Logic lines | ~330 (runner+enforcement) + ~165 (fold) ≈ 495 across 2 delivery halves; each half under 400 |
+| Pre-open floor, runner half | codex-review **2×P1** (title-mutability→subsumed; per_page=250→folded); **fsr BLOCKER** (reproduced publisher-enforcement bypass); qa PASS → operator: drive complete fix in #80 |
+| Pre-open floor, enforcement half | codex-review **1 P2** (>250 pagination — **defended**, deliberate fail-closed/availability-only/zero-instance, fsr-confirmed); **fsr CONFIRMED-SOUND**; qa NEEDS-WORK (1 tautology, folded) |
+| Pre-open floor, base-retarget fold | codex-review **CLEAN**; **fsr CONFIRMED-SOUND** (residue-zero class sweep, half-fix structurally impossible); qa NEEDS-WORK (3 test-quality: source-regex smell, trivial no-DELETE, branch cov — all folded) |
+| Post-open rounds | **1** (connector P1 + claude-review medium **CONVERGED** on the base-retarget bypass → fold) |
+| Connector | auto P1 on 7812223 (folded); re-triggered on 0d8980b → **👍 + "Didn't find any major issues, Reviewed commit 0d8980ba92"** (bot-authored, double-channel, head-matched) |
+| Implementer | **Codex MCP** (runner, enforcement, fold, 2 test-folds) — the credit-pivot's first full drive |
+| Domain reviewers | planner(fable)×2, fsr(opus)×3, qa(sonnet)×3, pr-triage(sonnet)×1 |
+| Merge state | required 6/6 green + connector clean + threads 2/2 resolved + pr-triage MERGEABLE; ONE red **non-required** check accepted by operator |
+| Residual filed | none new; documented residuals below |
+
+Claude sub-agent tokens (output; Codex impl/review = Codex credits, not Claude):
+| Delegation | Model | Output |
+|---|--:|--:|
+| planner-80b (enforcement contract) | fable | 127,563 |
+| planner-forkA (fold contract) | fable | 136,150 |
+| fsr-v1 (runner-half, BLOCKER) | opus | 172,480 |
+| fsr-v2 (enforcement, CONFIRMED-SOUND) | opus | 144,387 |
+| fsr-fold (CONFIRMED-SOUND) | opus | 169,402 |
+| qa-v1 | sonnet | 143,630 |
+| qa-v2 | sonnet | 170,178 |
+| qa-fold | sonnet | 170,624 |
+| pr-triage-186 | sonnet | 86,804 |
+| **Claude sub-agent total (9 delegations)** | | **1,321,218** |
+
+**#80 — learning 19: the Codex-implements credit-pivot works, and the Claude fsr is the load-bearing cross-family lens.** Codex authored a substantial protected-path change faithfully from the D104 contracts. Its OWN local `codex review` caught only the TIP of the fail-open (title mutability, one P1); the Claude `factory-security-reviewer` (opus) independently REPRODUCED the full publisher-enforcement BLOCKER end-to-end (the runner-only change was strictly worse than base — a false all-clear). Same-family author + same-family review is not a substitute for the opposite-family adversarial lens on a security gate. See [[codex-mcp-implementer-reinstated]] memory.
+
+**#80 — learning 20: class-sweep completeness is DIMENSION-specific.** The enforcement contract swept the DERIVATION-site dimension (every `parseLinkedIssueReferences` call site) and fsr CONFIRMED-SOUND on `hasCriteria:true`. But the base-retarget bypass lived on a DIFFERENT dimension — the VERIFICATION-surface asymmetry (head-only vs head+base) between the two dispatch paths (`hasCriteria:true` publishSummary vs `hasCriteria:false` Fork A). No pre-open lens caught it; the POST-OPEN connector + claude-review CONVERGED on it. Reinforces learning 8 (emergent subtlety, budget multiple rounds regardless of contract quality): sweep on the dimension the bug actually lives in, not only the obvious one. The fold's OWN sweep (verification-surface) was then residue-zero and fsr-verified.
+
+**#80 — learning 21: outcome.json (producer/consumer) schema additions are BREAKING under the trusted-base publisher pattern.** The privileged publisher checks out TRUSTED base (main) only, so a PR that adds a strict-grammar field to `outcome.json` (a) fails its OWN advisory publish-dogfood — main's older publisher rejects the new field as "unexpected" — and (b) would break any in-flight PR post-merge (main's new publisher then requires the field). Inherent to the trusted-base pattern; fail-closed (advisory gate, not a bypass); self-resolves the instant the PR lands on main. Operator-accept for an advisory gate with no in-flight PRs (this case); otherwise expand/contract (land a reader-tolerant change to main first, then the writer+enforcer). Same shape when `reviewedClosingIssueNumbers` was added (#96).
+
+**Process note (topology v2 + credit-pivot held end to end):** planner(fable) contract on the issue → orchestrator D104-verify + spot-check every citation vs origin/main → Codex implements in its own worktree (sandbox blocks its git-metadata writes, so the orchestrator drives the commits with the CI-skip scan) → pre-open floor (local codex review + fsr mandatory + qa) → draft-first until CI green → ready → connector → **1 post-open converged finding** → re-plan(fable)→Codex fold→re-floor(fsr+qa+codex)→re-push→connector re-trigger(👍)→independent pr-triage→resolve threads→autonomous merge on fully-clean (one operator-accepted non-required red). Zero bad merges preserved.
+
+### Session close (31 Jul) — handover state
+
+**Merged this session:** #80 → PR #186 (`eea7c4e`), the first full Codex-implements drive. Ledger row + learnings 19-21 above; **all ledger commits LOCAL/unpushed** (operator pushes). Memory written: [[codex-mcp-implementer-reinstated]] (supersedes learning 6, with #80 proof case + career [CONTROL] beats).
+
+**Guardrails held:** `FACTORY_PAUSED` untouched; no settings/secrets/branch-protection/Environment changes; protected branches untouched; merged branch `feature/80-...` left on origin (remote deletion is the operator's); the two #80 worktrees removed. Merge on fully-clean (required via check-runs API, bot-authored connector CLEAN on head, threads resolved, independent pr-triage; one operator-accepted non-required advisory red).
+
+**Documented residuals (not blockers):** the >250-commit compare fail-closed (deliberate, availability-only, zero-instance; docstring-explicit); the outcome.json schema-migration dogfood (learning 21 — self-resolved on this merge; expand/contract if a future field addition has in-flight PRs); the two fsr-noted fold residuals (pinned-commit reuse sound under head+base re-verify; cross-REST atomicity via cancel-in-progress:false → #88). AGENTS.md #140 "workflow-edit self-skip" note still stale (learning 18) — #186's claude-review ran a REAL 7m19s review on a workflow-edit PR again, re-confirming v1.0.176 does not self-skip; parked as an operator-owned AGENTS.md accuracy correction.
+
+**Next drivable (operator-gated):** #167, #178, #162, #146-s3, #47 (#80 was one of its criteria-freshness prerequisites — now merged). Drivable `ready-to-spec`: #77 (the OTHER #47 criteria-freshness prereq — linked-issue-edit cross-object staleness), #52. #184 filed (checklist-branch quoted-ticked-box fail-open). #69 C2-gated.
