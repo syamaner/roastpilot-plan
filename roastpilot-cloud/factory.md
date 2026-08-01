@@ -1,8 +1,10 @@
 # roastpilot-cloud — Software Factory Spec (D98)
 
-**Status**: Specced and agreed, 16 July 2026. Not yet implemented; F1 is the
-implementing epic. Prep work (labels, issue templates, milestones, C1/F1
-story issues) done 16 Jul 2026 directly in the `roastpilot-cloud` repo.
+**Status**: Specced and agreed, 16 July 2026. F1, the implementing epic, has
+since built most of the factory; the factory is paused (`FACTORY_PAUSED=true`)
+and not yet enabled for autonomous issue→PR flow. Prep work (labels, issue
+templates, milestones, C1/F1 story issues) done 16 Jul 2026 directly in the
+`roastpilot-cloud` repo.
 **Applies to**: `github.com/syamaner/roastpilot-cloud` only. The agent repo
 keeps its interactive operating model (D23); safety-critical code is never
 factory-autonomous.
@@ -161,19 +163,23 @@ surface→escalate→adjudicate loop. The exemption is the adjudication.)
 
 ## 6. Workflows (implemented in F1; structure adapted from hubble.md)
 
-- **`triage-issues.yml`** — `on: issues [opened]`; seed → triage → apply as
-  in §3. Concurrency group per issue number, cancel-in-progress. Triage skill
-  output is structured JSON (readiness + reasoning + missing-info questions)
-  validated by the apply job before any label write.
+- **`triage-issues.yml`** — `on: issues [opened]` plus `workflow_dispatch`
+  (manual/backfill re-triage, D116); seed → triage → apply as in §3.
+  Concurrency group per issue number, `queue: max` — NOT cancel-in-progress;
+  D133 records they are mutually exclusive, and `queue: max` is load-bearing
+  so a run is never cancelled mid-generation-write. Triage skill output is
+  structured JSON (readiness + reasoning + missing-info questions) validated
+  by the apply job before any label write.
 - **`implement-ready-issues.yml`** — `on: workflow_dispatch` (stage 1), plus
   `issues [labeled: ready-to-implement]` (stage 2, once enabled). Agent job
   has `contents: read` only and `persist-credentials: false`; a separate
   publish job holds the write token and pushes the branch + PR. Concurrency
   per issue, no cancel (never orphan a half-published branch).
-- **`claude-code-review.yml`** — ported from the agent repo unchanged in
-  spirit: `/code-review --comment`, inline findings block via conversation
-  resolution, the check itself not required (workflow-edit guard, agent-repo
-  lesson).
+- **`claude-code-review.yml`** — now holds three jobs: `claude-review`, ported
+  from the agent repo unchanged in spirit (`/code-review --comment`, inline
+  findings block via conversation resolution, the check itself not required);
+  plus `spec-grounded-review` and `publish-spec-grounding-review`, the F1-S9
+  anti-gaming pipeline (D107).
 - All third-party actions pinned by SHA. **The repo is PUBLIC (D100)** — so
   GitHub Advanced Security (CodeQL, dependency review, secret scanning + push
   protection) is free and the native gates are used directly; the OSS-fallback
@@ -191,6 +197,9 @@ surface→escalate→adjudicate loop. The exemption is the adjudication.)
   superseded by D119, its output is a PR PLAN**: per story — ordered coherent
   review units, scope, approximate logic size (normally about 400 lines),
   dependency order, and the domain reviewer each diff triggers.
+- **`spec-grounded-review`** — built in F1-S9/D107; read-only-by-construction,
+  with no write tools and nonce-delimited untrusted input. It is the read-only
+  agent behind the `spec-grounded-review` job.
 - Implementation conventions (stack rules, gates, PR hygiene) live in the
   repo's `AGENTS.md` (written at C1), which the implementing agent reads
   like any Claude Code session would.
@@ -210,6 +219,7 @@ surface→escalate→adjudicate loop. The exemption is the adjudication.)
   enter Actions.
 - **Vercel previews** come from the Vercel GitHub integration, not from
   tokens in workflows.
+- **Review jobs are write-capable, and their tool grant is the load-bearing control.** Unlike the implement agent, `claude-review` runs with `pull-requests: write` and holds `CLAUDE_CODE_OAUTH_TOKEN` (it posts inline comments). #192's probe confirmed a live `gh pr comment --body-file` exfiltration primitive on this surface; #199 narrowed the grant to the inline-comment MCP tool plus a blanket `Bash` deny (T24/T25 pin it). That shuts the Bash-reachable axis but NOT the primitive: tag mode still injects a bare `Read` and `update_claude_comment` remains a write sink, so `Read(env) -> comment` survives. #194/#192 stay open — see D146.
 
 ## 9. Merge policy
 
@@ -222,8 +232,9 @@ here, where the author is always an agent). The factory never merges.
 ## 10. Cost, metrics, and the autonomy ratchet
 
 - **Per-issue cost**: triage is cheap (read-only, small context);
-  implementation is a real token spend (Sonnet by default per the house
-  model-selection policy; Opus only for explicitly-flagged hard stories).
+  implementation defaults to Codex-MCP per D145's credit pivot; the Claude
+  `implementer` is the fallback, and the scarce Claude budget is reserved for
+  orchestration and the review floor.
 - **Metrics**: reuse the PR-flow metrics (churn, avoidable rework,
   findings-pre-open) plus factory-specific ones: triage accuracy (human
   overrides per 10 triages), first-pass-CI-green rate, human-touch minutes
@@ -261,13 +272,12 @@ deadline.
 
 ## 12. Open items
 
-1. `claude-code-action` auth mode (API key vs OAuth token) and version pin →
-   decide at F1-S2.
-2. Per-run token budget guardrail (hard cap per implement run, and what the
-   workflow does on hitting it) → F1-S3.
-3. Whether triage checks out the plan repo (public, read-only) for full
-   context or works from links quoted in the issue body → F1-S2; start with
-   checkout, it is cheap.
+1. **RESOLVED:** OAuth (`CLAUDE_CODE_OAUTH_TOKEN`), with
+   `anthropics/claude-code-action@700e7f8` pinned at v1.0.176.
+2. **RESOLVED:** the per-run token-budget guardrail is a hard turns cap in
+   `implement-ready-issues.yml`; its input description references “§12 open
+   item 2's token-budget guardrail”.
+3. **RESOLVED:** triage clones the plan repo read-only.
 4. Issue intake beyond the operator (e.g. tasters reporting bugs via the
    public page) is out of scope until the repo is public; revisit at C7.
 
@@ -522,6 +532,10 @@ only the POST-ready phase.** Two hard-won amendments from the live #64 arc:
   The ready-transition actor today is the lead/`pr-triage` (dispatch-first);
   automation of that transition is an autonomy-ratchet (§10) step, not assumed.
 
+**Supersession note:** superseded for factory PRs (see D142 and AGENTS.md): the
+privileged publisher opens factory PRs NON-draft, and the same review roster
+runs post-open; draft-first is the model for human/interactive PRs only.
+
 **D106 (19 Jul 2026) — account-role DDL is operator-run provisioning, never
 migration-stream work (closes cloud #61). PROVISIONED same day:** the operator
 ran the D106 script — roles `ROASTPILOT_AGENT` + `PUBLIC_WEB` (SYSADMIN
@@ -542,7 +556,10 @@ review-job Bash exfil path THEN enable the Claude lens on factory PRs, in S7;
 #59 = the PUBLIC-audit completeness limit ACCEPTED, closed; #58 folds into S6;
 the live DEV dispatch bundles into S6's dry run; S6 additionally scopes the
 @claude PR feedback loop + the codex-verdict stamp-and-flip status; C2 kicks
-off after F1 completes.)
+off after F1 completes.) **Forward note:** this prediction did not land as
+framed: #47 resolved Option B (1 Aug), staying open and NOT enabling the lens;
+the Bash exfil path was narrowed separately by #199 (merged, partial —
+#194/#192 residual). See D146.
 
 **D107 (21 Jul 2026) — F1-S9 spec-grounded review: design + security model +
 the completeness slice (documents shipped work; the §14 "should-add"
@@ -576,6 +593,9 @@ the plan reflects the merged reality (the §11 table previously stopped at F1-S6
 - **Go-live (operator, 21 Jul):** the gate is LIVE on the repo's own non-draft
   human/claude PRs (non-required, reversible); factory-bot enable is **#47**
   (which also closes the review-job Bash exfil path, per D106's S7 note).
+  **Forward note:** this prediction did not land as framed: #47 resolved Option
+  B (1 Aug), staying open and NOT enabling the lens; the Bash exfil path was
+  narrowed separately by #199 (merged, partial — #194/#192 residual). See D146.
 - **Completeness slice — cloud #90 (folds #88/#89), must-fix before #47.**
   On `hasCriteria: true`, generation-aware reconciliation auto-deletes only
   **no-obligation** individual blockers whose closing reference was removed or
@@ -660,7 +680,8 @@ the following boundaries after the S7 state audit:
 - While the Claude GitHub App is suspended, factory-authored PRs stay out of
   the Claude lens. Cloud #47 remains a separately specced redesign: its former
   Option A is not viable because the pinned review plugin relies on
-  `gh pr view`, `gh pr diff`, and `gh pr comment`.
+  `gh pr view`, `gh pr diff`, and `gh pr comment`. **Reactivation note:** the
+  App was reactivated by 27 Jul (see D142's narrative).
 - Cloud #102 was delivered as thin PR #113 (`5262e77`). It replaced the
   best-effort regex pin/allowlist audit with a structural parse using the
   typed, dependency-free `yaml` package, including composite-action discovery,
@@ -2210,6 +2231,8 @@ the calibration rules.
 The roster is two tiers, `opus` and `sonnet`. No Haiku tier is introduced:
 nothing in this repository is both high-volume and correctness-insensitive, and
 mechanical extraction is better served by `gh` or `grep` than by a third model.
+**Supersession note:** superseded: AGENTS.md topology v2 (#159, 28 Jul) adds a
+third `fable` tier for `story-planner`; the two-tier claim is stale.
 
 The Opus triggers are not narrowed to reduce cost. Both adversarial reviewers
 fire on F1-S6's first slice, because #58 changes a workflow file and grants.
@@ -2432,3 +2455,13 @@ which path: the pipeline-self-modification protections and the permanent human
 merge are unchanged, so a protected agent-instruction or workflow file is still
 never touched by any implementing agent, Codex included. The factory remains
 paused and `FACTORY_PAUSED` stays exactly `true`.
+
+## D146: claude-review's tool grant narrowed to shut the public-commenter exfil/injection axis; the tag-mode Read residual stays open
+
+**Decision (operator, 1 Aug 2026): fast-track a fix that removes claude-review's `gh pr comment|diff|view` Bash grant, over the ENV_SCRUB alternative.** The #192 probe (executed on throwaway PR #198) empirically confirmed a LIVE exfiltration primitive: with `Bash(gh pr comment:*)` granted, a prompt-injected review runs `gh pr comment <PR> --body-file /proc/self/environ` and publishes `CLAUDE_CODE_OAUTH_TOKEN`. ENV_SCRUB was ruled out as the fix (it requires bubblewrap, absent on the standard runner; triage-issues had already removed it as "breaks the job outright", and it would also scrub the token gh itself needs). The chosen fix (PR #199, merged `2d7829e`): `--allowedTools` is exactly `mcp__github_inline_comment__create_inline_comment`; `--disallowedTools` ends in a blanket `Bash`; and T24/T25 (a mutation-proven contract test) pin the no-Bash property so a later refactor cannot silently re-open it.
+
+**This is defense-in-depth, NOT closure of #194/#192, and the boundary is documented as such.** #199 shuts the Bash-reachable axis: the `gh pr comment --body-file` exfil, the `gh pr view --comments` public-commenter injection re-admission (#194's live channel), and the `gh pr comment --edit-last` tracking-comment forgery. It does not touch the exfil PRIMITIVE: tag mode still injects a bare `Read` (probe-confirmed to read arbitrary absolute paths), and the inline-comment + `update_claude_comment` write channels remain, so `Read(env) -> comment` survives for any residual injection vector, and step-B completion-forgery merely moved from Bash to the MCP channel. #194 and #192 stay OPEN by design (verified via `closingIssuesReferences`, not PR wording); the deeper closure is tag-mode territory, tracked there.
+
+**Evidence discipline of note.** codex-review and factory-security-reviewer disagreed on whether removing `gh pr diff` blinds the review; the disagreement was settled by an evidence gate rather than by argument — the fix PR's own `claude-review` run reviewed the actual diff with no Bash/gh in-session and said so, confirming the summary posts via `update_claude_comment` and the diff arrives via the action's prefetch. The doc sync (#202) records the residual honestly and does not claim step-B sound or #194/#192 closed.
+
+D146 changes no execution boundary beyond the one PR #199 already shipped under human review. It records the security-boundary decision and the documented residual; alters no repository setting, secret, Environment, or branch-protection rule; and leaves `FACTORY_PAUSED` untouched.
