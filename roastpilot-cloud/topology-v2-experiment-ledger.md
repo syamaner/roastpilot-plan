@@ -838,3 +838,43 @@ pr-triage caught that I reflexively re-triggered the connector on #202 (a pure d
 ### Per-PR metrics (topology-v2 experiment is past its 24h window, recorded as durable narrative)
 
 Implementer: **Codex-MCP throughout** (credit pivot D145 held; Claude reserved for the safety floor + orchestration). Reviewers all in isolated worktrees, gates independently re-run at every fold. Post-open review rounds: #193 ~2 (connector P2s folded/accepted), #199 ~1 (connector P2s: 1 fold + responses), #200 0, #202 ~1 (precision fixes pre-open). fsr passes: 6 across the session (full + focused on #193/#199, delta on #199-fold, #200, #202) — all on the operator's "rigor is not the budget lever" instruction; the credit lever was implementer (Codex) + search (Auggie/grep) choice, never the floor. Precise per-delegation token counts were NOT captured early enough into the ephemeral `subagents/agent-*.jsonl` (the known hazard in `reconstruct-topology-metrics-from-logs`); PR-level timelines are reconstructable from GitHub. Guardrails held: `FACTORY_PAUSED` untouched; no settings/secrets/branch-protection changes; every merge human-authorized explicitly; #194/#192 confirmed OPEN post-each-merge via `closingIssuesReferences`.
+
+---
+
+## Session 4 Aug 2026 — #192 Units 1+1b (PR #204) MERGED — deny the tool catalog + restore base config
+
+The two remaining structural closures for `claude-review`'s tool-grant residual, landed together as PR #204 (squash `0542a77`, `Refs #192, #194`, human-merged on an explicit "if safe, merge" after a full comment sweep + `closingIssuesReferences` verify). Codex-MCP authored both units and every fold (credit pivot D145 held); Claude was PM + the cross-family safety floor throughout. Headline: **the deny catalog alone does NOT close the exfil — Codex's own P1 showed the startup-execution vector survives it — so Unit 1b (restore base-owned config before the action runs) was folded in rather than deferred, and the whole thing was gated by an exhaustive restore-ordering adversarial pass.**
+
+### PR #204 — #192 Units 1+1b — MERGED
+
+| Field | Value |
+|---|---|
+| Path | conventional/interactive; `.github/workflows/claude-code-review.yml` (168 logic lines) + `tests/factory/**` (790 test lines across 3 files) |
+| Open → merge | ~19.5h wall-clock (2026-08-03 21:10Z → 2026-08-04 16:40Z), but dominated by a session compaction + a ~7h operator-decision gap on the claude-review-red posture; active drive was a fraction |
+| Units | **1** = deny the full 37-entry SDK tool catalog (metadata-only lens, `ToolSearch` §1.3 residual, `always()` evidence producer, T24–T33); **1b** = restore base-owned config from a retarget-hardened trusted revision before the action runs (`base.sha` only when `base.ref` byte-equals the default branch, else default-branch tip; `--no-renames`; `-z`/`read -r -d ''`; rm-before-checkout in BOTH restore steps), closing the startup-execution vector |
+| Offline / pre-open floor | `codex review` CLEAN (ran the full 2,947-test suite green in-sandbox); `factory-security-reviewer` **CONFIRMED-SOUND** on the complete diff (full attack matrix on both reorders in hermetic git repos: dir↔file, file→dir, deep-nesting, gitlink/submodule, prefix-collision, symlink; proved the sibling's third re-apply cannot place attacker content in or delete a trusted path); `qa` **PASS** (5 independent mutation experiments); `pr-triage` ×2 |
+| Online / post-open | Codex connector bot-authored 👍 on the final head `0bf33d3` (08:04:47Z, postdating the ready boundary, head unchanged) — clean, no findings round |
+| Findings folded pre-open | Codex **P1** (deny alone leaves the startup-exec vector → Unit 1b restore); Codex **P2** (checkout-before-rm deletes restored dir on a dir→file replacement → rm-before-checkout reorder); CodeQL HIGH TOCTOU (fd-based fix, not dismissed); the sibling reorder (pr-triage class-sweep, below); §1.3 `ToolSearch` relaxation (the full deny stubbed the review) |
+| Findings folded post-open | 0 (connector clean on the final head) |
+| Deferred to issues | **#205** (the `base.sha` retarget weakness in the `spec-grounded-review` restore + the write-token publish job); **Unit 2 #192** (runtime fail-closed catalog assertion + the completion-assertion metadata-only robustness); **Unit 3 #192** (doc sync incl. `registry.md`) |
+| Implementer | **Codex-MCP** (both units + every fold via `codex-reply`); the Claude `implementer` agent never invoked |
+| Domain reviewers | `factory-security-reviewer` (opus, CONFIRMED-SOUND); `qa` (sonnet, PASS); `pr-triage` (sonnet) ×2 |
+| Claude-subagent tokens (this session, all #204) | ~708 turns, ~431K output, ~4.3M cache-create across 12 delegations. Mapped: fsr-final 70t / 55.3K out / 379.6K cc; qa 80t / 15.8K / 177.4K; pr-triage#1 106t / 27.6K / 401.6K; pr-triage#2 81t / 14.4K / 288.0K. (Codex implementation + `codex review` are on the separate weekly subscription, not in these logs.) |
+
+### Learning 39 — the independent adjudicator (D23) is a backstop for the ORCHESTRATOR's routing, not only the implementer's.
+
+`pr-triage` returned FIX-FIRST **twice on the same PR**, each time catching a routing error the orchestrator (me) made, not the implementer or the contract:
+- (a) the `spec-grounded-review` sibling restore carried the identical checkout-before-rm class the Codex P2 fixed in `claude-review`, and it was **in-scope** — Unit 1b already edited that block (the `-z` fix), so "fix the class, sweep the repo pre-open" applied; I had wrongly deferred it to #205.
+- (b) the diff's 601-line new test file crossed the **exact 600-line** `qa`-routing threshold, and I had never dispatched `qa`.
+
+Topology v2 already has the orchestrator re-derive reviewer routing from the real diff *because* the pre-code contract's routing is only a prediction. Here the *contract* was fine; the *orchestrator* under-routed twice, and the independent D23 adjudication is what caught it. Lesson: the orchestrator is not exempt from the "re-derive routing from the real diff's paths AND content" discipline, and a security floor that only guards the implementer's output would have missed both.
+
+### Learning 40 — learning 16 recurs, now systematically: a metadata-only `claude-review` reds the completion-assertion non-deterministically.
+
+Unit 1's full deny catalog makes `claude-review` a metadata-only lens with no file-read tool. Running under it, the model honestly cannot complete the injected "line-by-line review" checklist item, so it strikes it through and leaves `- [ ]`; the #146 completion-assertion reds on any unticked box, **regardless of the terminal `REVIEW-COMPLETE` sentinel the same comment also carries**. It passed on two prior heads (`bbbb286`, `c84d60c`) and failed on the third (`0bf33d3`) — pure model-output-shape non-determinism (learning 16, now made systematic by the deny). The assertion cannot distinguish a *deliberately* metadata-only review from a truncated/failed one. `claude-review` is not a required check (#163), so the red is non-blocking; the operator chose accept + defer the robustness to Unit 2. This is the design-completeness tail of the metadata-only-lens decision: denying the tools was Unit 1; making the completion contract recognise the resulting review shape is Unit 2.
+
+### Process notes
+
+- **Codex API `[bot]`-suffix login.** The reviews AND reactions APIs return the connector's author as `chatgpt-codex-connector[bot]` (with the suffix). A Codex-wait watch filtering the bare `chatgpt-codex-connector` matched nothing and ran ~20 min blind to a real 👍. Filter with the suffix; the bot-authored 👍 (which a public-repo stranger cannot forge) is the load-bearing anti-spoof property, since the transient 👀 is often already GC'd by the time you poll. (Folded into `codex-connector-clean-signal-calibration`.)
+- **The two ordering reorders are one class, swept together.** rm-before-checkout in both `claude-review` and `spec-grounded-review`; T4b/T4d each mutation-kill exactly its own job's revert and nothing else. The sibling's third re-apply step (PR-head `scripts/factory` + the review skill) does not interact with the reorder.
+- Guardrails held: `FACTORY_PAUSED` untouched; no settings/secrets/branch-protection changes; the merge human-authorized explicitly; #192/#194/#205 confirmed OPEN post-merge via `closingIssuesReferences`.
