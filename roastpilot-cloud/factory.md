@@ -2483,3 +2483,19 @@ D146 changes no execution boundary beyond the one PR #199 already shipped under 
 **Resulting critical path to C2:** #47 (body refresh, spec, fresh factory-security re-evaluation, operator enable), then F1-S6 9b-9h, then S11, then C2 (whose to-issues draft is already prepared for filing).
 
 D147 records decisions only. It changes no execution boundary, alters no repository setting, secret, Environment, or branch-protection rule, and leaves `FACTORY_PAUSED` exactly `true`.
+
+## D148: 9d demotes D147 gate-2's thumbs-up surface to corroborating (comment-only clean); anchored certification held
+
+**Decision (operator working session, 8 Aug 2026), refining D147 gate 2.** During F1-S6 slice 9d's implementation (the advisory Codex-verdict status publisher that consumes the merged 9c reducer), the pre-open review floor established — with two evidence-confirmed fail-opens — that head-freshness for the **sha-less thumbs-up reaction** cannot be reliably determined from the available GitHub signals. A check suite proves a commit object materialised at a time, not that it was the PR head then; an append-push can leave no server-timestamped trace (the documented `GITHUB_TOKEN`-fallback path suppresses downstream workflows); and a pending review carries an old `commit_id`. No pure-snapshot rule certifies a sha-less thumbs-up as being about the current head.
+
+D147 gate 2 accepted three clean surfaces, including "a bot-authored thumbs-up". For the 9d advisory status specifically, that third surface is **narrowed from clean-sufficient to corroborating**:
+
+- The only mechanical `success` advisory is the sha-verified clean **comment** ("Codex Review: Didn't find any major issues" carrying a `Reviewed commit: <sha>` byte-equal to the current head) — head-safe by construction, because a stale comment names a different sha and is rejected.
+- A bot eyes/thumbs-up pair never yields `success`. Absent a clean comment it produces a distinct, visible `pending / reaction-clean-unconfirmed / advice=verify` status the operator resolves by reading the PR per the Merge Policy. Every such occurrence is loud, so the empirical question "does the connector ever signal clean by thumbs-up alone" is self-instrumented and recorded per clean episode in the 9h evidence manifest.
+- 9d removes check-suite timestamps from its evidence set entirely and derives head-change only from visible, server-timestamped `head_ref_force_pushed` / `head_ref_deleted` / `head_ref_restored` events (with `pr.created_at` as the floor). This is the class both fail-opens came from.
+
+This is the strict, fail-closed direction (fewer signals read clean), so it removes an unsafe-admission class at a bounded, observable availability cost that is nonzero only if a clean verdict is ever signalled by thumbs-up alone. It requires **no change to the merged 9c reducer** (the demotion is a post-reducer mapping inside 9d).
+
+**Held upgrade (not built): anchored certification.** If the 9h supervised session shows thumbs-up-only cleans occur at a material rate, the reaction channel can be made reliable by adding, as a new evidence source, 9d's own prior advisory statuses on the current head (an "head == H at T" attestation whose creator is byte-compared to the workflow identity), and gating the reaction pair's **eyes** on that anchor. That upgrade requires its own story-planner contract and a separate, fully-reviewed change to the merged 9c reducer (adding an eyes-postdates-anchor conjunct to the reaction-pair predicate); it is specced and deliberately deferred, activating only on ratified 9h evidence.
+
+D148 records decisions only. It changes no execution boundary, alters no repository setting, secret, Environment, or branch-protection rule, and leaves `FACTORY_PAUSED` exactly `true`.
