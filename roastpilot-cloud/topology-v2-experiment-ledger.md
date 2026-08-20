@@ -1790,3 +1790,10 @@ Operator chose #307 rebuild next (C2 critical path / DAG root) over a (#319). Ra
 3. **Auto-merge-on-clean (§10 step 2)** — only after a full epic (C2) lands factory-built with no post-merge defect traced to a factory PR, and with the permanent human spot-audit (§ "100% of PRs" audit) in place. Last dial.
 
 **Sequencing (open — operator to steer):** build #237 (credential isolation for the PR-comment-edit path) as the immediate F1 priority, interleaved with the first C2 stories (which double as the §10 clean-dispatch evidence + the autonomy vehicle). Then activate Surface B → PR-comment edits hands-off → flip auto-chain → eventually auto-merge. **Every activation stays an operator hard stop; the session preps + verifies, never flips.**
+
+## L126 — C2 DAG findings banked; topology-v2 handover session torn down (20 Aug 2026)
+
+The reverted heavy-orchestration handover session (`roastpilot-cloud-0e`, stopped) made **zero external changes** (no comments/labels/PRs/registry/Codex — factory live+untouched); its 3 worktrees + 3 story-planner contract drafts (#308/#309/#310, never retrieved/posted) were discarded — the pre-spun batch IS the topology-v2 pattern the L125 revert eliminates; redraft a spec cheaply when a story is actually built. **Two topology-independent DAG facts worth keeping for C2 sequencing:**
+- **#309 real MCP export fixture EXISTS** at `roastpilot-agent/tests/fixtures/live-roast-2026-06-07/` (correct MCP shape, 43+278 lines). Resolves the standing "#309 real MCP fixture availability" open flag: #309 (data-only) is unblocked, and **#315** (summary-variant field-mapping contract test, which consumes it) is unblocked in principle.
+- **#316** (data_quality_violations view) is **dep-blocked on #312's seed data** (synthetic-telemetry seed pipeline), not merely on review capacity — so #316 sequences AFTER #312, not in an early independent batch.
+Reflect in the registry C2 section when C2 next moves (a real PR). Worktrees `wt-308/309/310` + branches `c2/wt-308/309/310` removed.
