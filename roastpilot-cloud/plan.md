@@ -202,7 +202,7 @@ repo (`cloud_sync` module); the semantics carry over unchanged.
 |---|---|
 | Upload roast (was `POST /api/roasts`) | One connector session: `PUT` jsonl/csv/summary to `@roast_artifacts/<run_id>/`, `COPY INTO roast_telemetry`, `MERGE INTO cloud_roasts ON idempotency_key`, insert artifact rows, `CALL recompute_reference_summary(origin, level)`. Returns `{cloud_roast_id, public_slug}` — identical on replay. |
 | Update (was `PATCH`) | `UPDATE cloud_roasts` for visibility / operator_rating / notes; `regenerate_slug` = new agent-generated slug (revocation, D11). |
-| Delete (was `DELETE`) | `CALL delete_roast(id)`: procedural cascade (reviews, telemetry, artifact rows, `REMOVE @stage` files — by the recorded `roast_artifacts.stage_path`, which is `<run_id>/…`, not a `<roast_id>/` prefix) + summary recompute. |
+| Delete (was `DELETE`) | `CALL delete_roast(id)`: procedural cascade (reviews, telemetry, artifact rows, `REMOVE @stage` files — by the recorded `roast_artifacts.stage_path`, which is `<run_id>/…`, not a `<roast_id>/` prefix) + summary recompute. (C2-S6/#314 ships the row-cascade first; the `REMOVE @stage` step lands with the C3 connector's `stage_path` contract — #341, D-314-I — gated before C3 writes artifacts.) |
 | List / reviews (was `GET`s) | `SELECT` for the device SPA's list and detail views, via the agent as before (device SPA never talks to Snowflake). |
 | References (was `GET /api/references`) | `SELECT ... FROM reference_roast_summaries WHERE bean_origin=? AND roast_level=? AND avg_rating>=4 LIMIT 5` at `prepare_roast` (D13). |
 
