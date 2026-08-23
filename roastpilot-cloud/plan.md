@@ -146,7 +146,7 @@ create table roast_artifacts (
   id string default uuid_string() primary key,
   roast_id string not null,
   kind string not null,                             -- 'jsonl'|'csv'|'summary' (app-validated)
-  stage_path string not null,                       -- @roast_artifacts/<roast_id>/<kind>
+  stage_path string not null,                       -- @roast_artifacts/<run_id>/<kind> (the connector's PUT path, §"Upload roast"; run_id != roast_id, so delete_roast removes by the recorded stage_path, never a <roast_id>/ prefix)
   byte_size int,
   created_at timestamp_tz not null default current_timestamp()
 );
@@ -202,7 +202,7 @@ repo (`cloud_sync` module); the semantics carry over unchanged.
 |---|---|
 | Upload roast (was `POST /api/roasts`) | One connector session: `PUT` jsonl/csv/summary to `@roast_artifacts/<run_id>/`, `COPY INTO roast_telemetry`, `MERGE INTO cloud_roasts ON idempotency_key`, insert artifact rows, `CALL recompute_reference_summary(origin, level)`. Returns `{cloud_roast_id, public_slug}` — identical on replay. |
 | Update (was `PATCH`) | `UPDATE cloud_roasts` for visibility / operator_rating / notes; `regenerate_slug` = new agent-generated slug (revocation, D11). |
-| Delete (was `DELETE`) | `CALL delete_roast(id)`: procedural cascade (reviews, telemetry, artifact rows, `REMOVE @stage` files) + summary recompute. |
+| Delete (was `DELETE`) | `CALL delete_roast(id)`: procedural cascade (reviews, telemetry, artifact rows, `REMOVE @stage` files — by the recorded `roast_artifacts.stage_path`, which is `<run_id>/…`, not a `<roast_id>/` prefix) + summary recompute. |
 | List / reviews (was `GET`s) | `SELECT` for the device SPA's list and detail views, via the agent as before (device SPA never talks to Snowflake). |
 | References (was `GET /api/references`) | `SELECT ... FROM reference_roast_summaries WHERE bean_origin=? AND roast_level=? AND avg_rating>=4 LIMIT 5` at `prepare_roast` (D13). |
 
