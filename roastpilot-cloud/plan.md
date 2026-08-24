@@ -121,10 +121,14 @@ create table cloud_roasts (
   bean_weight_g float,
   profile_name string,
   roast_level string,
-  summary variant not null,       -- MCP summary.json verbatim (session_id, phase,
+  summary variant not null,       -- MCP summary.json (session_id, phase,
                                   -- lifecycle timestamps, total_roast_seconds,
                                   -- development_time_seconds/percent, metrics{RoR,
-                                  -- deltas}, first_crack_model{...}, roaster_driver)
+                                  -- deltas}, first_crack_model{...}, roaster_driver).
+                                  -- Connector (C3) writes it verbatim; the seed
+                                  -- pipeline constructs a closed-shape numeric
+                                  -- extract instead (never verbatim) — see the
+                                  -- "Source export shape" note below (D-312-D).
   operator_rating int,            -- 1..5, app-validated
   operator_notes string,
   contributed_to_learning boolean not null default true,  -- FeedbackConfig.contribute_roast_curves
@@ -133,13 +137,17 @@ create table cloud_roasts (
   updated_at timestamp_tz not null default current_timestamp()
 );
 
-create table roast_telemetry (                      -- NEW with D97: parsed JSONL rows
+create table roast_telemetry (                      -- NEW with D97: parsed JSONL rows.
+                                                    -- These are DESTINATION column names; the
+                                                    -- M1 roast.jsonl SOURCE field names differ —
+                                                    -- see the "Source export shape" note below.
   roast_id string not null,                         -- FK to cloud_roasts (declared)
-  elapsed_s float not null,
-  bean_temp_c float, env_temp_c float,
-  heat_percent int, fan_percent int,
-  ror_c_per_min float,
-  raw variant                                       -- full source row, forward-compatible
+  elapsed_s float not null,                         -- source: monotonic_seconds
+  bean_temp_c float, env_temp_c float,              -- source: bean_temp_c, env_temp_c (same names)
+  heat_percent int, fan_percent int,                -- source: heat_level_percent, fan_level_percent
+  ror_c_per_min float,                              -- NOT in the M1 source (seed leaves null; nullable)
+  raw variant                                       -- forward-compatible; the seed writes a closed
+                                                    -- numeric echo it constructs, never the source line
 );
 
 create table roast_artifacts (
@@ -192,6 +200,51 @@ create stage roast_artifacts encryption = (type = 'SNOWFLAKE_SSE');
 ```
 
 Units note: all temperatures Celsius end-to-end (matches MCP contract).
+
+### Source export shape (M1 agent) and source→destination mapping (D-312-D)
+
+The table columns above are the **destination** shape. The **source** is the
+real M1 `roastpilot-agent` export, and its field names are not the same as the
+column names, so anything that consumes the export (the connector at C3, the
+seed pipeline at C2-S11) must MAP source to destination rather than assume the
+column names appear in the file. This note is the authoritative source shape;
+it was reconciled after a synthetic fixture built to the destination-column
+names masked the mismatch (D-312-D, issue #312). Ground truth lives at
+`~/git/roastpilot-agent/tests/fixtures/live-roast-2026-06-07/session-{1,2}/`
+and the de-identified copy at `snowflake/fixtures/` (D-312-F, #309).
+
+A real session is two files:
+
+- **`roast.jsonl`** — one JSON object per line, with a `type` discriminator.
+  Lines are **interleaved**: `type == "telemetry"` rows carry the sampled
+  channels, `type == "event"` rows carry lifecycle markers (`kind`,
+  `payload`). A consumer filters to `type == "telemetry"` and ignores the
+  event lines. Telemetry fields and their destination:
+
+  | `roast.jsonl` (`type=="telemetry"`) | → `roast_telemetry` |
+  |---|---|
+  | `monotonic_seconds` | `elapsed_s` |
+  | `bean_temp_c` | `bean_temp_c` |
+  | `env_temp_c` | `env_temp_c` |
+  | `heat_level_percent` | `heat_percent` |
+  | `fan_level_percent` | `fan_percent` |
+  | (absent in source) | `ror_c_per_min` → `null` (RoR derivation out of scope for the seed) |
+  | `recorded_at_utc`, `cooling_on`, `session_id`, `type` | not mapped to columns |
+
+- **`summary.json`** — a flat object. The fields the aggregation and the seed
+  actually use: `development_time_percent`, `development_time_seconds`,
+  `total_roast_seconds`, `beans_dropped_at_utc`, `stopped_at_utc`,
+  `started_at_utc`, `first_crack_at_utc`, and the nested `metrics{...}` and
+  `first_crack_model{...}` objects (named numeric fields extracted, never
+  copied whole). `session_id` and `roaster_driver` are present but are
+  validated-then-discarded / synthesised by the seed.
+
+**`bean_origin` and `roast_level` are NOT in the M1 export** (neither
+`summary.json` nor `roast.jsonl` carries bean metadata). They are the logical
+key of `reference_roast_summaries`, so the seed **synthesises** them from a
+small fixed pool assigned deterministically across the fan-out (D-312-E,
+#312); the connector (C3) will source them from the operator-entered roast
+metadata, not the telemetry export.
 
 ## 5. Sync Contract (device plane, connector — replaces the REST device API)
 
@@ -324,7 +377,10 @@ roastpilot-cloud/
 ├── snowflake/
 │   ├── migrations/                       # schemachange-versioned DDL, roles/grants,
 │   │                                     #   secure views, stored procedures
-│   └── fixtures/                         # contract fixtures (real MCP exports)
+│   └── fixtures/                         # contract fixtures = de-identified real MCP
+│                                         #   exports (summary.json + roast.jsonl;
+│                                         #   session_id synthesised). See §4 "Source
+│                                         #   export shape" for the mapping (D-312-F, #309)
 ├── tests/                                # Vitest unit + contract tests
 ├── e2e/                                  # Playwright against preview deploys
 └── streamlit/                            # C8 (optional): operator analysis app (SiS)
