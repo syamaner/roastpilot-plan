@@ -64,8 +64,16 @@ Two planes:
   never touch Snowflake, which both hides warehouse cold-resume latency and
   keeps compute near zero.
 
-**Access control (replaces Supabase RLS as defence in depth)**: no grants to
-`PUBLIC` anywhere. `ROASTPILOT_AGENT` role: DML on the roastpilot database +
+**Access control (replaces Supabase RLS as defence in depth)**: no grant to
+`PUBLIC` on anything we own — reinterpreted by D-11-B..E (#11) into a two-layer
+invariant: the live audit (`assert_dev_ci_grants.py`) flags any PUBLIC grant
+reaching a DEV object we own / a non-Snowflake-default role / a
+non-Snowflake-default account privilege / a default role's own one-level DEV
+reach, or any PUBLIC future grant it can see (both checks bounded by what a
+minimal DEV-scoped role returns from `SHOW [FUTURE] GRANTS`, the #59
+completeness limit), and `check_forbidden_grants.py` rejects any `GRANT ... TO
+PUBLIC` in our migration text; the Snowflake account-default PUBLIC grants that
+cannot reach our objects are out of scope. `ROASTPILOT_AGENT` role: DML on the roastpilot database +
 stage read/write. `PUBLIC_WEB` role: SELECT on two **secure views**
 (roast-by-slug and reviews-by-roast, with `visibility <> 'private'` baked into
 the view definition) plus the right to call `SUBMIT_REVIEW` — granted in
@@ -437,7 +445,8 @@ land as agent-repo stories alongside C3/C6.
 ## 12. Sub-Agents (`.claude/agents/` in the new repo)
 
 - **schema-migration-reviewer** — reviews every schemachange migration: no
-  grants to PUBLIC, `PUBLIC_WEB` surface stays exactly two secure views + one
+  `GRANT ... TO PUBLIC` in our migration text (the two-layer
+  no-PUBLIC-on-our-objects invariant, D-11-B..E), `PUBLIC_WEB` surface stays exactly two secure views + one
   proc, secure views still embed the visibility filter, procedural cascades
   stay complete (rows + stage files), and nothing in the diff silently
   assumes an enforced PK/unique/FK/CHECK (§4 — Snowflake will not catch it).
