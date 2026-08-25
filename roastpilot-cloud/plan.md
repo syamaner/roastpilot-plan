@@ -69,7 +69,8 @@ Two planes:
 invariant: the live audit (`assert_dev_ci_grants.py`) flags any PUBLIC grant
 reaching a DEV object we own / a non-Snowflake-default role / a
 non-Snowflake-default account privilege / a default role's own one-level DEV
-reach, or any PUBLIC future grant it can see (both checks bounded by what a
+reach, any malformed or blank grant row it fails closed on rather than skip, or
+any PUBLIC future grant it can see (both checks bounded by what a
 minimal DEV-scoped role returns from `SHOW [FUTURE] GRANTS`, the #59
 completeness limit), and `check_forbidden_grants.py` rejects any `GRANT ... TO
 PUBLIC` in our migration text; the Snowflake account-default PUBLIC grants that
