@@ -123,10 +123,21 @@ instead of being hand-driven, generating the §10 track-record the ratchet needs
 - **#237 (task-agent Read escape / dial-1 fold-wall)** — the boundary F2 does NOT
   cross (D-F2-4); the fold-half track.
 
-## Open sub-decisions (resolve via comment)
+## Resolved sub-decisions (operator, 26 Aug)
 
-- Story A trigger: on issue-open directly, or on a `needs-spec` label the pre-filter
-  triage applies? (Affects how B's pre-filter is wired.)
-- `/respec` re-run: full re-spec, or an incremental fold of the comment into the
-  existing contract?
-- Owner-identity source: GitHub actor login allowlist, or a stronger binding?
+- **D-F2-A1 — Story A trigger: on issue-open directly.** `story-planner` fires on
+  `issues:[opened]` (spec-first, per D-F2-1); no pre-filter triage gates it. Story B
+  then wires `triage` to run *after* the contract is posted, and its post-spec pass
+  catches a raw non-story issue as `needs-info`. Simplest wiring.
+- **D-F2-A2 — `/respec` = full re-run.** `/respec` re-runs `story-planner` from
+  scratch, folding the operator's comment as additional input, and replaces the
+  contract. Simpler and safer than incremental contract-patching (no merge logic to
+  exploit); an incremental fold is a later optimisation only if full re-run proves
+  too coarse.
+- **D-F2-A3 — Owner-identity = GitHub actor-login allowlist.** Only comments whose
+  `github.actor` is on the allowlist act; every other `/`-command is inert
+  (fail-closed). A stronger binding can layer on later if the allowlist proves
+  insufficient.
+
+With these, F2's design is stable. Next step: turn the five stories into a
+`to-issues` draft batch (each with the §5 intake-bar shape) for PM review + filing.
