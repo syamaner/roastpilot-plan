@@ -196,5 +196,27 @@ instead of being hand-driven, generating the §10 track-record the ratchet needs
   scoped `Edit` output grant; no retrieval tool (auggie MCP is not wired in-runner),
   no comment MCP sink.
 
+- **D-F2-A6 — F2-A PR-1 registers-after-merge for the halt-inventory bootstrap
+  (operator, 26 Aug, from PR-1's factory-integrity test failures).** Adding a
+  `FACTORY_PAUSED`-gated model-invoking workflow trips three factory-integrity
+  inventories (`runbook-halt-inventory`, the claude-action token-count, the #120
+  execution-surface accounting). The halt-inventory needs the workflow's **numeric
+  GitHub workflow ID**, which GitHub assigns only **after** the file is on the
+  default branch (verified: two empty `actions/workflows` API queries from the
+  pushed branch; and #242 history shows the established pattern is
+  register-after-merge — `codex-verdict-status` (#225) and `owner-command-intake`
+  (#230) merged dark FIRST, then #242 created the halt test + runbook entries
+  retroactively). story-planner is the **first** gated workflow added AFTER that
+  test exists, so it is the first to hit the bootstrap. Resolution: **PR-1 ships
+  story-planner gated by `STORY_PLANNER_ENABLED` only (no `FACTORY_PAUSED`
+  conjunct)** — so it is not classified gated, the halt-inventory/runbook needs no
+  change, and PR-1 is green with only the two ID-free inventory updates
+  (execution-surface totals + a delta comment; token-count 7→8). The
+  `FACTORY_PAUSED` gate + runbook entry (with the **real** ID) land in a follow-up
+  once main assigns the ID — bundled with activation (F2-C's dark→live enable) or
+  a fast-follow. While dark, story-planner cannot run, so honoring `FACTORY_PAUSED`
+  is moot; and a placeholder ID (the rejected alternative) would ship a
+  knowingly-wrong operational runbook entry.
+
 With these, F2's design is stable. Next step: turn the five stories into a
 `to-issues` draft batch (each with the §5 intake-bar shape) for PM review + filing.
