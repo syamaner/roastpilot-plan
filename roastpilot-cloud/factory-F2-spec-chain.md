@@ -175,5 +175,26 @@ instead of being hand-driven, generating the §10 track-record the ratchet needs
   therefore shrinks to verb-addition + wiring, and its adversarial tests target
   the "new verb cannot escalate into the task-apply path" property.
 
+- **D-F2-A5 — F2-A posts via a deterministic publisher, NOT the model (Option B;
+  operator, 26 Aug, from the story-planner contract's F-0.3 fork).** story-planner
+  runs in **agent mode**: the model holds **no write credential** (its job is
+  `issues: read`; it writes the contract to a scoped output file via a narrow
+  `Edit(<output path>)` grant, the `triage-issues.yml` pattern), and a **separate
+  deterministic publisher job** (the sole `issues: write`) validates the
+  contract's shape/markers/sentinel **before** posting exactly one comment
+  (`scripts/factory/post-owner-command-response.mts` / `apply-triage-verdict.mts`
+  pattern). This supersedes the drafted AC3 "one comment sink in the model's
+  residual" (Option A / tag-mode) reading: story-planner's issue→contract-comment
+  shape IS the triage/owner-command sibling pattern, not the PR-diff-review shape
+  claude-code-review uses tag mode for. Rationale: (a) no write credential in the
+  model's environment; (b) AC5 becomes a **pre-post** deterministic gate so a
+  vacuous or prompt-injected-forged contract is never published (Option A's
+  post-hoc assertion is benign-truncation-sound but adversarially forgeable); (c)
+  D23-aligned (the deterministic publisher, not the model, decides what posts);
+  (d) no unverified tag-mode-on-`issues:labeled` probe needed. The catalog residual
+  (F-0.1) stays readers-only (`Read`/`Grep`/`Glob`/`LS` + `ToolSearch`) + the
+  scoped `Edit` output grant; no retrieval tool (auggie MCP is not wired in-runner),
+  no comment MCP sink.
+
 With these, F2's design is stable. Next step: turn the five stories into a
 `to-issues` draft batch (each with the §5 intake-bar shape) for PM review + filing.
