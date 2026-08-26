@@ -69,9 +69,14 @@ plan, routing) before it is `ready-to-spec`. Sketched here for review.
 Triggered by the `ready-to-spec` label (D-F2-A1). Run the `story-planner` agent on
 the labelled story issue; post the implementation contract as an issue comment.
 **Read-only + comment-sink only**, on the #192/#204
-metadata-only injection-hardened lineage: base-owned config restored from a
-trusted revision before the agent runs, tool-catalog closure asserted, no repo
-write / no code / no egress beyond the single comment sink. A poisoned issue body
+injection-hardened lineage: base-owned config restored from a
+trusted revision before the agent runs, tool-catalog closure asserted against the
+**correct residual** — story-planner NEEDS repo readers (Read/Grep/Glob, ±
+retrieval) to write a contract, so its permitted catalog is
+*readers + one comment sink, everything egress/execution/write denied*, NOT the
+`claude-code-review.yml` metadata-only (`[ToolSearch]` + sinks, no readers)
+closure it cannot literally mirror — no repo write / no code / no egress beyond
+the single comment sink. A poisoned issue body
 must not be able to steer the contract into anything but comment text (the
 orchestrator-verifies-before-posting property, #162, becomes a workflow-side
 completion + contract-shape assertion). Likely 3 slices: (A1) agent + workflow
@@ -88,11 +93,14 @@ posts) to move `ready-to-spec → ready-to-implement` against §5/D104. The
 `ready-to-spec` label is the seam between them and the manual/retroactive entry
 point. **Reviewer: `factory-security-reviewer`.**
 
-### Story C — operator-comment contribution: enable + harden `owner-command-intake`  *(security keystone)*
-The `/approve` + `/respec` grammar (D-F2-2). **Owner-identity auth, fail-closed**
-(only the operator's comments act; a stranger's `/respec` is inert — the repo is
-public). Comment body is **untrusted input** (#194 lineage; never interpolated
-into a privileged prompt unsanitised). Each command re-triggers its chain hop:
+### Story C — operator-comment contribution: extend + enable `owner-command-intake`  *(security keystone)*
+Add the `/approve` + `/respec` verbs (D-F2-2) to the EXISTING verb grammar
+(D-F2-A4 — not greenfield). **Owner-identity auth, fail-closed** already exists
+(`factory-owner-allowlist.mts`; a stranger's `/respec` is inert — the repo is
+public). Comment body is **untrusted input**, already nonce-fenced (#194 lineage;
+never interpolated into a privileged prompt unsanitised). Both new verbs live
+under `OWNER_COMMAND_INTAKE_ENABLED` only and must not reach the
+`OWNER_TASK_APPLY_ENABLED` (#237-walled) task-apply path. Each command re-triggers its chain hop:
 `/respec` re-runs `story-planner` folding the comment as input; `/approve`
 advances the readiness transition. Enabling a comment-triggered privileged
 dispatch is the highest-risk piece here. Likely 3 slices: (C1) grammar + owner-auth
@@ -150,6 +158,22 @@ instead of being hand-driven, generating the §10 track-record the ratchet needs
   `github.actor` is on the allowlist act; every other `/`-command is inert
   (fail-closed). A stronger binding can layer on later if the allowlist proves
   insufficient.
+- **D-F2-A4 — F2-C reuses the existing `owner-command-intake` security surface;
+  it is NOT greenfield (operator, 26 Aug, from the F2-A..E D104 review).**
+  `owner-command-intake.yml` + `scripts/factory/owner-command-logic.mts` already
+  ship the load-bearing pieces: a leading-command verb grammar (`question` /
+  `task`, ASCII-folded), owner-identity auth (`factory-owner-allowlist.mts` /
+  `isFactoryOwnerLogin`, already fail-closed), nonce-fenced untrusted-body
+  handling (the #194 lineage), and a **separately gated** task-apply path
+  (`OWNER_TASK_APPLY_ENABLED`, the #237 dial-1 wall). So F2-C ADDS two verbs
+  (`/approve`, `/respec`) to that existing grammar and wires them; it does not
+  rebuild the allowlist / parse / fence. **Both new verbs live under
+  `OWNER_COMMAND_INTAKE_ENABLED` only and MUST NOT reach the
+  `OWNER_TASK_APPLY_ENABLED` path**: `/respec` re-runs the read-only
+  `story-planner` workflow (F2-A), `/approve` advances the F2-B readiness label
+  transition — neither is a repo-patch apply, so the #237 wall is untouched. C1
+  therefore shrinks to verb-addition + wiring, and its adversarial tests target
+  the "new verb cannot escalate into the task-apply path" property.
 
 With these, F2's design is stable. Next step: turn the five stories into a
 `to-issues` draft batch (each with the §5 intake-bar shape) for PM review + filing.
