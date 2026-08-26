@@ -218,5 +218,25 @@ instead of being hand-driven, generating the §10 track-record the ratchet needs
   is moot; and a placeholder ID (the rejected alternative) would ship a
   knowingly-wrong operational runbook entry.
 
+- **D-F2-A7 — resolve the connector P1 (Read-scope credential-exfil) by empirical
+  probe before merging #371 (operator, 26 Aug).** The Codex connector posted a P1
+  on story-planner's `Read(./**)` scoping: it claims scoped `Read(...)` only
+  auto-approves matching reads and does NOT revoke the action's default read
+  access (citing `owner-command-intake.yml:163-166`), so `/proc/self/environ` →
+  `CLAUDE_CODE_OAUTH_TOKEN` → verbatim comment stays reachable. This CONTRADICTS
+  `factory-security-reviewer`'s CONFIRMED-CLOSED, which relied on the PR-#78 probe
+  (`Read(review-context/**)` denied an absolute read, `permission_denials_count:1`)
+  but INFERRED the exact `./**` form. The evidence leans fsr (a live probe beats an
+  assertion), but a credential-exfil P1 with a documented repo contradiction is not
+  waved through. Per the repo's "confirm with a probe, don't guess" standard
+  (#20/#22/#78), resolve empirically: adapt `task-agent-read-confinement-probe.yml`
+  on a throwaway branch to grant the exact `Read(./**),Grep(./**),Glob(./**),LS(./**)`
+  form, attempt an out-of-workspace/absolute read, and assert
+  `permission_denials_count >= 1` (read-confinement-probe Environment gate + probe
+  token, NOT the real credential). Denied → P1 resolved with evidence → merge;
+  allowed → the vector is real → redesign before merge. #371 stays PARKED (not
+  clean; P1 unresolved) until the probe settles it. Also fold the connector P2
+  (`isSubstantive` accepts a single char → strengthen the non-vacuity check).
+
 With these, F2's design is stable. Next step: turn the five stories into a
 `to-issues` draft batch (each with the §5 intake-bar shape) for PM review + filing.
