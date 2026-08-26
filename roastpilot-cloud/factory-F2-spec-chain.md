@@ -66,8 +66,9 @@ Each needs the full §5 intake-bar shape (plan link, diff-verifiable ACs, D104 P
 plan, routing) before it is `ready-to-spec`. Sketched here for review.
 
 ### Story A — `story-planner` as a read-only workflow  *(the missing leg)*
-Run the `story-planner` agent on a story issue; post the implementation contract
-as an issue comment. **Read-only + comment-sink only**, on the #192/#204
+Triggered by the `ready-to-spec` label (D-F2-A1). Run the `story-planner` agent on
+the labelled story issue; post the implementation contract as an issue comment.
+**Read-only + comment-sink only**, on the #192/#204
 metadata-only injection-hardened lineage: base-owned config restored from a
 trusted revision before the agent runs, tool-catalog closure asserted, no repo
 write / no code / no egress beyond the single comment sink. A poisoned issue body
@@ -79,10 +80,13 @@ trusted-revision), reusing the `claude-code-review.yml` pattern; (A3) completion
 contract-shape assertion (the fields D104 needs are present, non-vacuous).
 **Reviewer: `factory-security-reviewer`.**
 
-### Story B — chain sequencing: `story-planner` → `triage`
-Re-sequence per D-F2-1 so `triage` validates the specced issue. Wire the raw-open
-triage as a `needs-info` pre-filter; the readiness gate runs after Story A posts
-the contract. **Reviewer: `factory-security-reviewer`.**
+### Story B — chain sequencing: two-mode `triage`
+Give `triage` two modes (D-F2-A1): a **pre-filter** on `issues:[opened]` that
+applies `ready-to-spec` to genuine stories (or `needs-info` / closes a non-story),
+and the existing **readiness** gate that now runs *post-contract* (after Story A
+posts) to move `ready-to-spec → ready-to-implement` against §5/D104. The
+`ready-to-spec` label is the seam between them and the manual/retroactive entry
+point. **Reviewer: `factory-security-reviewer`.**
 
 ### Story C — operator-comment contribution: enable + harden `owner-command-intake`  *(security keystone)*
 The `/approve` + `/respec` grammar (D-F2-2). **Owner-identity auth, fail-closed**
@@ -125,10 +129,18 @@ instead of being hand-driven, generating the §10 track-record the ratchet needs
 
 ## Resolved sub-decisions (operator, 26 Aug)
 
-- **D-F2-A1 — Story A trigger: on issue-open directly.** `story-planner` fires on
-  `issues:[opened]` (spec-first, per D-F2-1); no pre-filter triage gates it. Story B
-  then wires `triage` to run *after* the contract is posted, and its post-spec pass
-  catches a raw non-story issue as `needs-info`. Simplest wiring.
+- **D-F2-A1 — Story A trigger: the `ready-to-spec` label** (operator-revised — more
+  flexible than on-open). `story-planner` fires when an issue gains the
+  `ready-to-spec` label, which the on-open `triage` pre-filter applies to genuine
+  stories AND which the operator/PM can apply manually to pull any issue — new or
+  old — into the chain. This filters non-stories (bugs, questions, duplicates)
+  before the opus `story-planner` runs, allows retroactive/manual entry, and reuses
+  the existing label taxonomy (`ready-to-spec` = "needs a spec before building").
+  Still spec-first per D-F2-1: the on-open triage is only a lightweight
+  is-this-a-story classifier; the load-bearing D104 readiness gate runs *post-contract*
+  to move `ready-to-spec → ready-to-implement`. So `triage` has two modes — pre-filter
+  (on open → applies `ready-to-spec` / `needs-info`) and readiness (post-contract →
+  `ready-to-implement`). (Supersedes the initial on-issue-open reading.)
 - **D-F2-A2 — `/respec` = full re-run.** `/respec` re-runs `story-planner` from
   scratch, folding the operator's comment as additional input, and replaces the
   contract. Simpler and safer than incremental contract-patching (no merge logic to
