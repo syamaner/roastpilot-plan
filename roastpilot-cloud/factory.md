@@ -2660,3 +2660,68 @@ branch-protection rule; it re-bases the acceptance condition of an existing
 residual and authorizes no new capability. #194, #184, and #212 remain the
 tracked review-lens residuals, unchanged. Recorded on cloud issue #376, which
 closes on this ratification and the F1-S7 registry reconcile.
+
+**D155 (27 Aug 2026) - F2 auto-mode: the orchestrator may merge a fully-clean F2
+pipeline PR on the operator's behalf; D154's human-merge gate is re-based, not
+removed.** The operator authorizes the next orchestrator session to run in auto
+mode over the F2 build work - the activation obligations (#373, #374), then F2-B
+(two-mode triage) and F2-C (owner `/approve`+`/respec`), then the C3 to-issues
+dogfood - driving each story spec-first and autonomously (story-planner contract
+-> Codex-MCP build in its own worktree -> pre-open floor -> PR -> CI -> fold ->
+clean), including performing the merge without a per-PR human click. Because
+every F2 story PR touches the factory pipeline, this amends D154's "every PR
+human-merged" clause and softens factory.md section 9's "merging is always
+human" for this bounded, operator-authorized drive. The merge click is
+**delegated to the orchestrator as the operator's proxy**, pre-authorized here
+and audited after; it is **not** the factory publisher self-merging, which stays
+forbidden.
+
+To preserve the property D154 protects - no unreviewed or unsafe factory-pipeline
+change lands - the human gate is replaced by a fail-closed clean-floor. An F2
+pipeline PR may be auto-merged only when **all** hold:
+
+- every required CI check is green (lint/typecheck/unit, Playwright, Snowflake
+  offline, mutation testing, CodeQL, dependency review);
+- the mandatory adversarial domain floor passed on the **real final diff**,
+  reviewer set re-derived from the diff's paths **and** changed content per the
+  Code Review Rubric: `factory-security-reviewer` CONFIRMED-SOUND on any
+  factory-pipeline diff (the Claude cross-family safety floor is not cut for
+  credits, D145), plus `schema-migration-reviewer` / `privacy-auditor` / `qa` as
+  the diff triggers;
+- the pre-open `codex review --base origin/main` floor ran and its findings were
+  folded (a registry-only diff is the sole exemption);
+- the Codex connector returned a CLEAN verdict on the exact final head,
+  bot-authored, per the Merge Policy (unchanged);
+- every review thread is resolved with a recorded disposition;
+- `pr-triage` returns MERGEABLE. This is load-bearing: the author (Codex or the
+  fallback implementer) never self-adjudicates (D23), and the independent triage
+  sub-agent is the control that makes an autonomous merge reviewed rather than
+  self-graded.
+
+If any of these is not clean, or `pr-triage` / `factory-security-reviewer` / `qa`
+returns anything other than pass / MERGEABLE, or there is any genuine judgment
+call, the session **parks for the operator and does not merge**. Supervision is
+now **by audit**: every autonomous merge is logged to the topology-v2 ledger with
+its clean-floor evidence and per-PR metrics for operator spot-check, replacing
+pre-merge approval with post-merge auditability.
+
+The D154 reopening triggers still **hard-stop** and are **not** auto-mergeable
+even in auto mode: a new execution class, a new credential or identity,
+activating a currently-dark enable-var (`STORY_PLANNER_ENABLED`,
+`OWNER_TASK_APPLY_ENABLED`, `OWNER_COMMAND_INTAKE_ENABLED`,
+`CODEX_ADVISORY_STATUS_ENABLED`), a change to an existing job's
+permissions/secrets/OIDC/token-minting, admission of an analyzer-unknown form, or
+anything tripping the Rigour Calibration scope-creep / fail-open /
+credential-crossing tests. In particular, **activating `STORY_PLANNER_ENABLED`
+(the F2-A activation switch) is itself a reopening-trigger operator action, not an
+auto-mode step**: auto mode ships the activation-obligation code (#373/#374) but
+the enable flip stays operator-only. The kill-switch (`FACTORY_PAUSED`) and all
+enable-vars remain operator-only; the session never flips them autonomously and
+never re-pauses the factory on its own.
+
+Scope: D155 authorizes autonomous **merge** of fully-clean F2 pipeline PRs and
+nothing more. It authorizes no activation of any dark surface, no repository
+setting / secret / Environment / branch-protection change, and no admission of any
+new privileged execution. It is bounded to the named F2 build work; a task
+outside that scope reverts to the standing per-action operator gates. Recorded on
+cloud issue #10; ledger L184.
