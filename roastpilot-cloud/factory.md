@@ -2190,7 +2190,14 @@ which closes after the ratification and state records reconcile. This
 acceptance is limited to the measured current surfaces; a new job, credential,
 identity, or execution class requires its own operator disposition and cannot
 inherit D140 by analogy. A separate operator decision to unpause into
-unsupervised dispatch also reopens the residual.
+unsupervised dispatch also reopens the residual. **Supersession note (D154, 27
+Aug 2026):** the acceptance condition in this paragraph is re-based from the
+literal `FACTORY_PAUSED=true` value to supervised operation. The 18 Aug 2026 C2
+unpause ran outside this stated condition; D154 re-evaluates the residual under
+`FACTORY_PAUSED=false` (a fresh `factory-security-reviewer` pass, CONFIRMED-SOUND)
+and re-accepts it while operation stays supervised. Read this paragraph's
+"remaining paused" wording as superseded by D154; the residual's substance,
+inventory, and reopening triggers are unchanged.
 
 The credential inventory established two corrections that remain explicit.
 Moving `FACTORY_PUBLISHER_PRIVATE_KEY` or
@@ -2575,3 +2582,81 @@ Delivered conventional / orchestrator-driven (`.github/workflows/claude-code-rev
 **D148 is NOT relaxed.** The mechanical 9d advisory-status reducer stays fail-closed exactly as D148 set it: a reaction, whether an eyes/thumbs pair or a lone thumbs, never yields mechanical `success`; only the sha-verified clean comment does; a lone or eyes-withdrawn thumbs yields the distinct, loud `pending / reaction-clean-unconfirmed / verify` status. D153 governs precisely how the operator **manually resolves** that `verify` status per the Merge Policy: a bot-authored thumbs-up on the unchanged head, postdating the boundary, with no findings review, is accepted. The executable reducer's eyes/thumbs-pair predicate (`codex-verdict-logic.mts` `findCleanReactionPair`) is unchanged by this decision and remains fail-closed under the swap (it falls through to `unpaired-or-misordered-reactions`, i.e. `pending`); aligning that predicate with the swap is a separately-tracked follow-up, not part of D153.
 
 **Scope.** D153 records a decision and its documentation correction in the lower authority (`AGENTS.md` Merge Policy clause, the operator-facing `CODEX_VERDICT_CRITERION` constant, the pinning contract test, and the now-inverted eyes-before-thumbs rationale in the test header and `AGENTS.md`), landed as roastpilot-cloud issue #303 citing this decision. It refines only D147 gate-2's human-path acceptance of the thumbs-up surface; every other part of D147, all of D148 (except the corrected pair-premise as it bears on the human path), D149, and the 9c/9d reducer stand. It changes no execution boundary, alters no repository setting, secret, Environment, or branch-protection rule, and leaves `FACTORY_PAUSED` exactly `true`.
+
+**D154 (27 Aug 2026) - the D140 residual acceptance is re-based from the
+literal `FACTORY_PAUSED=true` value to supervised operation.** D140 accepted
+the measured PR-triggered-execution residual (#120) "conditional on the factory
+remaining paused", and named the complete residual re-evaluation a prerequisite
+of #47 before the factory-bot enable decision. Two facts made that condition go
+stale unobserved. First, #47 closed (5 Aug 2026, PR #214) with a
+`factory-security-reviewer` D140 residual re-evaluation that returned clean, but
+that pass explicitly kept `FACTORY_PAUSED=true` and covered only admitting the
+factory-bot identity to the two Claude review lenses; it discharged the
+review-lens axis, not the unpause re-evaluation. Second, the 18 Aug 2026 C2
+unpause (`FACTORY_PAUSED` true->false) grounded itself in #47-closed plus the
+exfiltration closures (#192/#204/#157) and a supervised, per-task dispatch
+posture, but did not cite or re-evaluate D140's exact-`FACTORY_PAUSED=true`
+acceptance condition. The operator recorded the oversight on cloud issue #376
+(27 Aug 2026): the factory has run unpaused outside D140's stated condition
+since 18 Aug.
+
+The operator re-evaluates and re-accepts the residual under unpaused-but-
+supervised operation rather than re-pausing. The re-evaluation basis, verified
+against the tree and confirmed by a fresh adversarial `factory-security-reviewer`
+pass over all nine PR-triggered jobs under `FACTORY_PAUSED=false`
+(CONFIRMED-SOUND, no blocker; recorded on #376):
+
+- The pause never gated the residual surface. `FACTORY_PAUSED` gates only the
+  factory-author/dispatch workflows (`triage-issues`, `implement-ready-issues`,
+  `owner-command-intake`, `codex-verdict-status`, `story-planner`). The
+  residual's PR-triggered surface (`ci`, `claude-code-review`, `codeql`,
+  `dependency-review`) contains no `FACTORY_PAUSED` reference and executes
+  PR-head code identically whether paused or not. Unpausing does not change
+  whether that surface runs.
+- The only new actor unpausing adds is the factory authoring its own PRs, and a
+  factory-authored PR is structurally barred from D140's exploit precondition (a
+  PR head altering its own workflow before merge). The applier-authoritative
+  protected-path guard in `scripts/factory/publish-implement-patch.mts` seeds a
+  scratch index from HEAD, applies the patch to that index, and reads the path
+  set from a tree comparison of the applied result (closing rename, prefix, and
+  summary-compaction seams), normalizing and failing closed on `..`/absolute
+  paths; it rejects before applying any patch touching the protected surface.
+  Both implement and publish run only from `refs/heads/main`, so the guard runs
+  from the base tree and is never PR-head-mutable; the publish job executes no
+  agent output as code; there is no `id-token: write` in the pipeline and the
+  write token is isolated to the no-agent-code publish job. Pinned by
+  `tests/factory/protected-surface-lockstep.test.ts`.
+- Operation is supervised, not the unsupervised dispatch D140 named as a
+  reopening trigger. Since 18 Aug every factory dispatch has been per-task
+  operator-authorized and every PR human-merged, with every workflow-touching
+  diff routed to `factory-security-reviewer`.
+
+**The acceptance condition is re-based.** The literal `FACTORY_PAUSED` value is
+no longer the condition D140 tied the residual to. The residual is accepted
+while factory operation remains **supervised**, defined as: every factory
+dispatch is per-task operator-authorized and every PR is human-merged; the
+applier-authoritative protected-path guard and the `claude-review` tool-catalog
+closure (#204/#211) remain intact; and every workflow-touching diff is routed to
+`factory-security-reviewer`. One autonomous execution is a known, bounded
+exception inside that definition: `triage-issues.yml` fires on `issues:opened`
+(gated only by `FACTORY_PAUSED != 'true'`), but runs a read-only agent, its
+deterministic apply job holds `issues:write` only (labels and comments, no push,
+no PR), and it cannot chain to implement (implement is `workflow_dispatch`-only
+and no factory workflow dispatches it), so an attacker-influenced issue
+auto-labelled `ready-to-implement` still requires an operator to dispatch
+implement. The human gate holds.
+
+**Reopening triggers** (unchanged in spirit from D140): a move to unsupervised
+autonomous dispatch (loss of per-task authorization or of the human merge gate);
+or any new unattended privileged mutable-execution path, including a currently
+dark enable-var (`OWNER_TASK_APPLY_ENABLED`, `STORY_PLANNER_ENABLED`,
+`OWNER_COMMAND_INTAKE_ENABLED`, `CODEX_ADVISORY_STATUS_ENABLED`) going live, a
+new event-triggered autonomous factory job, a change to an existing job's
+permissions/secrets/OIDC/token-minting, or admission of an analyzer-unknown
+form. Each such surface requires its own operator disposition and cannot inherit
+D154 by analogy, exactly as D140 required. This decision changes no execution
+boundary and alters no repository setting, secret, Environment, or
+branch-protection rule; it re-bases the acceptance condition of an existing
+residual and authorizes no new capability. #194, #184, and #212 remain the
+tracked review-lens residuals, unchanged. Recorded on cloud issue #376, which
+closes on this ratification and the F1-S7 registry reconcile.
