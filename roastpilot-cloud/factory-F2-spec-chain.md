@@ -240,3 +240,40 @@ instead of being hand-driven, generating the §10 track-record the ratchet needs
 
 With these, F2's design is stable. Next step: turn the five stories into a
 `to-issues` draft batch (each with the §5 intake-bar shape) for PM review + filing.
+
+## F2-C build decisions (operator, 28 Aug — issue #390, story-planner contract)
+
+The F2-C `story-planner` contract (issue #390) surfaced that the existing
+owner-command surface is **PR-scoped** while `/approve` + `/respec` are
+**issue-scoped**, so the reusable parts are the leaf modules (grammar, allowlist,
+nonce-fence, sanitizer), not the intake workflow or `deriveResponseAuthorization`.
+Three build decisions, all operator-chosen:
+
+- **D-F2-C1 — verb syntax = `@claude approve` / `@claude respec`** (extend the
+  existing closed `{question, task}` verb set, reusing the hardened
+  parse/ASCII-fold/fail-closed grammar). The plan's earlier `/approve` `/respec`
+  slash notation (D-F2-2) is read as shorthand; the literal leading-slash grammar
+  was rejected as a larger new parse surface for no security gain.
+- **D-F2-C2 — architecture = a NEW isolated `owner-command-issue-intake.yml`,
+  gated on `OWNER_COMMAND_INTAKE_ENABLED`, containing no task path at all
+  (no `task-agent`/`task-apply` job, no `OWNER_TASK_APPLY_ENABLED`, no
+  `contents: write`).** This makes the #237 keystone STRUCTURAL-BY-ABSENCE and
+  leaves the byte-frozen PR intake (`owner-command-intake.yml`) untouched. **This
+  AMENDS D-F2-A4**: F2-C still reuses the existing *leaf security modules* (not
+  greenfield in that sense), but it does NOT extend the existing intake
+  *workflow* the way D-F2-A4's "reuse the existing surface" was first read. The
+  PR-scoped-vs-issue-scoped split (only discovered by reading the code during the
+  #390 contract) is the reason. The new workflow ships dark on
+  `OWNER_COMMAND_INTAKE_ENABLED` only (D-F2-A6 register-after-merge pattern: add
+  the `FACTORY_PAUSED` gate + numeric-ID runbook entry at activation, not build).
+- **D-F2-C3 — sequence: `/approve` first (C1 + C2a), `/respec` DEFERRED (C2b).**
+  `/respec`'s target `story-planner.yml` is not dispatchable today, so `/respec`
+  would have to add a `workflow_dispatch` + comment-fold input, expanding F2-A's
+  trigger/injection surface and hitting the `allowed_bots: ""` activation
+  obligation (#383). `/approve`'s target (triage readiness dispatch) is already
+  built. So C1 (grammar + issue-scoped owner-auth + dark issue-intake workflow)
+  and C2a (`@claude approve` -> `triage-issues.yml` `triage_mode: readiness`
+  dispatch) build now; C2b (`/respec` + story-planner dispatch/fold) waits until
+  the #383 / story-planner activation surface is settled. C3 (flipping
+  `OWNER_COMMAND_INTAKE_ENABLED`) is an operator ratchet, out of scope for the
+  buildable slices. `factory-security-reviewer` mandatory on every slice.
