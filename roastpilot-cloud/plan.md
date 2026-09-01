@@ -582,7 +582,68 @@ is the dominant term, not query runtime):
    on-demand with the monitor already in place.
 5. CI contract tests share the same warehouse and monitor; if CI frequency
    ever grows, give CI its own monitor before raising the cap.
+6. Anti-abuse / denial-of-wallet controls on the anonymous public surface:
+   see §16. Layered edge + application + Snowflake defences, built into
+   C4/C5/C7 acceptance criteria from the start, not bolted on later.
 
 For comparison: the superseded Supabase + Vercel stack was £0/month at this
 volume. The ~£5/month is the price of the Snowflake capabilities (SQL over
 telemetry, stored-proc aggregation, Streamlit analysis) — accepted in D97.
+
+## 16. Abuse & Denial-of-Wallet Defence
+
+The public taster surface (`/r/[slug]` and `POST /api/r/[slug]/reviews`) is
+anonymous and internet-facing, so it is a denial-of-wallet target: every
+uncached request that reaches Snowflake resumes the warehouse and bills the
+60 s minimum (§15). The §15 resource monitor already bounds the absolute cost
+(suspend at the credit cap), so a sustained attack degrades to an availability
+event, never an unbounded bill. The layers below stop it well before that
+ceiling. Each intercepts before the next, and they are a build-from-the-start
+requirement folded into the C4/C5/C7 story acceptance criteria, not a later
+hardening pass.
+
+**Layer 0, architecture (reads cost ~0 compute):**
+
+- ISR serves repeat page views from Vercel's edge; only revalidation touches
+  Snowflake (§15).
+- Slug shape is validated at the edge before any Snowflake call (fixed-length
+  base58, ≥96-bit); a malformed slug 404s for free, killing the random-slug
+  flood. Well-formed-but-missing slugs are negatively cached so a repeated
+  bogus lookup does not re-hit. Snowflake's result cache absorbs identical
+  lookups without a warehouse resume.
+
+**Layer 1, edge gate (before the function runs):**
+
+- Vercel WAF / Firewall rate-limit rules on both public routes.
+- Bot detection on entry via **Vercel BotID** (D-DoW-1): invisible
+  classification, no CAPTCHA on the human path, so the surface stays anonymous
+  and the review form stays <30 s on a phone (§6). Applied asymmetrically:
+  hard-block on the write route; observe / rate-limit only on the read route,
+  with legitimate link-unfurl crawlers (OG / preview bots) allowlisted so
+  shared-link previews are never blocked.
+
+**Layer 2, application (before the SQL API call):**
+
+- The review route runs honeypot, then BotID verification, then the per-IP
+  rate limit, all before `CALL submit_review`, so a rejected request never
+  resumes the warehouse. The rate limiter must sit in front of the SQL API
+  call, not after it.
+
+**Layer 3, Snowflake backstop (the hard ceiling):**
+
+- Resource monitor with `SUSPEND_IMMEDIATE` at the credit cap (§15),
+  `AUTO_SUSPEND = 60`, and a `STATEMENT_TIMEOUT_IN_SECONDS` so no single query
+  pins the warehouse.
+- Warehouse split (D-DoW-2, operator decision pending): a dedicated
+  public-web warehouse with its own resource monitor, separate from the
+  agent/CI warehouse, so public-surface abuse suspends only the public
+  warehouse. Reads keep serving stale via ISR, review writes fail with the
+  friendly 429 (§6), and agent sync plus CI continue unaffected. If adopted
+  this supersedes §15 control 2 (one shared warehouse).
+
+**Decisions.** **D-DoW-1**: the write-path bot challenge is Vercel BotID,
+chosen over Cloudflare Turnstile (which is action-scoped and can surface a
+visible interactive challenge, at odds with the <30 s anonymous form). BotID
+is invisible, native, and covers entry on both routes. **D-DoW-2**: one shared
+warehouse vs a public/agent split is an operator decision, to be settled at
+C7 provisioning; the split is recommended for blast-radius isolation.
