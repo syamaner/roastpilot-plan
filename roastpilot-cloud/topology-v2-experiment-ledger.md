@@ -2248,3 +2248,17 @@ Operator escalated grants explicitly and in-message: "I approve you to dispatch 
 **Two durable lessons reconfirmed:** the "first dispatch is the validation" — two live runs revealed exactly what all the offline lenses could not (the Azure egress gap, then the live proc failure); and a verifier that wraps `raise X from exc` but prints only `str(exc)` blinds its own evidence to the root cause (the #435 class, now also on the upsert path).
 
 NEXT: operator diagnoses the live upsert-CALL failure (run locally for the traceback) — that determines whether the fix is in the verifier's CALL or the `upsert_roast` proc (both #417). Then a final re-dispatch discharges #417 AC-4. #430/#431/#419 offline C3 work + a registry sync remain. FACTORY_PAUSED=true; nothing activated. [[executing-vs-readonly-review]] [[specify-external-read-semantics-in-contract]]
+
+**L248 — SESSION CONTINUED (4 Sep 2026 UTC, advisory). AC-4 root cause DEFINITIVELY diagnosed via a local verifier run (operator: "can you run it?"): `app.upsert_roast` is NOT deployed to ROASTPILOT_DEV. A deployment gap, not a code bug. cloud main unchanged at `88f8f55`.**
+
+Ran `upsert_roast_verify_live.py` locally as `ROASTPILOT_AGENT_CI` (key referenced by path, passphrase piped via `$(cat)` — contents never entered orchestrator context, preserving the D-433-F residual), through a NON-invasive wrapper that monkeypatches the verifier's `_print_failure` to also dump the chained cause the verifier hides. First run failed at `_preflight` on residue from CI dispatch #2 (2 leaked fixture files — the incomplete-cleanup case, cleanup keys on the absent cloud_roast_id); a targeted REMOVE cleared it (reusing the verifier's own `_connect`, with CURRENT_DATABASE/CURRENT_ROLE asserts before REMOVE). Re-run surfaced the real error:
+
+```
+002141 (42601): SQL compilation error: Unknown user-defined function APP.UPSERT_ROAST.
+```
+
+**Confirmed by direct inspection:** `DESCRIBE PROCEDURE app.load_roast_telemetry(string,string)` RESOLVES (#416 deployed); `app.upsert_roast(string,string)` does NOT (002003); `SHOW PROCEDURES IN app` lists `LOAD_ROAST_TELEMETRY` but not `UPSERT_ROAST`. So `R__proc_upsert_roast.sql` (+ its grant in `R__z_roles_grants.sql`) merged to main but DEV has had no `schemachange deploy` since #417 Unit 1. The verifier correctly fails closed on the missing proc. Recorded definitively on #417 (comment) and #433.
+
+**The full path to AC-4 is now known and unblocked:** (1) `schemachange deploy` the current main migrations to ROASTPILOT_DEV via `dev-snowflake-contract.yml` (the human-gated deploy workflow — confirmed it runs a real deploy step, not just a check) or a manual deploy as the deploy role → creates `app.upsert_roast` + grant; (2) re-dispatch `dev-snowflake-agent-verify.yml` (or re-run the verifier locally) → discharges #417 AC-4. Both are operator-authorizable dispatches on their respective Environments (deploy = dev-snowflake-ci; verify = dev-snowflake-agent); the deploy is a NEW action beyond the prior agent-verify grants.
+
+DEV left clean (both leaked-fixture sets REMOVE'd). Throwaway diagnostic worktree pruned. **Durable lesson (twice-proven this session): a verifier that does `raise X from exc` but prints only `str(exc)` blinds its own evidence — the #435 class — and the fix worth carrying is a wrapper that dumps `__cause__`, or teaching verifiers to print the chained cause.** FACTORY_PAUSED=true; nothing activated. [[executing-vs-readonly-review]]
