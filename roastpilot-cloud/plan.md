@@ -273,6 +273,18 @@ Semantics agreed with the agent plan, unchanged:
 - **Idempotency**: key = agent `roast_runs.id`. MERGE; replays return the same
   `{cloud_roast_id, public_slug}`. Agent marks `synced` only after a result
   containing `cloud_roast_id` (agent plan §5 `sync_jobs`).
+- **Run/roast binding (D-430-C, #430)**: the telemetry load calls
+  `load_roast_telemetry(p_run_id, p_roast_id)` with `p_run_id` equal to the
+  roast's idempotency key (the agent `roast_runs.id`, stored at
+  `cloud_roasts.idempotency_key`), and stages that run under
+  `@roast_artifacts/<run_id>/` with the same run id. The owner-rights procedure
+  enforces the binding server-side and fails closed (`-20014`): it loads and
+  labels telemetry only when the run key resolves to exactly one `cloud_roasts`
+  row whose `id` equals `p_roast_id`. Because Snowflake does not enforce
+  `idempotency_key` uniqueness, the guard checks global run-key uniqueness
+  rather than trusting the MERGE. This closes the run/roast binding gap under
+  the owner-rights load path and is the prerequisite for revoking the agent's
+  stage `WRITE` and `roast_artifacts` DML (#446 requirement (b)).
 - **Retry**: agent-side exponential backoff via `sync_jobs.attempts`; any
   connector error leaves the run `pending_sync`. Failed sync never changes the
   local run outcome (orchestration plan).
