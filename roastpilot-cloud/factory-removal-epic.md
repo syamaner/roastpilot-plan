@@ -97,6 +97,18 @@ interactive execution, Codex-authored per slice, pr-triage, human merge.
    `implement-patch-logic.mts` guard lists, so edit them together); update the
    `AGENTS.md` and `registry.md` routing lists to drop the deleted paths while
    still protecting `.github/**`, `.claude/**`, `AGENTS.md`, and `registry.md`.
+   **Also reframe here (deferred from the 15 Sep reconciliation because they
+   accurately describe apparatus that exists until this epic deletes it):** the
+   kept `.claude/agents` bodies that reference the factory (`factory-security-reviewer`
+   most heavily, plus the `factory-dispatchable` execution path in
+   `story-planner.md` and the factory references in `pr-triage.md` / `qa.md`),
+   and the reviewer-routing hint in `.github/PULL_REQUEST_TEMPLATE.md` (it names
+   `scripts/factory/**` / `tests/factory/**`). Reframe each as its referenced
+   paths are removed, so the descriptions and the apparatus die together rather
+   than the docs going stale-ahead. (The prose-only reconciliation of 15 Sep did
+   `AGENTS.md`, `registry.md`, the plan-repo docs, `README.md`, and
+   `snowflake/README.md`; these cloud `.claude` / `.github` items were the
+   deliberate remainder.)
 7. *(optional, deferred, D-remove-3)* **Simplify the now-unpinned `AGENTS.md`
    factory prose** (connector-verdict section, envelope, roster). Doc-only.
 
