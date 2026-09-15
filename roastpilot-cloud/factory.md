@@ -1,8 +1,21 @@
 # roastpilot-cloud — Software Factory Spec (D98)
 
-**Status**: Specced and agreed, 16 July 2026. F1, the implementing epic, has
-since built most of the factory; the factory is paused (`FACTORY_PAUSED=true`)
-and not yet enabled for autonomous issue→PR flow. Prep work (labels, issue
+**Status (updated 15 Sep 2026): DECOMMISSIONED.** The autonomous CI factory is
+permanently removed on ToS grounds (Anthropic consumer OAuth tokens are not
+permitted for CI automation), with no metered-key revival path. This supersedes
+the earlier "paused (`FACTORY_PAUSED=true`), not yet enabled" framing and
+operator decision D-ToS-1. Work on `roastpilot-cloud` ships through the
+compliant model: the interactive Claude Code PM / orchestrator, Codex-MCP as
+the default implementer (D145), Claude cross-family review sub-agents, and a
+human merge (see the repo's `AGENTS.md` and `docs/state/registry.md`, the
+authoritative decommission record). This document is retained as a historical
+design and decision archive; the factory workflows, glue scripts and integrity
+tests remain in-tree as dormant machinery pending a separate removal epic. Read
+the sections and decision log below as the recorded design of that
+decommissioned pipeline, not as a current or pending execution path.
+
+_Original status (16 Jul 2026, historical):_ Specced and agreed. F1, the
+implementing epic, built most of the factory; prep work (labels, issue
 templates, milestones, C1/F1 story issues) done 16 Jul 2026 directly in the
 `roastpilot-cloud` repo.
 **Applies to**: `github.com/syamaner/roastpilot-cloud` only. The agent repo
@@ -2663,7 +2676,13 @@ closes on this ratification and the F1-S7 registry reconcile.
 
 **D155 (27 Aug 2026) - F2 auto-mode: the orchestrator may merge a fully-clean F2
 pipeline PR on the operator's behalf; D154's human-merge gate is re-based, not
-removed.** The operator authorizes the next orchestrator session to run in auto
+removed.** _(Superseded 15 Sep 2026 by the factory decommission at the top of
+this document: the F2 pipeline no longer exists, so this F2-scoped auto-merge
+authorization is dead. The general auto-merge mechanism it defines, namely the
+orchestrator merging a fully-clean PR as the operator's proxy under a fail-closed
+clean-floor, survives only for conventional work, and only under an explicit
+per-drive operator grant of `/orchestrate` auto mode; it is not a standing
+authorization.)_ The operator authorizes the next orchestrator session to run in auto
 mode over the F2 build work - the activation obligations (#373, #374), then F2-B
 (two-mode triage) and F2-C (owner `/approve`+`/respec`), then the C3 to-issues
 dogfood - driving each story spec-first and autonomously (story-planner contract
