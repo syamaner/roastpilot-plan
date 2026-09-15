@@ -10,9 +10,14 @@ surface only)
 
 ## Documents
 
-- [`factory.md`](factory.md) — **software factory spec (D98)**: issue-driven
-  agent pipeline for C2–C8 (triage → implement → review, human merge), label
-  taxonomy, security model, autonomy ratchet, F1 epic stories.
+- [`factory.md`](factory.md) — **software factory spec (D98) — DECOMMISSIONED
+  15 Sep 2026**, retained as a historical design archive: issue-driven agent
+  pipeline for C2–C8 (triage → implement → review, human merge), label taxonomy,
+  security model, autonomy ratchet, F1 epic stories. The factory is permanently
+  removed; work now ships through the compliant interactive model (Claude Code
+  orchestrator + Codex-MCP implementer + human merge).
+- [`factory-removal-epic.md`](factory-removal-epic.md) — plan for removing the
+  decommissioned factory apparatus from the repo (planned, not filed).
 - [`plan.md`](plan.md) — full component plan: decisions D97 + D10–D13,
   two-plane architecture (Snowflake data platform / Vercel public surface),
   Snowflake schema + role/grant lockdown, connector sync contract
@@ -23,10 +28,12 @@ surface only)
 
 ## Decisions
 
-- **D98**: **Factory-first build for C2–C8** — GitHub-issue-driven agent
-  pipeline (`claude-code-action`, adapted from the hubble.md reference);
-  human specs, clarifies, and merges; C1 + F1 conventional. See
-  [`factory.md`](factory.md).
+- **D98**: **Factory-first build for C2–C8** _(superseded 15 Sep 2026)_ —
+  GitHub-issue-driven agent pipeline (`claude-code-action`, adapted from the
+  hubble.md reference); human specs, clarifies, and merges; C1 + F1 conventional.
+  See [`factory.md`](factory.md). **Superseded: the autonomous CI factory is
+  decommissioned; C2 onward builds through the compliant interactive model
+  (Claude Code orchestrator + Codex-MCP implementer + human merge).**
 - **D97**: **Snowflake + Vercel** replaces Supabase. Agent syncs directly via
   `snowflake-connector-python` (key-pair auth); telemetry lands in a
   queryable table; the public taster surface stays on Vercel because

@@ -1,5 +1,11 @@
 # F2 — `to-issues` DRAFT batch (PM-review, not filed)
 
+> **DECOMMISSIONED (15 Sep 2026).** This is a story-decomposition draft for the
+> F2 autonomous-factory milestone, which is permanently decommissioned on ToS
+> grounds (see [`factory.md`](factory.md) and the cloud repo's
+> `docs/state/registry.md`). These stories will not be filed or built. Retained
+> as a historical record only.
+
 **Draft for operator review (26 Aug 2026).** Decomposes the F2 milestone
 ([`factory-F2-spec-chain.md`](./factory-F2-spec-chain.md), decisions D-F2-1..4,
 A1..A3) into story issues meeting factory.md §5's intake bar. **Filing status (26 Aug):

@@ -1,5 +1,13 @@
 # F2 — Autonomous spec chain + operator-comment contribution
 
+> **DECOMMISSIONED (15 Sep 2026).** F2 was the front-half-of-autonomy milestone
+> for the autonomous CI factory. The factory is permanently decommissioned on
+> ToS grounds (see [`factory.md`](factory.md) and the cloud repo's
+> `docs/state/registry.md`), so F2 will not be built. This document is retained
+> as a historical design record only. Work on `roastpilot-cloud` ships through
+> the compliant interactive model: interactive Claude Code orchestrator,
+> Codex-MCP implementer, Claude review sub-agents, and a human merge.
+
 **Status: DRAFT for operator review (26 Aug 2026).** Iterate by commenting inline
 or on the story issues once filed. Folds into `factory.md` §10 (autonomy ratchet)
 and the §11 milestone table once ratified. This is the front-half-of-autonomy
