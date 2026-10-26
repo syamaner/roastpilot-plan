@@ -171,6 +171,12 @@ flowchart LR
     CLOUD -.->|"references at roast start"| CTRL
 ```
 
+**Superseded in part by D220 (27 Oct 2026):** The architecture diagram's
+references-at-roast-start edge (S14) means idle background refresh and cached-only
+preparation. Its adjacent roast-end upload arrow is a logical completion trigger,
+not a synchronous controller-to-cloud call or a cloud wait in roast control.
+See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references).
+
 ## Runtime Flow
 
 The normal roast flow is:

@@ -307,7 +307,7 @@ clause superseded; only the listed meanings change. Everything else stays in for
 | S11 | Agent plan §5 sync_jobs and cloud_sync_status | Durable per-field latest intent and acknowledgement; local schema deferred |
 | S12 | Agent plan §7 M2 SPA additions | Stable unlisted link; queued cloud deletion; automatic idle cached reviews |
 | S13 | Orchestration advisor-context list | No tasting-text or flavour-axis propagation |
-| S14 | Orchestration Local Application | Idle refresh and cached-only prepare |
+| S14 | Orchestration architecture diagram and Local Application | Idle refresh and cached-only prepare; upload arrow is a logical completion trigger, not a control-loop cloud wait |
 | S15 | Orchestration responsibility/code sketches | Independent consent and sharing; cached-only prepare; sketches non-normative |
 | S16 | Orchestration Flow 1 next-roast illustration | Non-normative temperature example superseded; Celsius only, no invented conversion |
 | S17 | Orchestration Privacy and Ethics | Unlisted approved curves, learning default-on/opt-out, explicit queued deletion |
@@ -324,7 +324,7 @@ clause superseded; only the listed meanings change. Everything else stays in for
 | R6 | §2 R6; §5 durable intent; §6 consent ordering | S3, S11 |
 | R7 | §2 R7; §8 tombstones and stage residuals | S5, S9, S12, S17 |
 | R8 | §2 R8; §9 complete HTTP review reads | S6, S12 |
-| R9 | §2 R9; §10 idle references and cached prepare | S1, S7, S10, S13, S14, S15 |
+| R9 | §2 R9; §10 idle references and cached prepare | S1, S7, S10, S13, S14 (diagram and Local Application), S15 |
 | B1 | §3 single principal and private/public boundary | S2, S8, S9, S17 |
 | B2 | §4 separated domain, orchestration, adapters and presentation | S11, S15 |
 | B3 | §5 versioned curated export and per-field acknowledgement | S3, S4, S11 |
