@@ -33,7 +33,7 @@ compete with the July harness deadline (00-repository-structure.md).
 | D12 | Summary builds | **On write** | Recompute the affected (bean_origin, roast_level) summary after every roast upload and review submit — now a single `RECOMPUTE_REFERENCE_SUMMARY` stored procedure called from both write paths (agent connector and public review route). No cron / no serverless tasks at this volume (a few roasts/week). |
 | D13 | Agent reference fetch | **Fetch at roast start + cached fallback** | `prepare_roast` queries Snowflake directly (short timeout; a suspended warehouse's ~1–3 s auto-resume is within it), updates the local `reference_roasts` cache; any failure → use cache or proceed without. Cloud outage never affects a roast. **Loop semantics (M2)** unchanged: references are rating-filtered *process* aggregates of ≥4-star roasts (FC/drop temp, development %, total time), i.e. *reinforce the process of well-rated roasts*, **not** defect-driven correction. Tasting flavour axes and bitter/grassy signals are **not** propagated to the advisor in M2; defect-axis → adjustment is the `key_patterns` backlog path (§14). |
 
-**Superseded in part by D220 (27 Oct 2026):** The D13 at-roast-start fetch (S1) becomes idle background refresh and cached-only prepare. The no-flavour-axis clause remains. See [cloud-sync-plan.md §10](../cloud-sync-plan.md#10-roast-control-non-interference-and-references).
+**Superseded in part by D220 (27 Oct 2026):** The D13 at-roast-start fetch (S1) becomes idle background refresh and cached-only prepare. The no-flavour-axis clause remains. See [cloud-sync-plan.md §10](../cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
 
 ## 2. Scope
 

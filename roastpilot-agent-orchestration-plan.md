@@ -175,7 +175,7 @@ flowchart LR
 references-at-roast-start edge (S14) means idle background refresh and cached-only
 preparation. Its adjacent roast-end upload arrow is a logical completion trigger,
 not a synchronous controller-to-cloud call or a cloud wait in roast control.
-See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references).
+See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
 
 ## Runtime Flow
 
@@ -573,7 +573,7 @@ The advisor can use reference context such as:
 - development percent
 - tasting notes such as sweetness, acidity, body, and defects
 
-**Superseded in part by D220 (27 Oct 2026):** The advisor-context tasting-notes and defects item (S13) introduces no tasting-text or flavour-axis propagation. Only cached process aggregates reach reference context. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references).
+**Superseded in part by D220 (27 Oct 2026):** The advisor-context tasting-notes and defects item (S13) introduces no tasting-text or flavour-axis propagation. Only cached process aggregates reach reference context. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
 
 The advisor still cannot execute commands. It only returns typed
 recommendations that safety policy may accept, clamp, or reject.
@@ -641,7 +641,7 @@ Before a roast, the agent:
        key_adjustments: list[str]  # e.g., "reduced heat at 340F"
    ```
 
-**Superseded in part by D220 (27 Oct 2026):** The Local Application before-a-roast cloud query and download steps (S14) become idle background refresh; prepare uses cached process aggregates only, without tasting text or flavour axes. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references).
+**Superseded in part by D220 (27 Oct 2026):** The Local Application before-a-roast cloud query and download steps (S14) become idle background refresh; prepare uses cached process aggregates only, without tasting text or flavour axes. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
 
 #### Advisory Prompt Enhancement
 
@@ -1167,7 +1167,7 @@ CREATE TABLE reference_roast_summaries (
 4. **Next roast**: Operator benefits from community knowledge
    - "5 similar roasts suggest reducing heat at 340F"
 
-**Superseded in part by D220 (27 Oct 2026):** The Flow 1 Next roast temperature illustration (S16) is non-normative and superseded. Plans are Celsius only; no replacement conversion or temperature is invented. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references).
+**Superseded in part by D220 (27 Oct 2026):** The Flow 1 Next roast temperature illustration (S16) is non-normative and superseded. Plans are Celsius only; no replacement conversion or temperature is invented. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
 
 #### Future Out Of Scope: Model Improvement Cycle
 
