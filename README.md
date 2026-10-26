@@ -12,6 +12,7 @@ agent rebuild.
 | [`roastpilot-agent-orchestration-plan.md`](roastpilot-agent-orchestration-plan.md) | Authoritative architecture plan: controller, state machine, safety policy, advisor (its repo-structure section is superseded — banner inside) |
 | [`roastpilot-agent/`](roastpilot-agent/) | Agent harness component plan (M1, D5–D9, epics E1–E12), UI prompt pack, Figma Make prototypes + frozen screenshots |
 | [`roastpilot-cloud/`](roastpilot-cloud/) | Cloud data plane component plan (M2 / Loop A, D10–D13, epics C1–C7) |
+| [`cloud-sync-plan.md`](cloud-sync-plan.md) | LA-1/LA-2 cloud sync product contract and ordered delivery plan (D220); home epics E15/C9 |
 | [`coffee-roaster-mcp/`](coffee-roaster-mcp/) | Small Loop A contract change spec (FC override source marker) |
 | [`coffee-first-crack-detection/`](coffee-first-crack-detection/) | No-change note + Loop B backlog appendix |
 | [`archive/`](archive/) | Superseded draft-era documents (kept for history; see its README) |
@@ -30,3 +31,5 @@ repositories. The two cross-repo epics — **LA-1** (roast sync & sharing) and
 **LA-2** (reference feedback loop) — are tracked here: spec files in this
 repo, epic tracking issues with cross-repo task lists, and one user-level
 GitHub Project ("RoastPilot") as the cross-repo view.
+
+The LA-1/LA-2 spec is [cloud-sync-plan.md](cloud-sync-plan.md); its home epics are E15 (Agent) and C9 (Cloud).

@@ -567,6 +567,8 @@ The advisor can use reference context such as:
 - development percent
 - tasting notes such as sweetness, acidity, body, and defects
 
+**Superseded in part by D220 (27 Oct 2026):** The advisor-context tasting-notes and defects item (S13) introduces no tasting-text or flavour-axis propagation. Only cached process aggregates reach reference context. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references).
+
 The advisor still cannot execute commands. It only returns typed
 recommendations that safety policy may accept, clamp, or reject.
 
@@ -632,6 +634,8 @@ Before a roast, the agent:
        tasting_score: float
        key_adjustments: list[str]  # e.g., "reduced heat at 340F"
    ```
+
+**Superseded in part by D220 (27 Oct 2026):** The Local Application before-a-roast cloud query and download steps (S14) become idle background refresh; prepare uses cached process aggregates only, without tasting text or flavour axes. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references).
 
 #### Advisory Prompt Enhancement
 
@@ -1100,6 +1104,12 @@ async def prepare_roast(bean_origin: str, target_level: str):
     logger.info(f"Downloaded {len(references)} reference roasts for {bean_origin}")
 ```
 
+**Superseded in part by D220 (27 Oct 2026):** The Current Agent Layer
+Responsibilities `FeedbackConfig`, `sync_roast_to_cloud` and `prepare_roast` sketches
+(S15) are illustrative and non-normative. Learning consent is independent of
+approved public curves; references refresh while idle and prepare reads cached
+process aggregates only. See [cloud-sync-plan.md §§6, 10](cloud-sync-plan.md#6-consent-model).
+
 ### Cloud Data Schema Extensions
 
 Extend cloud tables:
@@ -1131,6 +1141,8 @@ CREATE TABLE reference_roast_summaries (
 );
 ```
 
+**Superseded in part by D220 (27 Oct 2026):** The illustrative Cloud Data Schema Extensions contribution default (S15) is not the appliance consent contract. Learning defaults on with per-roast opt-out, independently of sharing; the later schema contract supplies the implementation. See [cloud-sync-plan.md §6](cloud-sync-plan.md#6-consent-model).
+
 ### User Experience Flow
 
 #### Flow 1: Contributing Feedback
@@ -1148,6 +1160,8 @@ CREATE TABLE reference_roast_summaries (
 
 4. **Next roast**: Operator benefits from community knowledge
    - "5 similar roasts suggest reducing heat at 340F"
+
+**Superseded in part by D220 (27 Oct 2026):** The Flow 1 Next roast temperature illustration (S16) is non-normative and superseded. Plans are Celsius only; no replacement conversion or temperature is invented. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references).
 
 #### Future Out Of Scope: Model Improvement Cycle
 
@@ -1194,6 +1208,13 @@ Week 5: FC detection is more accurate
   user-controlled
 - **User benefit**: Contributors see improved recommendations
 - **Community benefit**: Better reference summaries help all users
+
+**Superseded in part by D220 (27 Oct 2026):** The Privacy and Ethics
+aggregated-only visibility, contribution opt-in default and contribution-deletion
+clauses (S17) now mean approved curves shared by stable unlisted link, learning
+default-on with per-roast opt-out, and separate explicit queued cloud deletion.
+Private operator notes remain excluded from public projections. See
+[cloud-sync-plan.md §§3, 6, 8](cloud-sync-plan.md#6-consent-model).
 
 ### Success Metrics
 
