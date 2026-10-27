@@ -347,8 +347,8 @@ clause superseded; only the listed meanings change. Everything else stays in for
 | S1 | Cloud plan §1 D13 | Idle refresh; cached-only prepare; retain no flavour-axis propagation |
 | S2 | Cloud plan §4 schema comment | Learning consent independent of public sharing |
 | S3 | Cloud plan §5 Upload raw artefacts and §4 verbatim-summary mirror | Curated upload/projections only; keep D97 connector and qualified write protocol |
-| S4 | Cloud plan §5 Update, D11 revocation and §8 regeneration | Per-field latest intent; regeneration deferred; initial revocation is cloud deletion |
-| S5 | Cloud plan §5 Delete, D11 revocation and §8 deletion/regeneration | Explicit queued deletion and revocation, permanent tombstone; separate DML/stage effects |
+| S4 | Cloud plan §5 Update, D11 revocation mirrors in Cloud plan/README and §8 regeneration | Per-field latest intent; regeneration deferred; initial revocation is cloud deletion |
+| S5 | Cloud plan §5 Delete, D11 revocation mirrors in Cloud plan/README and §8 deletion/regeneration | Explicit queued deletion and revocation, permanent tombstone; separate DML/stage effects |
 | S6 | Cloud plan §5 List/reviews | HTTP GET/ETag review-read contract only |
 | S7 | Cloud plan §5 References | Idle refresh and cached-only prepare |
 | S8 | Cloud plan §5 Privacy mapping | Learning opt-out excludes aggregation, not approved public curves |
@@ -367,18 +367,18 @@ clause superseded; only the listed meanings change. Everything else stays in for
 | Requirement | Sections carrying the requirement | Supersession pointers |
 |---|---|---|
 | R1 | §2 R1; §7 eligibility and immutable start marker | None (no historical conflicting eligibility clause) |
-| R2 | §2 R2; §3 closed public fields; §5 stable identity | S3 (Upload and summary mirror), S4, S12, S17 |
+| R2 | §2 R2; §3 closed public fields; §5 stable identity | S3 (Upload and summary mirror), S4 (D11 Cloud plan/README mirrors), S12, S17 |
 | R3 | §2 R3; §3 private operator notes; §5 rejected notes | S4, S9, S17 |
 | R4 | §2 R4; §6 independent consent | S2, S8, S15, S17 |
 | R5 | §2 R5; §5 field merge and explicit clear | S4, S11, S12 |
 | R6 | §2 R6; §5 durable intent; §6 consent ordering | S3, S11 |
-| R7 | §2 R7; §8 tombstones and stage residuals | S4 (D11), S5, S9, S12, S17 |
+| R7 | §2 R7; §8 tombstones and stage residuals | S4/S5 (D11 Cloud plan/README mirrors), S5, S9, S12, S17 |
 | R8 | §2 R8; §9 complete HTTP review reads | S6, S12 |
 | R9 | §2 R9; §10 idle references and cached prepare | S1, S7, S10, S13, S14 (architecture/feedback Mermaid edges, before-a-roast prose and Local Application), S15 |
 | B1 | §3 single principal and private/public boundary | S2, S3 (Upload and summary mirror), S8, S9, S17 |
 | B2 | §4 separated domain, orchestration, adapters and presentation | S11, S15 |
 | B3 | §5 versioned curated export and per-field acknowledgement | S3, S4, S11 |
-| B4 | §8 qualified server ordering and separate stage effects | S5, S9 |
+| B4 | §8 qualified server ordering and separate stage effects | S5 (including D11 Cloud plan/README mirrors), S9 |
 | B5 | §9 HTTP pagination, existence/visibility and content ETags | S6, S12 |
 | B6 | §10 proven bounded idle work; no new numeric budget | S1, S7, S10, S14 (Mermaid edge and before-a-roast prose), S15 |
 | B7 | §11 separate PRs, fresh contracts, reviewers and gates | None (carried by the E15/C9 allocation rows) |

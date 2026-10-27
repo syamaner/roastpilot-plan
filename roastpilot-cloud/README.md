@@ -52,7 +52,7 @@ surface only)
 - **D13**: Agent **fetches references at roast start** (short timeout) with
   local-cache fallback; cloud outage never affects a roast.
 
-**Superseded in part by D220 (27 Oct 2026):** The Decisions D13 at-roast-start fetch mirror (S10) becomes idle reference refresh and cached-only prepare, retaining the no-flavour-axis boundary. See [cloud-sync-plan.md §10](../cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
+**Superseded in part by D220 (27 Oct 2026):** The Decisions D13 at-roast-start fetch mirror (S10) becomes idle reference refresh and cached-only prepare, retaining the no-flavour-axis boundary. See [cloud-sync-plan.md §10](../cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6). The Decisions D11 revocation mirror (S4, S5) means separate explicit queued cloud deletion in the initial scope; slug regeneration remains deferred, without instant or atomic erasure. See [cloud-sync-plan.md §8](../cloud-sync-plan.md#8-server-correctness-b4).
 
 ## Cost (plan.md §15)
 
