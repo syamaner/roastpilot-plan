@@ -33,7 +33,7 @@ compete with the July harness deadline (00-repository-structure.md).
 | D12 | Summary builds | **On write** | Recompute the affected (bean_origin, roast_level) summary after every roast upload and review submit — now a single `RECOMPUTE_REFERENCE_SUMMARY` stored procedure called from both write paths (agent connector and public review route). No cron / no serverless tasks at this volume (a few roasts/week). |
 | D13 | Agent reference fetch | **Fetch at roast start + cached fallback** | `prepare_roast` queries Snowflake directly (short timeout; a suspended warehouse's ~1–3 s auto-resume is within it), updates the local `reference_roasts` cache; any failure → use cache or proceed without. Cloud outage never affects a roast. **Loop semantics (M2)** unchanged: references are rating-filtered *process* aggregates of ≥4-star roasts (FC/drop temp, development %, total time), i.e. *reinforce the process of well-rated roasts*, **not** defect-driven correction. Tasting flavour axes and bitter/grassy signals are **not** propagated to the advisor in M2; defect-axis → adjustment is the `key_patterns` backlog path (§14). |
 
-**Superseded in part by D220 (27 Oct 2026):** The D13 at-roast-start fetch (S1) becomes idle background refresh and cached-only prepare. The no-flavour-axis clause remains. See [cloud-sync-plan.md §10](../cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
+**Superseded in part by D220 (27 Oct 2026):** The D13 at-roast-start fetch (S1) becomes idle background refresh and cached-only prepare. The no-flavour-axis clause remains. See [cloud-sync-plan.md §10](../cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6). The D11 revocation mirror (S4, S5) means explicit queued cloud deletion in the initial scope; slug regeneration is deferred, not removed. No instant or atomic erasure is claimed.
 
 ## 2. Scope
 
@@ -218,7 +218,7 @@ create stage roast_artifacts encryption = (type = 'SNOWFLAKE_SSE');
 -- visibility <> 'private'.
 ```
 
-**Superseded in part by D220 (27 Oct 2026):** The §4 schema comment coupling `cloud_roasts.contributed_to_learning` to curve contribution (S2) does not govern public sharing: learning consent and approved public curves are independent. See [cloud-sync-plan.md §6](../cloud-sync-plan.md#6-consent-model).
+**Superseded in part by D220 (27 Oct 2026):** The §4 schema comment coupling `cloud_roasts.contributed_to_learning` to curve contribution (S2) does not govern public sharing: learning consent and approved public curves are independent. See [cloud-sync-plan.md §6](../cloud-sync-plan.md#6-consent-model). The §4 `cloud_roasts.summary` verbatim-connector comment (S3) is superseded: stored summary and public projections contain only closed, versioned curated-export content, without raw-export, model or provider exceptions. C1/E1/E3 settle its artefact form; the two-secure-view boundary is unchanged.
 
 Units note: all temperatures Celsius end-to-end (matches MCP contract).
 
@@ -282,7 +282,11 @@ repo (`cloud_sync` module); the semantics carry over unchanged.
 
 **Superseded in part by D220 (27 Oct 2026):** The §5 Sync Contract Upload row (S3)
 keeps D97 connector writes; ordering, acknowledgement and idempotency follow the
-Cloud write protocol, whose algorithm is not fixed here. The Update row (S4)
+Cloud write protocol, whose algorithm is not fixed here. The legacy raw
+jsonl/csv/summary PUT in that Upload row (S3) is superseded: upload only the closed,
+versioned curated export, without raw-export, model or provider exceptions.
+C1/E1/E3 settle the artefact form; the two-secure-view boundary is unchanged.
+The Update row (S4)
 uses per-field latest intent for rating, private operator note and consent edits;
 visibility selection and slug regeneration are deferred outside the stable-link
 initial scope. The Delete row (S5) becomes an explicit queued action with a
@@ -403,10 +407,10 @@ empty in M2 (automated pattern extraction is backlog; never fabricate).
   recompute. The device SPA exposes it as "Delete from cloud". Note Time
   Travel retention (default 1 day) keeps deleted rows recoverable briefly;
   document this in the runbook rather than pretending deletion is instant.
-
-**Superseded in part by D220 (27 Oct 2026):** The §8 cloud deletion/revocation clause (S5) means a separate explicit queued deletion backed by a permanent tombstone; local removal keeps the cloud copy. Transactional DML and stage-file cleanup remain separate, without atomic erasure or rollback claims. See [cloud-sync-plan.md §8](../cloud-sync-plan.md#8-server-correctness-b4).
 - Slug regeneration (D11) invalidates previously shared links immediately
   (plus an ISR revalidation of the old path).
+
+**Superseded in part by D220 (27 Oct 2026):** The §8 cloud deletion/revocation clause (S5) means a separate explicit queued deletion backed by a permanent tombstone; local removal keeps the cloud copy. Transactional DML and stage-file cleanup remain separate, without atomic erasure or rollback claims. See [cloud-sync-plan.md §8](../cloud-sync-plan.md#8-server-correctness-b4). The §8 Slug regeneration bullet (S4) is deferred; initial-scope link revocation is explicit cloud deletion (S5), without instant or atomic erasure.
 
 ## 9. Repository Layout
 

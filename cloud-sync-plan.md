@@ -28,7 +28,7 @@ backlog work. Documents and mocks cannot satisfy an operator-only activation gat
 
 There is no account system, new base-table grant, generic sync framework, local
 structured-tasting upload or new public description field. Private operator notes
-and approved cloud taster-review notes have different privacy rules (§3).
+and submitted cloud taster-review content have different privacy rules (§3).
 No new resource envelope, refresh cadence, grace period or cost budget is set.
 
 D97 Snowflake connector writes remain the write transport. HTTP is the review-read
@@ -59,12 +59,15 @@ outside this settled initial scope, not removed from history.
 
 **R3. Private operator notes.** Operator notes are private by default and may
 travel only through a private field. They never appear in public projections.
-Approved public cloud taster-review notes remain part of cloud reviews (§3).
+Submitted cloud taster-review content remains part of cloud reviews (§3).
 
 **R4. Independent learning consent.** Learning defaults on appliance-wide, with
 per-roast opt-out. Learning consent is independent of sharing: opting out excludes
 the roast from aggregation but neither withholds nor withdraws approved public
-curves. Sharing is not evidence of learning consent.
+curves. Sharing is not evidence of learning consent. A default change affects future
+roasts only; existing roasts keep their own setting. A later per-roast opt-out
+removes that roast from derived reference summaries when recomputed, without an
+immediate-recompute, cadence or cost promise, retroactive default sweep or live authority.
 
 **R5. Appliance-owned edits.** Automatically merge appliance-owned rating,
 private operator note and consent edits as per-field latest intent. Explicit clear
@@ -74,17 +77,25 @@ values remain local and visibly unacknowledged rather than silently nulled.
 **R6. Durable intent and acknowledgement.** Persist the latest desired action
 and its per-field acknowledgement durably. Older acknowledgements cannot erase
 newer desired values, and an older opt-in cannot undo a newer opt-out. Retrying an
-acknowledged intent is idempotent. A failed private operator note is never synced.
+acknowledged intent is idempotent. A failed private operator note is never marked
+synced; its latest intent stays pending for retry.
 
 **R7. Separate local and cloud removal.** Removing a local roast keeps the cloud
 copy. Cloud deletion is a separate explicit queued action backed by a permanent
 tombstone. Local discard behaviour is unchanged. Transactional row changes and
 stage-file cleanup are separate effects; §8 specifies their qualification limits.
+After local removal the appliance keeps minimal durable cloud identity for a later
+queued cloud deletion, without an account system; a warning alone is insufficient.
+In the initial scope, link revocation is explicit cloud deletion and slug
+regeneration is deferred. Nothing promises instant or atomic erasure.
 
 **R8. Offline-capable reviews.** Refresh reviews automatically while idle, retain
 an offline cache and offer Refresh now under the same admission and lifetime
 bounds. Use the HTTP GET, pagination and ETag contract in §9. Cached data must not
-be presented as fresh or as evidence of current public visibility.
+be presented as fresh or as evidence of current public visibility. Retain it through
+transient network errors; confirmed cloud deletion or an authoritative inaccessible
+response atomically invalidates the matching body and ETag together. Exact status
+codes and UI handling are later E7/E6 contract work.
 
 **R9. Cached-only roast preparation.** Refresh references in the idle background;
 prepare reads cached process aggregates only. No tasting text, flavour axes or
@@ -106,10 +117,12 @@ raw exports, private operator notes, the test-run marker, internal IDs, logs,
 model or provider details. The private operator-note field is excluded from
 **every** PUBLIC_WEB projection, regardless of whether it is populated.
 
-Approved cloud taster-review notes remain public review content, displayed as
-untrusted text. This neither prohibits those notes nor extends local
-structured-tasting upload. Pulled reviewer names and text do not become trusted
-instructions, markup or advisor input. No public description field is added.
+Public cloud taster-review content is permitted review content submitted through
+the existing review path. It is not moderated, not vetted and not trusted;
+it is displayed as untrusted text. No approval or moderation workflow is added.
+This neither prohibits submitted review content nor extends local structured-tasting
+upload. Pulled reviewer names and text do not become trusted instructions,
+markup or advisor input. No public description field is added.
 Projection and schema changes require explicit schema-migration and privacy review.
 
 ## 4. Layering (B2)
@@ -137,6 +150,10 @@ Export a closed, versioned curated shape, not raw local exports. Unknown or
 unsupported schema versions fail closed. Stable roast identity and a stable
 unlisted link survive retries and appliance-owned edits. The exact local schema
 and the server ordering algorithm require later ratified contracts.
+The closed curated export governs both uploaded material and every public
+projection, without exceptions for raw jsonl/csv/summary, model data or provider
+data. The two-secure-view PUBLIC_WEB boundary is unchanged; C1/E1/E3 settle the
+curated artefact form.
 
 Represent each field's monotonic desired intent and acknowledgement independently.
 An omitted field is preserved; explicit null requests a clear where the field's
@@ -155,7 +172,11 @@ D97 connector transport is settled; this Plan does not choose its SQL algorithm.
 The appliance-wide learning default is on; each roast can opt out independently.
 Learning controls aggregation eligibility, not unlisted sharing. A learning opt-out
 therefore does not withhold or withdraw approved public curves. Public sharing
-and aggregation must not be inferred from one another.
+and aggregation must not be inferred from one another. Changing the default affects
+future roasts only; existing roasts retain their own setting. A later per-roast
+opt-out removes that roast from derived reference summaries when recomputed.
+There is no immediate-recompute promise, cadence, cost, retroactive default sweep
+or live execution authority.
 
 A newer per-roast opt-out supersedes an older opt-in, including across delayed
 writes, retry, restart and late acknowledgement. Outbox persistence and server
@@ -192,11 +213,21 @@ Deletion tombstones are permanent. Every accepted legacy or new write path must
 participate in a verified ordering/transaction protocol or be disabled: create,
 patch, telemetry load, review submit, delete and summary-recompute side effects.
 The exact SQL, locking or gate-table algorithm is **not** ratified here.
+Server ordering and tombstone enforcement hold for every admitted writer,
+whatever any client does. Tombstones retain only minimal identity and ordering
+data, with no roast payload, notes or reviews. The exact schema, ordering
+algorithm and staged-file residuals remain C2/C4 and G1 qualification requirements,
+not a new activation gate.
 
 There is no client-only or single-client fallback while server consistency is
 unqualified. One local dispatcher is not proof of server correctness. No caller
 is activated before qualification. A late upload cannot resurrect a tombstoned
 roast or restore stale consent, including through summary recomputation.
+Local removal is separate from cloud deletion. Retain minimal durable cloud
+identity after local removal so a later explicit cloud deletion can be queued;
+no account system or warning-only substitute is introduced. Initial-scope link
+revocation means cloud deletion; slug regeneration is deferred, with no instant
+or atomic erasure claim.
 
 Transactional DML and stage-file effects are separate. Neither rollback of stage
 operations nor atomic stage erasure is claimed. Later qualification must cover
@@ -215,6 +246,25 @@ page. Check current existence and visibility **before** returning a body or 304.
 Do not inherit the existing page cache's stale-deletion residual. A query ID,
 timestamp or count is not a content validator. Cache body and validator atomically
 on the client so a validator cannot refer to a different cached representation.
+Retain the offline cache through transient network errors. Confirmed cloud
+deletion or an authoritative inaccessible-resource response invalidates the
+matching cached body and ETag atomically. The cache never proves current public
+visibility. E7/E6 settle exact status codes and UI handling in later contracts.
+
+Before implementation, C3 must settle endpoint surface, principal and authorised
+caller credentials without choosing a new auth architecture in P0. Keep existing
+slug-shape validation and negative caching, WAF and rate limits, and the Snowflake
+statement timeout. Check existence and visibility before any body or 304;
+inaccessible states return an indistinguishable 404. Strict opaque-cursor parsing
+must reject invalid input with a typed rejection that leaks no internal identifier.
+No new public grant or numeric budget is authorised.
+
+E7's later contract must define finite byte, page, item and lifetime bounds,
+a strict response schema and visible incomplete or error outcomes rather than
+silent truncation. Require complete enumeration for valid bounded workloads,
+without unbounded processing; explicit HTTPS, origin, redirect and proxy
+restrictions; and access-link redaction in logs and errors. No numeric bound,
+timeout widening, framework or reopening of the transport choice is added here.
 
 ETags reduce transferred bodies, not necessarily warehouse queries or cost.
 PUBLIC_WEB stays at two secure views plus `SUBMIT_REVIEW`, without base-table
@@ -296,9 +346,9 @@ clause superseded; only the listed meanings change. Everything else stays in for
 |---|---|---|
 | S1 | Cloud plan §1 D13 | Idle refresh; cached-only prepare; retain no flavour-axis propagation |
 | S2 | Cloud plan §4 schema comment | Learning consent independent of public sharing |
-| S3 | Cloud plan §5 Upload | Keep D97 connector; use qualified write protocol, not a fixed algorithm |
-| S4 | Cloud plan §5 Update | Per-field latest intent; visibility and slug regeneration deferred |
-| S5 | Cloud plan §5 Delete and §8 deletion | Explicit queued deletion, permanent tombstone; separate DML/stage effects |
+| S3 | Cloud plan §5 Upload raw artefacts and §4 verbatim-summary mirror | Curated upload/projections only; keep D97 connector and qualified write protocol |
+| S4 | Cloud plan §5 Update, D11 revocation and §8 regeneration | Per-field latest intent; regeneration deferred; initial revocation is cloud deletion |
+| S5 | Cloud plan §5 Delete, D11 revocation and §8 deletion/regeneration | Explicit queued deletion and revocation, permanent tombstone; separate DML/stage effects |
 | S6 | Cloud plan §5 List/reviews | HTTP GET/ETag review-read contract only |
 | S7 | Cloud plan §5 References | Idle refresh and cached-only prepare |
 | S8 | Cloud plan §5 Privacy mapping | Learning opt-out excludes aggregation, not approved public curves |
@@ -307,33 +357,33 @@ clause superseded; only the listed meanings change. Everything else stays in for
 | S11 | Agent plan §5 sync_jobs and cloud_sync_status | Durable per-field latest intent and acknowledgement; local schema deferred |
 | S12 | Agent plan §7 M2 SPA additions | Stable unlisted link; queued cloud deletion; automatic idle cached reviews |
 | S13 | Orchestration advisor-context list | No tasting-text or flavour-axis propagation |
-| S14 | Orchestration architecture diagram and Local Application | Idle refresh and cached-only prepare; upload arrow is a logical completion trigger, not a control-loop cloud wait |
-| S15 | Orchestration responsibility/code sketches | Independent consent and sharing; cached-only prepare; sketches non-normative |
+| S14 | Orchestration architecture/feedback Mermaid query edges, before-a-roast prose and Local Application | Idle refresh and cached-only prepare; no control-loop cloud wait |
+| S15 | Orchestration responsibility/code sketches and Testing Strategy opt-out bullets | Independent consent/sharing, cached-only prepare; tests do not gate upload on learning |
 | S16 | Orchestration Flow 1 next-roast illustration | Non-normative temperature example superseded; Celsius only, no invented conversion |
-| S17 | Orchestration Privacy and Ethics | Unlisted approved curves, learning default-on/opt-out, explicit queued deletion |
+| S17 | Orchestration Privacy and Ethics, User Controls granular/local-only bullets and Testing Strategy | Independent sharing/learning; queued deletion; no global local-only switch authorised |
 
 ## 14. Traceability matrix
 
 | Requirement | Sections carrying the requirement | Supersession pointers |
 |---|---|---|
-| R1 | §2 R1; §7 eligibility and immutable start marker | S11, S12 |
-| R2 | §2 R2; §3 closed public fields; §5 stable identity | S4, S12, S17 |
-| R3 | §2 R3; §3 private operator notes; §5 rejected notes | S4, S12 |
+| R1 | §2 R1; §7 eligibility and immutable start marker | None (no historical conflicting eligibility clause) |
+| R2 | §2 R2; §3 closed public fields; §5 stable identity | S3 (Upload and summary mirror), S4, S12, S17 |
+| R3 | §2 R3; §3 private operator notes; §5 rejected notes | S4, S9, S17 |
 | R4 | §2 R4; §6 independent consent | S2, S8, S15, S17 |
 | R5 | §2 R5; §5 field merge and explicit clear | S4, S11, S12 |
 | R6 | §2 R6; §5 durable intent; §6 consent ordering | S3, S11 |
-| R7 | §2 R7; §8 tombstones and stage residuals | S5, S9, S12, S17 |
+| R7 | §2 R7; §8 tombstones and stage residuals | S4 (D11), S5, S9, S12, S17 |
 | R8 | §2 R8; §9 complete HTTP review reads | S6, S12 |
-| R9 | §2 R9; §10 idle references and cached prepare | S1, S7, S10, S13, S14 (diagram and Local Application), S15 |
-| B1 | §3 single principal and private/public boundary | S2, S8, S9, S17 |
+| R9 | §2 R9; §10 idle references and cached prepare | S1, S7, S10, S13, S14 (architecture/feedback Mermaid edges, before-a-roast prose and Local Application), S15 |
+| B1 | §3 single principal and private/public boundary | S2, S3 (Upload and summary mirror), S8, S9, S17 |
 | B2 | §4 separated domain, orchestration, adapters and presentation | S11, S15 |
 | B3 | §5 versioned curated export and per-field acknowledgement | S3, S4, S11 |
 | B4 | §8 qualified server ordering and separate stage effects | S5, S9 |
 | B5 | §9 HTTP pagination, existence/visibility and content ETags | S6, S12 |
-| B6 | §10 proven bounded idle work; no new numeric budget | S1, S7, S10, S14, S15 |
-| B7 | §11 separate PRs, fresh contracts, reviewers and gates | E15/C9 allocations and S11, S12 |
-| B8 | §12 operator-only G1-G6; feature-off until qualified | S5, S9 |
-| B9 | §2 R1; §7 capture, immutability, local-only marker and four proofs | S11, S12 |
+| B6 | §10 proven bounded idle work; no new numeric budget | S1, S7, S10, S14 (Mermaid edge and before-a-roast prose), S15 |
+| B7 | §11 separate PRs, fresh contracts, reviewers and gates | None (carried by the E15/C9 allocation rows) |
+| B8 | §12 operator-only G1-G6; feature-off until qualified | None (no historical activation clause) |
+| B9 | §2 R1; §7 capture, immutability, local-only marker and four proofs | None (no historical conflicting clause) |
 
 ## 15. Residuals
 
@@ -345,3 +395,4 @@ cleanup and retention residuals must be recorded rather than promised away.
 The test-run-marker question is answered. Its later implementation and behavioural
 proof remain undelivered by this prose slice; physical acceptance remains separate.
 No runtime, live cloud or operator-gate evidence is created here.
+The C3 auth surface, E7 bounds and tombstone schema remain later contract gates.

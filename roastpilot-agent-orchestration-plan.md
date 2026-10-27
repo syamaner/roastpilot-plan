@@ -573,7 +573,7 @@ The advisor can use reference context such as:
 - development percent
 - tasting notes such as sweetness, acidity, body, and defects
 
-**Superseded in part by D220 (27 Oct 2026):** The advisor-context tasting-notes and defects item (S13) introduces no tasting-text or flavour-axis propagation. Only cached process aggregates reach reference context. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
+**Superseded in part by D220 (27 Oct 2026):** The advisor-context tasting-notes and defects item (S13) introduces no tasting-text or flavour-axis propagation. Only cached process aggregates reach reference context. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6). The before-a-roast selected-summary sync step (S14) means idle cache refresh before a later roast; prepare reads only the cache, without a fetch at roast start.
 
 The advisor still cannot execute commands. It only returns typed
 recommendations that safety policy may accept, clamp, or reject.
@@ -687,6 +687,11 @@ flowchart LR
     LocalCache --> Advisor["PydanticAI Advisor"]
     Advisor --> BetterRecommendations["Better Recommendations"]
 ```
+
+**Superseded in part by D220 (27 Oct 2026):** The Continuous Improvement Loop
+Mermaid Next Roast Start query edge (S14) means idle background refresh into the
+local cache. Starting a roast and prepare read only that cache and never wait on
+the cloud. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
 
 ### Future Out Of Scope: First-Crack Detection Improvement
 
@@ -1219,6 +1224,9 @@ Week 5: FC detection is more accurate
 aggregated-only visibility, contribution opt-in default and contribution-deletion
 clauses (S17) now mean approved curves shared by stable unlisted link, learning
 default-on with per-roast opt-out, and separate explicit queued cloud deletion.
+The User Controls Granular opt-in and Local-only mode bullets (S17) do not couple
+learning and sharing: learning defaults on with per-roast opt-out. D220 neither
+specifies nor authorises a global local-only switch; that needs a later decision.
 Private operator notes remain excluded from public projections. See
 [cloud-sync-plan.md §§3, 6, 8](cloud-sync-plan.md#6-consent-model).
 
@@ -1322,6 +1330,14 @@ Out of scope for the current agent harness.
 #### Integration Tests
 - Privacy: Verify opt-out prevents upload
 - Recovery: Cloud unavailable doesn't break roast
+
+**Superseded in part by D220 (27 Oct 2026):** The Testing Strategy privacy opt-out
+and opt-out-prevents-upload bullets (S15, S17) must test aggregation exclusion
+independently of sharing. Learning opt-out does not block eligible public curve
+upload or withdraw a shared curve. Apply R1 eligibility and fail closed on unknown
+eligibility or marker state; schema, privacy and protocol validation errors also
+fail closed. No new eligibility exclusion is introduced. See
+[cloud-sync-plan.md §§6, 7](cloud-sync-plan.md#6-consent-model).
 
 ## API And UI Events
 
