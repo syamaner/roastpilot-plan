@@ -24,6 +24,7 @@ compete with the July harness deadline (00-repository-structure.md).
 
 | # | Decision | Choice | Notes |
 |---|----------|--------|-------|
+| D220 | Cloud sync product contract (27 Oct 2026) | Cloud sync product contract and ordered delivery plan per [cloud-sync-plan.md](../cloud-sync-plan.md); narrowly supersedes the D13/§5/§8 and orchestration-plan clauses it lists | Operator syamaner settled the product choices in roastpilot-plan#81; Refs roastpilot-agent#955. Keeps D97 connector writes, the two-secure-view PUBLIC_WEB surface, controller and safety ownership, Celsius and current delivery policy. Numbering is organisational; no deployment, activation or hardware claim. Requirements, not enforcement. |
 | D99 | M2 kickoff (17 Jul 2026) | **M2 starts now; C1 underway** | Operator ruling: remaining M1 work (E11 completion half, E12 validation) is operator/hardware-gated, not build-capacity-bound, so M2 no longer competes with the harness deadline — the timing rule is satisfied. C1 issues #1–#4 flipped `ready-to-implement` same day; C1-S1 started. **Region (resolves §14 item 7 with a deviation):** the Snowflake trial account was created 16 Jul on **Azure UK South (London), Standard edition** (account identifier `HVPXLEY-EX88650`, region `AZURE_UKSOUTH`), not the AWS eu-west-2 default — data stays in London; Azure London on-demand is in the same ballpark per credit (~$3), so the §15 cost model holds (~£4–7/mo, monitor cap unchanged at 5 credits). Vercel account to be created at C1-S3. |
 | D98 | Build process | **Factory-first for C2–C8** _(superseded 15 Sep 2026)_ | Issue-driven agent pipeline (triage → implement → review) on GitHub Actions + `claude-code-action`; the human specs, clarifies, and merges. C1 and the factory itself (new epic F1) are built conventionally. Full spec, security model, label taxonomy, and autonomy ratchet: [`factory.md`](factory.md). Merging is never autonomous; the agent repo is explicitly out of factory scope. **Superseded 15 Sep 2026: the autonomous CI factory was decommissioned permanently on ToS grounds. C2 onward builds through the compliant interactive model (interactive Claude Code orchestrator + Codex-MCP implementer + Claude review sub-agents + human merge); some early C2 stories had shipped factory-first before the pause. `factory.md` is now a historical design archive; the cloud `docs/state/registry.md` carries the decommission record.** |
 | D97 | Cloud stack revision (supersedes the Supabase half of D2) | **Snowflake + Vercel** | Snowflake becomes the single data platform: roast sync lands directly via `snowflake-connector-python` (key-pair auth), telemetry JSONL is parsed into a queryable table (the ingestion-pipeline win), aggregation runs as stored procedures, and owner analysis gets Streamlit-in-Snowflake. Vercel keeps only the taster-facing surface, because the public half **cannot** live inside Snowflake: Streamlit-in-Snowflake and SPCS public endpoints both require Snowflake authentication (verified against docs, 16 Jul 2026); anonymous phone access is unsupported. Functionality is unchanged from the 7 Jun plan. Cost model in §15; target is as close to free as Snowflake allows. |
@@ -31,6 +32,8 @@ compete with the July harness deadline (00-repository-structure.md).
 | D11 | Review spam control | **Slug entropy + rate limit** | High-entropy unlisted slug (≥96 bits, base58) is the access control. Per-IP rate limit + honeypot field on the review form. Revocation = regenerate slug. Signed per-share tokens → backlog. Unchanged by D97. |
 | D12 | Summary builds | **On write** | Recompute the affected (bean_origin, roast_level) summary after every roast upload and review submit — now a single `RECOMPUTE_REFERENCE_SUMMARY` stored procedure called from both write paths (agent connector and public review route). No cron / no serverless tasks at this volume (a few roasts/week). |
 | D13 | Agent reference fetch | **Fetch at roast start + cached fallback** | `prepare_roast` queries Snowflake directly (short timeout; a suspended warehouse's ~1–3 s auto-resume is within it), updates the local `reference_roasts` cache; any failure → use cache or proceed without. Cloud outage never affects a roast. **Loop semantics (M2)** unchanged: references are rating-filtered *process* aggregates of ≥4-star roasts (FC/drop temp, development %, total time), i.e. *reinforce the process of well-rated roasts*, **not** defect-driven correction. Tasting flavour axes and bitter/grassy signals are **not** propagated to the advisor in M2; defect-axis → adjustment is the `key_patterns` backlog path (§14). |
+
+**Superseded in part by D220 (27 Oct 2026):** The D13 at-roast-start fetch (S1) becomes idle background refresh and cached-only prepare. The no-flavour-axis clause remains. See [cloud-sync-plan.md §10](../cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6). The D11 revocation mirror (S4, S5) means explicit queued cloud deletion in the initial scope; slug regeneration is deferred, not removed. No instant or atomic erasure is claimed.
 
 ## 2. Scope
 
@@ -215,6 +218,8 @@ create stage roast_artifacts encryption = (type = 'SNOWFLAKE_SSE');
 -- visibility <> 'private'.
 ```
 
+**Superseded in part by D220 (27 Oct 2026):** The §4 schema comment coupling `cloud_roasts.contributed_to_learning` to curve contribution (S2) does not govern public sharing: learning consent and approved public curves are independent. See [cloud-sync-plan.md §6](../cloud-sync-plan.md#6-consent-model). The §4 `cloud_roasts.summary` verbatim-connector comment (S3) is superseded: stored summary and public projections contain only closed, versioned curated-export content, without raw-export, model or provider exceptions. C1/E1/E3 settle its artefact form; the two-secure-view boundary is unchanged.
+
 Units note: all temperatures Celsius end-to-end (matches MCP contract).
 
 ### Source export shape (M1 agent) and source→destination mapping (D-312-D)
@@ -275,6 +280,21 @@ repo (`cloud_sync` module); the semantics carry over unchanged.
 | List / reviews (was `GET`s) | `SELECT` for the device SPA's list and detail views, via the agent as before (device SPA never talks to Snowflake). |
 | References (was `GET /api/references`) | `SELECT ... FROM reference_roast_summaries WHERE bean_origin=? AND roast_level=? AND avg_rating>=4 LIMIT 5` at `prepare_roast` (D13). |
 
+**Superseded in part by D220 (27 Oct 2026):** The §5 Sync Contract Upload row (S3)
+keeps D97 connector writes; ordering, acknowledgement and idempotency follow the
+Cloud write protocol, whose algorithm is not fixed here. The legacy raw
+jsonl/csv/summary PUT in that Upload row (S3) is superseded: upload only the closed,
+versioned curated export, without raw-export, model or provider exceptions.
+C1/E1/E3 settle the artefact form; the two-secure-view boundary is unchanged.
+The Update row (S4)
+uses per-field latest intent for rating, private operator note and consent edits;
+visibility selection and slug regeneration are deferred outside the stable-link
+initial scope. The Delete row (S5) becomes an explicit queued action with a
+permanent tombstone; DML and stage effects are separate, with no atomic erasure
+or rollback claim. The List/reviews row (S6) uses HTTP GET/ETag for review reads
+only. The References row (S7) uses idle refresh and cached-only prepare.
+See [cloud-sync-plan.md §§5, 8-10](../cloud-sync-plan.md#5-data-and-mutation-contract-b3).
+
 Semantics agreed with the agent plan, unchanged:
 
 - **Idempotency**: key = agent `roast_runs.id`. MERGE; replays return the same
@@ -306,6 +326,8 @@ Semantics agreed with the agent plan, unchanged:
 - **Batching (cost lever, §15)**: sync work coalesces into one connector
   session per roast; the agent must not open a session per statement (each
   warehouse auto-resume bills a 60 s minimum).
+
+**Superseded in part by D220 (27 Oct 2026):** The §5 Privacy mapping curve-withholding rule (S8) is replaced: learning opt-out excludes aggregation but neither withholds nor withdraws approved public curves. See [cloud-sync-plan.md §6](../cloud-sync-plan.md#6-consent-model).
 
 ## 6. Public Surface (no auth — Vercel)
 
@@ -388,6 +410,8 @@ empty in M2 (automated pattern extraction is backlog; never fabricate).
 - Slug regeneration (D11) invalidates previously shared links immediately
   (plus an ISR revalidation of the old path).
 
+**Superseded in part by D220 (27 Oct 2026):** The §8 cloud deletion/revocation clause (S5) means a separate explicit queued deletion backed by a permanent tombstone; local removal keeps the cloud copy. Transactional DML and stage-file cleanup remain separate, without atomic erasure or rollback claims. See [cloud-sync-plan.md §8](../cloud-sync-plan.md#8-server-correctness-b4). The §8 Slug regeneration bullet (S4) is deferred; initial-scope link revocation is explicit cloud deletion (S5), without instant or atomic erasure. The inherited public-page cache residual is not deletion completion: later C2/C4 contracts include service-controlled page/preview-cache invalidation with explicit failure, acknowledgement and completion qualification; edge and third-party copies may outlive deletion.
+
 ## 9. Repository Layout
 
 ```text
@@ -457,6 +481,7 @@ kickoff, not up front.
 | C6 References | aggregation proc + agent-side `prepare_roast` query (D13) | C3 | factory |
 | C7 Ops | key-pair provisioning/rotation, resource monitors, trial→on-demand cutover, backup/export runbook, deploy runbook | C3–C6 | human + factory |
 | C8 Analysis (optional) | Streamlit-in-Snowflake operator workspace: cross-roast queries, paired N vs N+1 comparisons (feeds open item 5) | C2 | factory |
+| C9 Cloud sync server (D220) | Curated projections, write protocol, reviews GET, offline verifier | C2 | interactive (D98 superseded) |
 
 Agent-side counterparts (sync queue wiring, `FeedbackConfig`,
 `AdvisorContext.reference_roasts`) are already specced in the agent plan and
@@ -474,6 +499,8 @@ land as agent-repo stories alongside C3/C6.
   beyond reviewer-name free text, IP only ever hashed and purged, private
   roasts return 404, `contributed_to_learning=false` paths excluded from
   aggregation and telemetry upload, deletion truly cascades (tables + stage).
+
+**Superseded in part by D220 (27 Oct 2026):** The §12 privacy-auditor deletion claim (S9) must distinguish transactional rows from separately qualified stage cleanup, with permanent tombstones and explicit queued deletion. Its contribution clause excludes aggregation, not approved public curves. Private operator notes stay outside public projections. See [cloud-sync-plan.md §§3, 6, 8](../cloud-sync-plan.md#8-server-correctness-b4).
 
 ## 13. UI Prototyping
 

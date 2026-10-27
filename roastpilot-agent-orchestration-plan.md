@@ -171,6 +171,12 @@ flowchart LR
     CLOUD -.->|"references at roast start"| CTRL
 ```
 
+**Superseded in part by D220 (27 Oct 2026):** The architecture diagram's
+references-at-roast-start edge (S14) means idle background refresh and cached-only
+preparation. Its adjacent roast-end upload arrow is a logical completion trigger,
+not a synchronous controller-to-cloud call or a cloud wait in roast control.
+See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
+
 ## Runtime Flow
 
 The normal roast flow is:
@@ -567,6 +573,8 @@ The advisor can use reference context such as:
 - development percent
 - tasting notes such as sweetness, acidity, body, and defects
 
+**Superseded in part by D220 (27 Oct 2026):** The advisor-context tasting-notes and defects item (S13) introduces no tasting-text or flavour-axis propagation. Only cached process aggregates reach reference context. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6). The before-a-roast selected-summary sync step (S14) means idle cache refresh before a later roast; prepare reads only the cache, without a fetch at roast start.
+
 The advisor still cannot execute commands. It only returns typed
 recommendations that safety policy may accept, clamp, or reject.
 
@@ -633,6 +641,8 @@ Before a roast, the agent:
        key_adjustments: list[str]  # e.g., "reduced heat at 340F"
    ```
 
+**Superseded in part by D220 (27 Oct 2026):** The Local Application before-a-roast cloud query and download steps (S14) become idle background refresh; prepare uses cached process aggregates only, without tasting text or flavour axes. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
+
 #### Advisory Prompt Enhancement
 
 The PydanticAI advisor receives:
@@ -677,6 +687,11 @@ flowchart LR
     LocalCache --> Advisor["PydanticAI Advisor"]
     Advisor --> BetterRecommendations["Better Recommendations"]
 ```
+
+**Superseded in part by D220 (27 Oct 2026):** The Continuous Improvement Loop
+Mermaid Next Roast Start query edge (S14) means idle background refresh into the
+local cache. Starting a roast and prepare read only that cache and never wait on
+the cloud. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
 
 ### Future Out Of Scope: First-Crack Detection Improvement
 
@@ -1100,6 +1115,12 @@ async def prepare_roast(bean_origin: str, target_level: str):
     logger.info(f"Downloaded {len(references)} reference roasts for {bean_origin}")
 ```
 
+**Superseded in part by D220 (27 Oct 2026):** The Current Agent Layer
+Responsibilities `FeedbackConfig`, `sync_roast_to_cloud` and `prepare_roast` sketches
+(S15) are illustrative and non-normative. Learning consent is independent of
+approved public curves; references refresh while idle and prepare reads cached
+process aggregates only. See [cloud-sync-plan.md §§6, 10](cloud-sync-plan.md#6-consent-model).
+
 ### Cloud Data Schema Extensions
 
 Extend cloud tables:
@@ -1131,6 +1152,8 @@ CREATE TABLE reference_roast_summaries (
 );
 ```
 
+**Superseded in part by D220 (27 Oct 2026):** The illustrative Cloud Data Schema Extensions contribution default (S15) is not the appliance consent contract. Learning defaults on with per-roast opt-out, independently of sharing; the later schema contract supplies the implementation. See [cloud-sync-plan.md §6](cloud-sync-plan.md#6-consent-model).
+
 ### User Experience Flow
 
 #### Flow 1: Contributing Feedback
@@ -1148,6 +1171,8 @@ CREATE TABLE reference_roast_summaries (
 
 4. **Next roast**: Operator benefits from community knowledge
    - "5 similar roasts suggest reducing heat at 340F"
+
+**Superseded in part by D220 (27 Oct 2026):** The Flow 1 Next roast temperature illustration (S16) is non-normative and superseded. Plans are Celsius only; no replacement conversion or temperature is invented. See [cloud-sync-plan.md §10](cloud-sync-plan.md#10-roast-control-non-interference-and-references-b6).
 
 #### Future Out Of Scope: Model Improvement Cycle
 
@@ -1194,6 +1219,16 @@ Week 5: FC detection is more accurate
   user-controlled
 - **User benefit**: Contributors see improved recommendations
 - **Community benefit**: Better reference summaries help all users
+
+**Superseded in part by D220 (27 Oct 2026):** The Privacy and Ethics
+aggregated-only visibility, contribution opt-in default and contribution-deletion
+clauses (S17) now mean approved curves shared by stable unlisted link, learning
+default-on with per-roast opt-out, and separate explicit queued cloud deletion.
+The User Controls Granular opt-in and Local-only mode bullets (S17) do not couple
+learning and sharing: learning defaults on with per-roast opt-out. D220 neither
+specifies nor authorises a global local-only switch; that needs a later decision.
+Private operator notes remain excluded from public projections. See
+[cloud-sync-plan.md §§3, 6, 8](cloud-sync-plan.md#6-consent-model).
 
 ### Success Metrics
 
@@ -1295,6 +1330,14 @@ Out of scope for the current agent harness.
 #### Integration Tests
 - Privacy: Verify opt-out prevents upload
 - Recovery: Cloud unavailable doesn't break roast
+
+**Superseded in part by D220 (27 Oct 2026):** The Testing Strategy privacy opt-out
+and opt-out-prevents-upload bullets (S15, S17) must test aggregation exclusion
+independently of sharing. Learning opt-out does not block eligible public curve
+upload or withdraw a shared curve. Apply R1 eligibility and fail closed on unknown
+eligibility or marker state; schema, privacy and protocol validation errors also
+fail closed. No new eligibility exclusion is introduced. See
+[cloud-sync-plan.md §§6, 7](cloud-sync-plan.md#6-consent-model).
 
 ## API And UI Events
 

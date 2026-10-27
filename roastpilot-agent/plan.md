@@ -457,6 +457,8 @@ CREATE TABLE reference_roasts (             -- M2 cache; table ships in v1 schem
 );
 ```
 
+**Superseded in part by D220 (27 Oct 2026):** The §5 `sync_jobs` sketch and `cloud_sync_status` states (S11) do not define the new local schema: durable per-field latest intent and acknowledgement now govern sync. The exact local persistence contract is deferred. See [cloud-sync-plan.md §5](../cloud-sync-plan.md#5-data-and-mutation-contract-b3).
+
 Indexes: `(run_id, tick)` on telemetry/safety/advisor/command tables;
 `(run_id, kind)` on roast_events; `cloud_sync_status` on roast_runs.
 
@@ -552,6 +554,14 @@ device SPA and talk to the cloud through the agent:
   plan), plus proxy endpoints for visibility/slug/delete/reviews — defined at
   M2 alongside cloud C3.
 
+**Superseded in part by D220 (27 Oct 2026):** The §7 M2 SPA cloud additions
+(S12) use stable unlisted links without a publish step; visibility selection and
+slug regeneration are deferred. Appliance-owned edits use per-field latest intent.
+Delete from cloud is an explicit queued action; local removal keeps the cloud
+copy. Reviews refresh automatically while idle, cache offline and offer Refresh
+now through the HTTP review-read contract. See
+[cloud-sync-plan.md §§2, 5, 9](../cloud-sync-plan.md#2-settled-product-requirements-r1-r9).
+
 **Replay harness** (`replay.py` + `--replay` CLI flag): streams a recorded
 roast export (JSONL/CSV from real past roasts) through the *real* SSE pipeline
 at 1×–60×. Uses: UI development without hardware, deterministic UI tests,
@@ -598,6 +608,7 @@ re-validates them against the installed `coffee-roaster-mcp` version.
 | E10 SPA | scaffold, replay harness, dashboard, detail, history | E7 |
 | E11 Packaging | wheel incl. `web/dist`, systemd unit, deployment doc | E9, E10 |
 | E12 Validation & demo | supervised Hottop runs; record demo traces (≥1 CLAMP, ≥1 REJECT), MCP interaction trace, full-workflow screen capture. **Capture measured M1 metrics from the decision trace from E9's first run onward**: advisory acceptance rate (ALLOW/CLAMP/REJECT mix), operator interventions per roast, roasts completing without recovery — honest measured numbers for the talk (the banned determinism percentages' replacement) and the baseline M2's feedback loop is judged against | E11 |
+| E15 Cloud sync client (D220) | Curated export, outbox, adapter, dispatcher, API/UI, reviews, references | C9 server contract; feature-off until activation gates |
 
 E12's outputs are the talk's demo plan artifacts — treat them as deliverables,
 not byproducts.
