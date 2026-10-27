@@ -228,6 +228,11 @@ identity after local removal so a later explicit cloud deletion can be queued;
 no account system or warning-only substitute is introduced. Initial-scope link
 revocation means cloud deletion; slug regeneration is deferred, with no instant
 or atomic erasure claim.
+Later C2/C4 contracts must include invalidation of service-controlled public
+`/r/[slug]` page and preview-image caches as part of cloud deletion/revocation.
+They must specify failure and acknowledgement semantics and qualify deletion
+completion including those caches. This Plan chooses no invalidation algorithm
+or new gate; the stronger current-existence-before-body/304 read contract remains.
 
 Transactional DML and stage-file effects are separate. Neither rollback of stage
 operations nor atomic stage erasure is claimed. Later qualification must cover
@@ -391,6 +396,8 @@ Content-based ETags can reduce response bytes without reducing warehouse queries
 or cost. Late uploads and crashes need explicit qualification against tombstones,
 consent ordering and recomputation. Stage-file erasure is non-atomic with row DML;
 cleanup and retention residuals must be recorded rather than promised away.
+Edge and third-party link-preview copies may outlive cloud deletion, even after
+service-controlled invalidation. No instant or global erasure is promised.
 
 The test-run-marker question is answered. Its later implementation and behavioural
 proof remain undelivered by this prose slice; physical acceptance remains separate.

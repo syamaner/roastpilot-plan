@@ -323,11 +323,11 @@ Semantics agreed with the agent plan, unchanged:
   metadata + summary only: no stage upload, no `roast_telemetry` rows, and
   `contributed_to_learning=false` (excluded from reference aggregation).
   `download_reference_roasts=false` → agent never queries references.
-
-**Superseded in part by D220 (27 Oct 2026):** The §5 Privacy mapping curve-withholding rule (S8) is replaced: learning opt-out excludes aggregation but neither withholds nor withdraws approved public curves. See [cloud-sync-plan.md §6](../cloud-sync-plan.md#6-consent-model).
 - **Batching (cost lever, §15)**: sync work coalesces into one connector
   session per roast; the agent must not open a session per statement (each
   warehouse auto-resume bills a 60 s minimum).
+
+**Superseded in part by D220 (27 Oct 2026):** The §5 Privacy mapping curve-withholding rule (S8) is replaced: learning opt-out excludes aggregation but neither withholds nor withdraws approved public curves. See [cloud-sync-plan.md §6](../cloud-sync-plan.md#6-consent-model).
 
 ## 6. Public Surface (no auth — Vercel)
 
@@ -410,7 +410,7 @@ empty in M2 (automated pattern extraction is backlog; never fabricate).
 - Slug regeneration (D11) invalidates previously shared links immediately
   (plus an ISR revalidation of the old path).
 
-**Superseded in part by D220 (27 Oct 2026):** The §8 cloud deletion/revocation clause (S5) means a separate explicit queued deletion backed by a permanent tombstone; local removal keeps the cloud copy. Transactional DML and stage-file cleanup remain separate, without atomic erasure or rollback claims. See [cloud-sync-plan.md §8](../cloud-sync-plan.md#8-server-correctness-b4). The §8 Slug regeneration bullet (S4) is deferred; initial-scope link revocation is explicit cloud deletion (S5), without instant or atomic erasure.
+**Superseded in part by D220 (27 Oct 2026):** The §8 cloud deletion/revocation clause (S5) means a separate explicit queued deletion backed by a permanent tombstone; local removal keeps the cloud copy. Transactional DML and stage-file cleanup remain separate, without atomic erasure or rollback claims. See [cloud-sync-plan.md §8](../cloud-sync-plan.md#8-server-correctness-b4). The §8 Slug regeneration bullet (S4) is deferred; initial-scope link revocation is explicit cloud deletion (S5), without instant or atomic erasure. The inherited public-page cache residual is not deletion completion: later C2/C4 contracts include service-controlled page/preview-cache invalidation with explicit failure, acknowledgement and completion qualification; edge and third-party copies may outlive deletion.
 
 ## 9. Repository Layout
 
