@@ -255,18 +255,24 @@ points participate in the qualified protocol or reject; there is no client-only
 fallback, and no standalone change disabling existing writers is inferred from
 an unverified assumption that no deployed caller exists. Operator seed and live
 verifier tools are not normal ingest and must not concurrently bypass an
-activated protocol; their handling belongs to the detailed contract and G1/G2.
+activated protocol. They never bypass ordering or tombstone enforcement; their
+qualification and maintenance handling belongs to the detailed contract and
+G1/G2.
 
 Durable per-field revision and acknowledgement state covers the appliance-owned
 rating, private operator note and consent. Permanent minimal tombstones hold
 identity and ordering only, with no roast payload, notes or reviews. Stale
 actions and late acknowledgements never undo a newer intent, consent decision or
-deletion. Omission and explicit clear stay distinct; cloud reviews and the
-stable identity and link are preserved. No other editable field, public
-description, visibility selection or slug regeneration is added. The existing
-appliance principal gains only the right to call a controlled delete procedure,
-with no PUBLIC access, new principal, direct base-table DML or new stage
-permission. Destructive-stage provenance is not cleared by this direction.
+deletion. Omission and explicit clear stay distinct. On appliance-owned edits,
+cloud reviews and the stable identity and link are preserved. No other editable
+field, public description, visibility selection or slug regeneration is added.
+The existing appliance principal is to gain only the right to call a controlled
+delete procedure through the later contract and G1 qualification, with no new
+PUBLIC access, principal, direct base-table DML or stage permission. Its existing
+direct DML and stage grants are operational writer surfaces. Their participation
+or rejection, including any grant reduction, belongs to the later C2 contract
+and G1/G2; this direction changes no grant. Destructive-stage provenance is not
+cleared by this direction.
 Transactional DML stays separate from stage-file effects and cache-invalidation
 failure acknowledgements; no instant, global or atomic erasure is promised.
 
