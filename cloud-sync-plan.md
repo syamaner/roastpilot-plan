@@ -240,6 +240,50 @@ crash and late-upload windows, deletion, cleanup and their recorded residuals.
 Delivering an offline verifier and procedure is separate from executing the
 operator-authorised synthetic DEV qualification. Documents and mocks prove neither.
 
+**Approved server coordination direction (D221, 28 Oct 2026).** The operator
+approved this C2 design direction in roastpilot-plan#83, recorded as
+[D221](roastpilot-cloud/plan.md#1-decisions-this-drill-down). It narrows how the
+requirements above are met. The statement above that the exact SQL, locking or
+gate-table algorithm is not ratified here still holds. Existing Snowflake
+standard tables are kept. One pre-provisioned, owner-only shared coordination
+lock covers every admitted operational writer, acquired before its authoritative
+reads and writes: create, patch, telemetry load, review submit, delete and
+summary-recompute side effects. It is not replaced by dynamically inserted
+per-roast gate rows and is not an assumption of per-key uniqueness. Helpers must
+not bypass it through autonomous scoped transactions. Legacy operational entry
+points participate in the qualified protocol or reject; there is no client-only
+fallback, and no standalone change disabling existing writers is inferred from
+an unverified assumption that no deployed caller exists. Operator seed and live
+verifier tools are not normal ingest and must not concurrently bypass an
+activated protocol; their handling belongs to the detailed contract and G1/G2.
+
+Durable per-field revision and acknowledgement state covers the appliance-owned
+rating, private operator note and consent. Permanent minimal tombstones hold
+identity and ordering only, with no roast payload, notes or reviews. Stale
+actions and late acknowledgements never undo a newer intent, consent decision or
+deletion. Omission and explicit clear stay distinct; cloud reviews and the
+stable identity and link are preserved. No other editable field, public
+description, visibility selection or slug regeneration is added. The existing
+appliance principal gains only the right to call a controlled delete procedure,
+with no PUBLIC access, new principal, direct base-table DML or new stage
+permission. Destructive-stage provenance is not cleared by this direction.
+Transactional DML stays separate from stage-file effects and cache-invalidation
+failure acknowledgements; no instant, global or atomic erasure is promised.
+
+The operator accepted that writes across different roasts, including public
+review submissions, may wait behind one another. No throughput, latency,
+timeout, cadence or cost budget is set, and roast control never waits for the
+cloud. Exact SQL, transaction boundaries, read consistency, lock acquisition,
+deadlock, timeout and missing or duplicate lock behaviour belong to the later C2
+contract and operator G1 qualification; unknowns fail closed. No account-wide
+parameter change, credential, deployment, live call or activation is implied;
+any required account-wide setting or material scope or cost expansion returns to
+the operator. D220's other requirements are unchanged, including the
+two-secure-view PUBLIC_WEB surface plus `SUBMIT_REVIEW`, private operator notes,
+curated and versioned data, independent learning and sharing, Celsius,
+controller and safety ownership and D97 connector writes. G1-G6 remain
+operator-only and unperformed, and the feature stays off.
+
 ## 9. Reviews read contract (B5)
 
 The reviews GET is the HTTP review-read adapter only; D97 connector writes stay
