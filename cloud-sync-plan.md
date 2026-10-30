@@ -290,6 +290,40 @@ curated and versioned data, independent learning and sharing, Celsius,
 controller and safety ownership and D97 connector writes. G1-G6 remain
 operator-only and unperformed, and the feature stays off.
 
+**Approved read-consistency prerequisite (D222, 29 Oct 2026).** The operator
+approved documenting account-level `READ_CONSISTENCY_MODE=GLOBAL` as a
+prerequisite for future C9-C2 qualification and deployment, recorded in
+roastpilot-cloud#576 and roastpilot-plan#85 as
+[D222](roastpilot-cloud/plan.md#1-decisions-this-drill-down). This answers,
+for this one setting only, the D221 clause above that returns any required
+account-wide setting to the operator; D221's shared-lock direction is retained
+and not replaced. The prerequisite is a stated precondition, not a description
+of the present account configuration or a grant: this Plan does not claim that
+the setting is already in effect or that any runtime is qualified, and no
+account was inspected. G1 must verify the setting and qualify actual
+cross-session visibility and the complete write protocol; G5 must retain the
+verified prerequisite. If the prerequisite is absent, changes or cannot be
+verified, qualification and deployment fail closed and the feature stays off.
+Exact verification mechanics belong to the later C2 contract and G1; no new
+verification privilege is inferred, and if no safe verification mechanism can
+be established the decision returns to the operator. The parameter is not
+proof of the shared-lock SQL, lock acquisition, transaction or retry protocol,
+and does not by itself qualify cross-session behaviour. Its whole-account
+impact on other workloads, response times and cost is unmeasured; no
+performance, timeout, cadence or cost budget is selected. This record changes no
+setting and performs no qualification, credential, grant, live call,
+deployment or activation, and gives no account command or deployment recipe;
+executing the future account change remains an operator action outside
+software delivery. Any further account-wide setting or privilege, or material
+scope or cost-policy expansion, returns to the operator. D220 and D221 are
+otherwise unchanged: standard tables, one shared coordination lock for every
+admitted operational writer, maintenance tools that never bypass ordering or
+tombstone enforcement, durable per-field revision and acknowledgement state,
+minimal permanent tombstones, private operator notes, the two-secure-view
+PUBLIC_WEB surface plus `SUBMIT_REVIEW`, independent learning and sharing,
+Celsius, controller and safety ownership and D97 connector writes. G1-G6
+remain operator-only and unperformed, and the feature stays off.
+
 ## 9. Reviews read contract (B5)
 
 The reviews GET is the HTTP review-read adapter only; D97 connector writes stay
