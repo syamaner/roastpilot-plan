@@ -324,6 +324,59 @@ PUBLIC_WEB surface plus `SUBMIT_REVIEW`, independent learning and sharing,
 Celsius, controller and safety ownership and D97 connector writes. G1-G6
 remain operator-only and unperformed, and the feature stays off.
 
+**Approved deletion-cache allocation (D223, 30 Oct 2026).** The operator
+approved this C2 scope choice in roastpilot-cloud#576 and roastpilot-plan#87,
+recorded as [D223](roastpilot-cloud/plan.md#1-decisions-this-drill-down). It
+allocates the service-controlled cache invalidation required by the paragraph
+above that begins "Later C2/C4 contracts"; that paragraph, its failure and
+acknowledgement requirement and the current-existence-before-body/304 read
+contract still hold. C3 owns authenticated deletion revalidation of
+service-controlled public `/r/[slug]` roast pages, preview images and data
+caches, with an explicit acknowledgement and absence confirmation through the
+existing view path. Its caller principal and credentials belong to C3's
+separately ratified authentication contract; none is assumed reusable,
+selected or provisioned here, and no new PUBLIC access is added. C2 reports
+cache invalidation separately as pending and claims no deletion completion
+until the C3 acknowledgement is durably recorded. Agent E3 durably records the
+server deletion acknowledgement; E7 performs the authenticated revalidation
+call and durably records its acknowledgement; E6 shows deletion as pending
+until both are acknowledged. C4 qualifies the end-to-end failure and retry
+path. Cache expiry alone neither satisfies this requirement nor completes a
+deletion. Edge and third-party copies remain residuals (§15).
+
+**Approved stage-upload residual (D223, 30 Oct 2026).** In the same decision
+the operator kept the existing appliance principal's direct stage-upload
+permission and explicitly accepted a private-storage residual: a fresh upload
+by that same principal into a tombstoned prefix, at any later time, can leave
+bytes indefinitely until deletion is retried or separately authorised cleanup
+removes them. The qualified server ordering and tombstone protocol must prevent
+those bytes from reaching database rows, reference aggregates or public
+projections; permanent tombstones and the late-upload rule above are
+unchanged. A file-removal acknowledgement describes a point-in-time outcome
+only, with no guarantee that the prefix stays empty. C4 enumerates non-empty
+tombstoned prefixes. Agent E3 refuses uploads for queued or acknowledged
+deletions; that client discipline is additional and is not a server guard or
+server proof. This decision selects no new upload service and no grant
+reduction, and introduces no retention deadline, automatic cleanup schedule,
+numeric budget, permanent stage-emptiness guarantee or new public access.
+Stage effects stay separate from transactional DML and cache invalidation,
+with no instant, global or atomic erasure claim.
+
+**D223 boundaries.** D223 chooses no SQL verification, lock or cleanup
+algorithm, authentication identity, credential or new grant; exact supported
+mechanics and G1 qualification remain later contracts. The known unsupported
+owner-rights session-probe and SQL-handler LIST proposals are not endorsed.
+D220, D221 and D222 are otherwise unchanged, including D221's shared
+coordination lock, per-field revision and acknowledgement state, minimal
+permanent identity and order tombstones and controlled delete procedure for
+the existing appliance principal, and D222's future GLOBAL read-consistency
+prerequisite. Private operator notes, independent learning and sharing, the
+two-secure-view PUBLIC_WEB surface plus `SUBMIT_REVIEW`, Celsius, controller
+and safety ownership and D97 connector writes are unchanged. No account was
+inspected or changed, and no grant, credential, live qualification,
+deployment or activation is performed. G1-G6 remain operator-only and
+unperformed, and the feature stays off.
+
 ## 9. Reviews read contract (B5)
 
 The reviews GET is the HTTP review-read adapter only; D97 connector writes stay
@@ -392,7 +445,7 @@ routes. No cross-repository PR is implied. Every client unit ships feature-off.
 | C0 | Cloud | C9 epic or state docs | P0 | Sufficient independent docs review; product audit only for suspected drift |
 | C1 | Cloud | Curated projections and schema: private operator-note field, consent, tombstones, version | C0 | Security, schema-migration, privacy |
 | C2 | Cloud | Write ordering, acknowledgement and idempotency; cover or disable every accepted path | C1 | Security; schema-migration and privacy if fields change |
-| C3 | Cloud | Reviews HTTP GET/ETag/pagination within the two-view boundary | C1 | Security |
+| C3 | Cloud | Reviews HTTP GET/ETag/pagination within the two-view boundary; authenticated deletion revalidation of service-controlled page, preview and data caches with acknowledgement (§8, D223) | C1 | Security |
 | C4 | Cloud | Offline verifier and qualification procedure, delivery only | C2 | Security, qa |
 | E1m | Agent | Start/API/SPA marker capture; immutable local persistence; no export field or control change | A0 | Safety, schema-migration, ui-reviewer, qa |
 | E1 | Agent | Closed curated export, fail-closed eligibility including marker exclusion, consent and intent merge | A0, E1m, C1 contract | Security, qa, privacy |
@@ -401,7 +454,7 @@ routes. No cross-repository PR is implied. Every client unit ships feature-off.
 | E4 | Agent | Idle admission and bounded, pre-emptible, reaped dispatcher lifetime | E2, E3, E1m | Safety, security |
 | E5 | Agent | Owner-action and status API | E4 | Security |
 | E6 | Agent | SPA sync status, unsynced values, cloud deletion and Refresh now | E5 | Ui-reviewer |
-| E7 | Agent | HTTP review-read adapter and atomic cache | E3, C3 | Security |
+| E7 | Agent | HTTP review-read adapter and atomic cache; authenticated deletion-revalidation call with durable acknowledgement record (§8, D223) | E3, C3 | Security |
 | E8 | Agent | Idle reference refresh and cached-only prepare | E3 | Safety, security |
 
 Cloud contracts precede any activated client. Reviewer labels denote lenses,
