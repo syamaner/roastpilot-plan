@@ -132,8 +132,13 @@ This ruling closes neither MCP #157 nor #194 and authorises no release.
   installed/frozen identity verification, idle-reboot first-session timeout,
   stopped/empty physical confirmation, emergency-stop evidence, restart
   recovery without automatic heat/fan resume, and server-governed clearance
-  and closure. Confirm
-  physical heat-off and the software emergency-stop result, including positive
+  and closure. The session-creating path is normal Agent Start through the
+  server UI/API; it executes the selected profile's preheat heat and fan targets
+  on the empty drum. "Dry" means no beans, not no heat or no actuation. The
+  bounded operator authorisation must identify that profile and its displayed
+  initial heat/fan targets, explicitly cover this empty preheat and the software
+  e-stop that ends it, and cover the subsequent restart-recovery checks. Do not
+  create a session before that authorisation. Confirm physical heat-off and the software emergency-stop result, including positive
   `driver_safety_method_called` evidence, and restart recovery without automatic
   heat/fan resume. Use only current server-projected recovery/closure actions.
 - Every fresh live Agent process requires D213 physical restart clearance.
@@ -190,9 +195,14 @@ clearance after any process restart. No earlier-process clearance carries over.
 ## Predeclared metric intervals
 
 The 1,200-second observation is not 1,200 seconds of audio capture or inference.
-Normal MCP capture begins at session start and stops at drop; inference is
-eligible only in the roasting phase while detection remains pending, stopping
+For a qualifying attempt, MCP capture begins at session start and stops at
+drop; inference is eligible only in the roasting phase while detection remains pending, stopping
 at first-crack detection. These production lifecycle rules remain unchanged.
+A manual first-crack override stops capture/recording immediately in MCP 0.2.4;
+that truncated attempt does not qualify for this acceptance. The operator must
+never withhold a needed override or safety action to preserve qualification.
+Retain that attempt and its actual capture end, and obtain human disposition
+before another acceptance attempt.
 
 - **Capture interval:** session capture start through drop, including preheat
   and post-first-crack recording. Evaluate unchanged D191 maximum consecutive
@@ -206,7 +216,14 @@ at first-crack detection. These production lifecycle rules remain unchanged.
   overruns, maximum inference duration below the configured seven-second hop,
   and no growing queue during this interval. Retain time-aligned boundary and
   interval observations and evaluate cumulative counters as deltas against the
-  opening boundary. Record the preheat and post-detection queue/drop counters
+  opening boundary. A manually marked T0 performs no pending-audio discard;
+  its beans-added event must not be substituted for that boundary, so the
+  inference evidence is unconfirmed and the attempt cannot qualify. Running
+  maxima are not subtracted: retain the maximum inference duration at the
+  closing observation. Also require zero inference overruns and a maximum
+  duration below the seven-second hop across all actual session inference,
+  including any post-drop pending-window processing; a post-drop overrun is a
+  failure, not merely a note. Record the preheat and post-detection queue/drop counters
   separately: the intentionally undrained queue outside this interval may fill
   and drop windows while recording continues. They are not inference-overload
   failures inside the eligible interval and are never erased. Any post-drop
