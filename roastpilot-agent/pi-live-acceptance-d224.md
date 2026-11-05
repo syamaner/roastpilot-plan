@@ -4,7 +4,9 @@ This proposal has no effect before explicit maintainer ratification of its exact
 PR head and merge. Ratification is recorded in a repository-owner PR comment
 naming that head. After merge, verify that both decision files match the ratified
 head and record the merge SHA/tree; squash-merge provenance does not substitute
-for this file-content check. On ratification and merge, the historical evidence
+for this file-content check. If either merged file differs from the ratified
+head, D224 has no effect and needs a new explicit decision. On ratification
+and verified merge, the historical evidence
 identified below satisfies the cold-load sequencing prerequisite for the exact
 candidate only. No second implicit qualification-reuse approval is required.
 Final live acceptance remains a separate human decision.
@@ -13,6 +15,12 @@ The independent static safety assessment supports non-materiality only for the
 characterised cold workload. This ruling is not a new cold run, new cold
 qualification, general hardware-readiness claim, or MCP acceptance. It changes
 no production code or cold-admission rule.
+
+This clarifies D183/D191's material-identity clauses and D192's fresh-
+characterisation sequencing clause only for this candidate: by ratifying this
+record, the maintainer determines that the identified changes are non-material
+for the characterised cold-load prerequisite. Those clauses otherwise remain
+unchanged. This determination supplies no measured live-runtime headroom.
 
 ## Historical evidence and review binding
 
@@ -120,7 +128,11 @@ This ruling closes neither MCP #157 nor #194 and authorises no release.
   occurs only with no active run and the roaster physically stopped. A timeout
   or uncertain startup is a failed preflight; repeated warm starts do not
   replace the cold-start measurement.
-- Complete the full operator-supervised, stopped/empty dry preflight. Confirm
+- The dry preflight means exactly the supervised checks in this section:
+  installed/frozen identity verification, idle-reboot first-session timeout,
+  stopped/empty physical confirmation, emergency-stop evidence, restart
+  recovery without automatic heat/fan resume, and server-governed clearance
+  and closure. Confirm
   physical heat-off and the software emergency-stop result, including positive
   `driver_safety_method_called` evidence, and restart recovery without automatic
   heat/fan resume. Use only current server-projected recovery/closure actions.
@@ -132,8 +144,12 @@ This ruling closes neither MCP #157 nor #194 and authorises no release.
   roast command is issued from an SSH shell.
 - A clean dry preflight is followed by a separate immediate operator live GO.
   This decision itself authorises no connection, reboot, actuation, bean charge
-  or live run. Physical supervision, abort and emergency response remain human
-  authority.
+  or live run. Before execution, a fresh explicit operator authorisation must
+  cover the reboot and each actuating preflight step; one bounded supervised
+  dry-preflight authorisation may enumerate and cover those steps together.
+  A software emergency stop is real actuation (heat zero, fan 100, cooling on),
+  not a read-only check. Physical supervision, abort and emergency response
+  remain human authority.
 
 If any condition fails or remains uncertain, progression is blocked. A fresh
 D210 qualification on the intended set requires a separately approved versioned
@@ -163,23 +179,55 @@ alone is not proof of uninterrupted monitoring. This record adds no numeric
 tick-density or collector-gap tolerance, and uncertain continuity is unconfirmed,
 not a pass. The operator and an independent read-only evidence reviewer judge
 continuity, recording their disposition in the private acceptance report and
-its sanitised summary. Broken or aborted attempts are never combined. Each new
+its sanitised summary. All attempts, passing or failing, are listed in the
+acceptance report. Broken, aborted or completed-but-failing attempts are never
+combined or discarded in favour of a later pass. Any failed attempt requires
+an explicit human disposition of the failure before retry. Each new
 attempt requires a fresh supervised dry-preflight check and immediate live GO;
 D213 clearance must be valid for its current Agent process, with new explicit
 clearance after any process restart. No earlier-process clearance carries over.
 
-Evaluate the unchanged D191 ceilings over this complete window: maximum
-consecutive audio overflows no greater than N=1 and peak trailing-60-second
-lost audio no greater than X=200 ms; production fatal streak remains 30.
-The existing D183/D191 acceptance criteria also apply: zero dropped windows,
-zero inference overruns, no fatal/capture-runtime or microphone errors, no
-unexpected capture restart, maximum inference duration below the configured
-seven-second hop, and no growing queue. Existing provisional host bounds remain:
-80 °C abort/alarm, clean current and sticky under-voltage/capping/throttling bits
-from the validation boot, at least 512 MiB MemAvailable, and at least 2 GiB free
-before start and 1 GiB throughout. Retain complete primary WAV and sidecars.
-A failed or uncertain criterion is not acceptance; no threshold is relaxed from
-the observed outcome.
+## Predeclared metric intervals
+
+The 1,200-second observation is not 1,200 seconds of audio capture or inference.
+Normal MCP capture begins at session start and stops at drop; inference is
+eligible only in the roasting phase while detection remains pending, stopping
+at first-crack detection. These production lifecycle rules remain unchanged.
+
+- **Capture interval:** session capture start through drop, including preheat
+  and post-first-crack recording. Evaluate unchanged D191 maximum consecutive
+  audio overflows N=1 and peak trailing-60-second lost audio X=200 ms; production
+  fatal streak remains 30. Require no fatal/capture-runtime or microphone error,
+  no unexpected capture restart, and a complete primary WAV and sidecars over
+  this actual capture interval. Preserve the frozen post-stop counters.
+- **Inference-eligible interval:** from the T0 boundary's pending-audio discard
+  until first-crack detection stops draining, or drop if detection remains
+  pending. Require zero incremental dropped detector windows, zero inference
+  overruns, maximum inference duration below the configured seven-second hop,
+  and no growing queue during this interval. Retain time-aligned boundary and
+  interval observations and evaluate cumulative counters as deltas against the
+  opening boundary. Record the preheat and post-detection queue/drop counters
+  separately: the intentionally undrained queue outside this interval may fill
+  and drop windows while recording continues. They are not inference-overload
+  failures inside the eligible interval and are never erased. Any post-drop
+  pending-window processing is separately reported, not presented as additional
+  live inference time. Missing or ambiguous boundary evidence is unconfirmed,
+  never a zero delta. No counter reset, instrumentation change or inferred
+  sample is authorised by this record.
+- **Full observation window:** collector/controller continuity, physical
+  supervision, controller/advisor/safety outcomes and host bounds apply for all
+  1,200 seconds. Existing host bounds remain: 80 °C abort/alarm, clean current
+  and sticky under-voltage/capping/throttling bits from the validation boot,
+  at least 512 MiB MemAvailable, at least 2 GiB free before start and 1 GiB
+  throughout. No capture or inference is claimed during cooling or idle.
+
+These are prospective live-lifecycle interval definitions for this candidate,
+not retrospective changes to D210/D211's cold evaluation. A failed or uncertain
+criterion is not acceptance; no threshold or interval is relaxed from an
+observed outcome. Before live GO, verify that the existing read-only evidence
+path can retain the necessary boundaries and metrics; an unavailable measure
+must be reported as unproven rather than replaced by elapsed time or a source-
+only assumption.
 
 Preserve the complete controller/advisor/operator decision trace, requested,
 adjusted and actuated commands and safety evaluations, restart/recovery state,
