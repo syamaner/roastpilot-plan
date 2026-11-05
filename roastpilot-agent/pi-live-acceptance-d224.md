@@ -41,7 +41,7 @@ is retained alongside that later interpretation, never overwritten.
   now-absent temporary assessment file was freshly rehashed.
 - Independent static materiality review: authenticated local Claude
   `safety-reviewer`, high effort, 5 November 2026; retained handback SHA-256
-  `6f3311a74aa2bcb2eabf36ffa3697f323292dbb665cfa104df3a26b6333008a7`.
+  `610a5eb7af0b4a653b47230a2fc83ef2e287cf87328489ff598c0238c115f03b`.
   It supports non-materiality for the characterised cold workload only and
   grants no acceptance or hardware authority.
 
@@ -53,16 +53,20 @@ separate historical records.
 
 | Item | Binding |
 | --- | --- |
-| Intended Agent source | Merged `a41978141a456a1305bf592f26335f7e41704cea`, tree `86299a72be96f1f2110e16d2f8b7bc1e3834ee73`, identical to reviewed `033866744542cca69824657a7088c920e7e90ce4` |
-| Intended Agent wheel SHA-256 | `09ac2f900d368ffee765a9250c316c2004b8148dd79eb22e0e2a06e1186203fe` |
+| Intended Agent source | Reviewed candidate `7ed3b787a608bb48a0789d211ef94749b035973a`, tree `4c11333b68df271ed3998af73ba62836f29a9240`; protected delivery pending |
+| Intended Agent wheel SHA-256 | `96cdfce574045aaed92fbf3f48d5dd8b9889deb75f58e7d7299f7bcc4758b79c` |
 | Intended MCP | Published `coffee-roaster-mcp==0.2.4`, source `e2fab8e910e7bff59d158b612c19e17d33a765c2`, wheel SHA-256 `b11b6764b520bbb7662d4f82841949322222c239a1024d7cc4c74f1875020b70` |
 | Preserved dependency file manifest SHA-256 | `703997fa6e0d0950dc5b11fa6e2ea12732f33e1e892b1fc0925439cf18dba576` |
 | Qualified historical Agent | Source `fcd457492c300712491e0bcb2ae9dcb4b55535b6`, original wheel SHA-256 `f3313ceef9846770ba00affd8708dc3d74871402b620072a125eef067715900e` |
 | Qualified historical MCP | Reviewed source `96f8916407ec8d31bbed9637e824c3cd2b0cf24a`, unreleased 0.2.2 candidate wheel SHA-256 `4f52048efa4c368e785c30acface04356dd943583a251e02a9b635905dec476a` |
 
-The intended wheel was built from reviewed `03386674` and retained unchanged;
-its source bytes are verified against the identical merged `a4197814` tree.
-This does not relabel its build provenance.
+The intended wheel was built from reviewed `7ed3b787`, with all 63 Python
+payload files verified against that source. Protected Agent delivery remains a
+prerequisite; the final merged source must be file-equivalent to tree
+`4c11333b68df271ed3998af73ba62836f29a9240`, and its exact merge SHA and
+content comparison must be recorded in a verified repository-owner comment on
+the D224 Plan PR, naming this exact Plan head, before this proposal is ratified. This
+retains the wheel's actual build provenance.
 
 The candidate contains 93 distributions. All recorded qualified versions remain
 unchanged except the required MCP 0.2.2 to 0.2.4 replacement; the Agent retains
@@ -70,7 +74,9 @@ its development version string but its source and wheel identities change.
 The remaining dependency files are exact copies of the retained qualified set.
 The Codex delivery session acting for Sertan Yamaner on 5 November 2026
 verified 9,867 equal dependency files, 9,814 original installed RECORD hashes,
-and 127 current Agent/MCP package files against the selected wheels.
+and 127 package files against the earlier selected Agent/MCP wheels.
+That earlier installed-Agent verification does not cover the new wheel; the
+new Agent payload and unchanged MCP must be reverified after staging.
 `pip check` passed. These are explicit host attestations, not independent
 re-hashing by the model reviewer.
 
@@ -90,14 +96,46 @@ source. The historical evidence and original exit-6 outcome remain unchanged.
 
 ## Materiality scope and preserved limits
 
-The cold tick, audio capture, detector, inference, temperature projection and
-advisory implementation are unchanged. The new recovery and emergency paths
-are live-only and were never measured by the cold run. The SciPy import moves
-from process startup to detector construction before capture; the additional
-store migrations and health projections are startup or request costs.
-These startup/request costs remain unmeasured. The static conclusions establish
-no measured live controller headroom; the unchanged startup bound and the
-remaining supervised gates must still pass.
+The static Agent comparison covers the 63 Python files extracted from the
+actual historical and intended wheels, not a merge-base diff. The MCP
+comparison covers git source snapshots (19 Python files plus pyproject); the
+0.2.4 wheel-to-source binding is a parent attestation. The appliance template
+was confirmed comment-only through a direct git endpoint diff. The bundled SPA
+and other non-Python payload were not compared with the historical wheel;
+installed-byte reverification must bind them to the intended wheel before use. Its per-file SHA-256 manifests
+show 50 of 63 Agent Python files and 14 of 20 MCP source/metadata files
+byte-identical. Agent cold engine, policy, MCP observation adapter, evidence
+modules, advisor, config and safety are identical, as are MCP audio, detector,
+first-crack runtime, config and dependency metadata. The direct comparison
+receipt (SHA-256 `5a71448ec1a57673dec4fd8d6e34979d0cf64f3b05032de0cf2681eedd8711eb`) and the current static handback are retained privately.
+
+#1069 adds four total numeric validation calls to the normal typed MCP state
+parse on each one-second tick. The strict raw-tree cold evidence projection is
+unchanged. The MCP already emitted these keys, so its response payload does not
+grow. Normal live persisted telemetry and API/SSE retain those values or null;
+these live projection paths are absent from the cold runner. Values, nulls or
+zeros alone do not establish that inference ran. Positive processed-window,
+capture, session and boundary continuity evidence remain necessary.
+
+The post-seal `two_phase.py` checker now selects D211 revision 1; this does not
+change the characterised tick workload or rewrite original outcomes. MCP export
+changes are unreachable through the cold tool allowlist, and start-admission
+bookkeeping adds fail-closed, constant-size refusals. Recovery and emergency
+paths are live-only and were not measured by the cold run.
+
+Unmeasured startup/request costs include 21 rather than 16 migrations on
+every fresh run-private cold store, two Agent SQLite store reads per cold
+health call versus one (with no MCP call), and the SPA's three-second health
+poll. Live health additionally persists process-epoch/clearance rows on its
+first call and performs MCP fault readbacks while a fault lease is OPEN.
+The SciPy import moves into first per-session detector construction inside
+`start_roast_session`; recording-on recorder construction is also inside that
+session-start call. The call remains bounded by the unchanged five-second MCP
+timeout. Whether it completes within that bound is unmeasured and is decided
+only by the supervised idle-reboot measurement.
+These are static observations, not timing measurements or a claim of live
+controller headroom. Historical browser-polling activity is unknown. The
+remaining supervised startup, resource and live gates must still pass.
 
 D191's N=1, X=200 ms and production fatal streak 30 remain locked. D210's
 10-minute recording-off plus 10-minute recording-on characterisation and
@@ -110,7 +148,7 @@ This ruling closes neither MCP #157 nor #194 and authorises no release.
 
 - Reverify the installed Agent/MCP bytes and preserved dependency manifest on
   the Pi at preflight time. Verify the same frozen model, provider/model/prompt,
-  relevant configuration, host/OS/kernel/Python, devices, power and cooling
+  relevant inference configuration, host/OS/kernel/Python, devices, power and cooling
   identity against the qualifying record, with explicit operator attestation
   for physical facts. Accepted identity deltas are limited to the exact Agent
   source/wheel identity and MCP artifact/version in the table, the additive
@@ -120,7 +158,38 @@ This ruling closes neither MCP #157 nor #194 and authorises no release.
   defined; capture/inference settings match the qualified recording-on phase.
   These deltas must never be disguised as identical frozen identity. No other
   runtime/configuration difference is authorised. An unlisted or uncertain
-  material difference blocks this ruling.
+  material difference blocks this ruling. Freeze and record the complete live
+  configuration as well, including controller, safety, advisor timeouts,
+  telemetry interval and recording. Each non-inference difference must be
+  explicitly listed here as an existing D194 lifecycle difference or block
+  progression; inference-only equality is insufficient.
+- The qualified cold advisory context was synthetic `Cold characterisation`,
+  with a 195 °C target, not a saved bean recipe. Do not claim the live bean
+  profile is historically identical. The operator-selected live recipe is the
+  restored Brazil Santos (Natural): 250 g, 195 °C drop, 14% development,
+  initial heat 100%, fan 30%, charge guidance 170–200 °C. Its saved input
+  SHA-256 is `b8ca3bfa8c4ae536ca36c540e1398c24d0b5484fbf55b3a011ac84dcbb3267d5`,
+  computed over the retained original UTF-8 JSON input-file bytes with no
+  canonicalisation or whitespace/newline changes. Before import, verify those
+  exact bytes; after normal API import, compare every parsed original input
+  field with the server profile, excluding only server-generated metadata.
+  Freeze and verify that normal server profile before the actuating preflight
+  and live run. This is the existing cold-to-normal-live lifecycle distinction,
+  not measured equivalence of live advisory context or runtime load.
+- **Proposed owner recording-sequence choice:** ratifying this exact record
+  selects using the same frozen recording-on configuration for both the empty
+  dry preflight and the subsequent live run. Recording/autocapture must match
+  the qualified recording-on settings and be identity-verified BEFORE the
+  supervised idle reboot and first-session timing measurement. The empty
+  preflight produces a labelled preheat-only WAV/sidecars, retained privately;
+  it is not a bean roast or live-acceptance recording. The current recording-off
+  dry configuration supplies no startup/preflight evidence for the live stack.
+  No recording or actuation follows from this proposal: the later bounded
+  physical authorisation must explicitly include empty-preheat recording.
+  Any configuration change after preflight invalidates that preflight and its
+  startup measurement; repeat the frozen-identity verification and authorised
+  idle-reboot first-session/dry checks before live GO. No recording-off proof
+  carries over to a recording-on stack.
 - Measure the first `start_roast_session` after an idle supervised reboot on
   the actual Pi against the unchanged `call_timeout_seconds = 5.0` bound
   enforced by the MCP client. This is the session-call timeout, not the
@@ -136,7 +205,9 @@ This ruling closes neither MCP #157 nor #194 and authorises no release.
   server UI/API; it executes the selected profile's preheat heat and fan targets
   on the empty drum. "Dry" means no beans, not no heat or no actuation. The
   bounded operator authorisation must identify that profile and its displayed
-  initial heat/fan targets, explicitly cover this empty preheat and the software
+  initial heat/fan targets (100% / 30%, matched to the exact saved-input hash
+  and verified server profile above), explicitly cover this empty preheat and its
+  primary-microphone recording, and the software
   e-stop that ends it, and cover the subsequent restart-recovery checks. Do not
   create a session before that authorisation. Confirm physical heat-off and the software emergency-stop result, including positive
   `driver_safety_method_called` evidence, and restart recovery without automatic
