@@ -413,6 +413,95 @@ PUBLIC_WEB stays at two secure views plus `SUBMIT_REVIEW`, without base-table
 access. Any projected rating or review-id column needs explicit contract and
 migration review rather than an implicit expansion of the public projection.
 
+**Approved C3 caller credential and paging-key directions (D226, 6 Nov
+2026).** The operator approved two C3 architecture directions, recorded as
+[D226](roastpilot-cloud/plan.md#1-decisions-this-drill-down) and linked to
+roastpilot-cloud#576 and roastpilot-agent#955. They approve this Plan
+amendment and the later detailed contracts only. D220-D223 are retained, not
+reopened, and the paragraphs of this section above still hold.
+
+**Dedicated C3 caller credential.** One dedicated appliance-to-Cloud bearer
+secret admits the C3 reviews-read API and the C3 deletion-cache revalidation
+API, and nothing else. Only the appliance and the Cloud deployment hold it,
+each through a named environment variable. It is separate from every
+Snowflake key, including the existing appliance key pair in §3, and from every
+platform token, and it is not a Snowflake principal. It grants no Snowflake
+write, private-roast read, deployment or account-administration authority.
+The public roast page and public review submission stay anonymous and
+unchanged. Authentication precedes every SQL or cache effect: an absent or
+malformed configuration or credential, or a wrong credential, fails closed
+before any query or cache work. Secrets and access links are never logged.
+Rotation is a single-slot operator action; until both holders agree,
+requests may stay visibly pending and be retried. Generating, provisioning,
+rotating and revoking the secret are later operator actions under G4; no
+dual-slot acceptance, new credential store, automatic rotation service or
+asymmetric-key substitution is selected. A stolen secret permits repeated
+permitted reads and cache work until it is revoked, and a replayed response
+cannot stand in for a current absence confirmation. Authentication is
+additional admission, not a complete abuse or denial-of-wallet defence: the
+existing layered controls in this section are retained and still need
+runtime qualification; no WAF rule alone is treated as equivalent, and no new
+numeric budget or sharing of the public review-submission limiter is
+approved. Any further privilege, credential, budget or material scope change
+returns to the operator.
+
+**Derived public paging key.** The existing `reviews_by_roast` secure view
+may project one additional, explicitly reviewed column: a stable public
+paging key that is a versioned, domain-separated cryptographic digest derived
+from the existing review identity and scoped to its roast. It is not the raw
+internal review ID, places no review text in the cursor, and is not
+encryption, anonymisation or an access credential. There is no new stored
+identity, live backfill or data rewrite, no third secure view, no base-table
+access, no new PUBLIC grant and no private operator field in either view;
+PUBLIC_WEB stays at the two secure views plus `SUBMIT_REVIEW`. The exact
+derivation and encoding, identity validation, rejection of duplicate,
+colliding or malformed identities, timestamp precision, canonical ordering,
+high-water and restart semantics and concurrent-change behaviour belong to
+the detailed C3 contract, its schema-migration, privacy and security reviews
+and operator qualification.
+
+**Complete pagination.** The source-derived page size of 50 reviews is a
+per-page limit, never a silent total cap. A traversal enumerates the complete
+valid, finite review set present when it starts, without duplicates; reviews
+added during a traversal may be collected by the next one. Unknown ordering,
+duplicate keys, transport truncation and partition problems are explicit
+incomplete or error outcomes. This direction is not snapshot,
+timestamp-monotonicity, key-uniqueness or runtime proof, and waives no
+duplicate or loss residual. E7 keeps the later client byte, page, item and
+lifetime bounds.
+
+**Retained read and deletion-cache rules.** Weak ETags stay content-based and
+bound to the exact resource, representation and page. Current existence and
+visibility are checked before any review body or 304, and inaccessible
+resources return an indistinguishable 404. D223 still governs deletion-cache
+completion: the cache acknowledgement needs successful authenticated,
+service-controlled invalidation of the public roast page, preview image and
+data caches plus an uncached absence confirmation through the existing view
+path. A cache primitive returning without an exception is not proof that
+stale content cannot be served; expiry alone or stale-while-revalidate
+behaviour never completes a deletion, and unsupported or unqualified
+invalidation semantics stay pending. E3 keeps the server acknowledgement, E7
+the cache acknowledgement and E6 shows deletion pending until both; C4
+qualifies failure and retry, and edge and third-party copies remain residuals
+(§15). This direction chooses no cache API or algorithm, and neither the
+framework version pinned in Cloud source nor current framework documentation
+qualifies that cache behaviour.
+
+**Direction boundaries.** This direction chooses no endpoint wire grammar, credential
+comparison implementation, cursor or ETag bytes, exact digest algorithm, SQL
+or cache algorithm, privilege or account setting. Static prose and checks
+prove no deployed cache expiry or invalidation, cross-session visibility,
+corpus uniqueness or pagination correctness. If a safe protocol cannot be
+established, the decision returns to the operator rather than weakening a
+requirement. D220-D223, private operator notes, independent learning and
+sharing, the two-secure-view PUBLIC_WEB surface plus `SUBMIT_REVIEW`,
+Celsius, controller and safety ownership and D97 connector writes are
+otherwise unchanged. No credential is generated or provisioned, no account,
+grant or setting is changed, and no G1-G6 gate, deployment, activation or
+future merge is performed or authorised. G1-G6 remain operator-only and
+unperformed, and the feature stays off. C3 implementation needs this merged
+amendment and a fresh ratified contract.
+
 ## 10. Roast-control non-interference and references (B6)
 
 Admit cloud work only while idle. Bound background process and HTTP lifetimes;
