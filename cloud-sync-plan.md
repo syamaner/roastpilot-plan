@@ -572,6 +572,98 @@ authorised. G1-G6 remain operator-only and unperformed, and the feature
 stays off. Full cloud sync remains incomplete; C3B implementation needs
 this merged amendment and a fresh ratified contract.
 
+**Approved C3B legacy-cache completion direction (D229, 8 Nov 2026).**
+The operator approved this direction for the C3 deletion-cache work (C3B)
+on 8 Nov 2026, recorded as
+[D229](roastpilot-cloud/plan.md#1-decisions-this-drill-down) and linked to
+roastpilot-cloud#576 and roastpilot-agent#955. It approves this Plan
+amendment and the later detailed contracts only; it is not an
+implementation contract, publication approval or live activation. It is a
+new legacy-cache completion decision and does not reopen D228's uncached
+server rendering direction. D220-D223, D226 and D228 are retained, and the
+paragraphs of this section above still hold except where this direction
+narrowly replaces the meaning of legacy-cache completion.
+
+**Transition-qualified non-servability.** After a qualified deployment
+transition, legacy-cache completion means that a deleted roast's page,
+preview image and data cached before the transition can no longer be
+served. It is not a claim that every legacy byte was physically removed
+from provider storage, and not a per-call witness of every legacy cache
+entry. Legacy provider cache bytes may remain indefinitely until the
+provider or a separately authorised purge removes them; no retention
+deadline or physical-erasure claim is made.
+
+**Operator transition qualification.** Before activation, future operator
+qualification under G5 and G6 must establish that no ISR-era production
+alias, deployment URL or rollback target can serve roast pages, preview
+images or their data, and that legacy producers have drained. Rollback is
+then limited to qualified uncached versions, and the later procedure must
+retain a qualified cache-safe recovery path. An uncached response already
+in flight may finish after the cache acknowledgement; no duration is
+selected, and qualification must state its actual limits. This is separate
+from persistent legacy caches and from edge and third-party copies. If the
+transition is unsupported, fails, changes or cannot be verified, no trusted
+completion is produced: activation stays off and deletion stays pending,
+and a permanently pending stub is not delivery. Qualification is an
+operator obligation that repository tests do not prove. No access,
+retirement or draining mechanism, deployment inventory, deployment
+deletion, protection setting, platform permission, account operation or
+cost is chosen.
+
+**Per-acknowledgement evidence.** Each C3B cache acknowledgement still
+requires authentication, its contracted invalidation calls and a fresh
+confirmation of current absence through the existing view path. Its
+evidence identifies the legacy class as transition-qualified
+non-servability, not physical erasure or a per-call witness of every
+legacy cache. A cache primitive returning normally, a source or version
+marker, a configuration marker or a caller claim alone is insufficient.
+E3 keeps the server acknowledgement and E7 the cache acknowledgement, E6
+shows deletion pending until both, and C4 delivers the transition
+qualification and failure and retry procedures. Exact enforcement and
+typed failure and retry handling belong to a fresh C3B contract and its
+independent review.
+
+**Narrow supersession of legacy-cache completion.** Historical text is
+preserved. For the legacy-cache evidence class only, and with the
+contracted invalidation calls above still required, this direction
+replaces the following completion meanings with transition-qualified
+non-servability: in §8, the requirement in the paragraph that begins
+"Later C2/C4 contracts" to qualify deletion completion including those
+caches, and the D223 allocation's deletion revalidation of
+service-controlled pages, preview images and data caches, as applied to
+entries cached before the transition; in this section, the retained
+deletion-cache rule that the cache acknowledgement needs successful
+invalidation of those caches, as applied to legacy entries; in D228's
+legacy caches and transition paragraph, the invalidation of legacy page,
+preview-image and data-cache entries and the coverage of entries cached
+and producers still in flight; in D228's narrow supersession of caching
+text, the description of the existing page cache as the legacy cache to
+invalidate; the completion qualification in the Cloud plan §8 note
+superseded in part by D220; and the matching meanings in the Cloud plan
+§1 D223, D226 and D228 rows. Everything else in those clauses still
+holds, including D221's server coordination, D222's future GLOBAL
+prerequisite, D223's stage-upload residual, D226's caller credential and
+paging key, D228's uncached server rendering, the authenticated C3A
+reviews read, anonymous access to stable unlisted links with curated
+data, and the PUBLIC_WEB boundary of two secure views plus
+`SUBMIT_REVIEW`, with no new PUBLIC grant.
+
+**Direction boundaries.** This direction chooses no source algorithm,
+endpoint wire grammar, cache API, purge design, store, principal, secret,
+credential consumer, flag or numeric budget. A provider cache purge exists
+but may reach caches shared across a team's projects; it is neither
+selected nor approved. External-state detection mechanisms remain for a
+fresh contract. No existing acknowledgement is rewritten, and no claim
+is made about any existing cache-acknowledgement corpus. Static prose
+proves no runtime, deployment, cache or
+legacy-removal behaviour. No credential, account, grant or setting is
+changed, and no live cache or Snowflake operation, deployment, retirement,
+purge, private upload, hardware action, provider API spend, implementation
+before ratification or future merge is performed or authorised. G1-G6
+remain operator-only and unperformed, and the feature stays off. Full
+cloud sync remains incomplete; C3B implementation needs this merged
+amendment and a fresh ratified contract.
+
 ## 10. Roast-control non-interference and references (B6)
 
 Admit cloud work only while idle. Bound background process and HTTP lifetimes;
@@ -662,6 +754,7 @@ clause superseded; only the listed meanings change. Everything else stays in for
 | S15 | Orchestration responsibility/code sketches and Testing Strategy opt-out bullets | Independent consent/sharing, cached-only prepare; tests do not gate upload on learning |
 | S16 | Orchestration Flow 1 next-roast illustration | Non-normative temperature example superseded; Celsius only, no invented conversion |
 | S17 | Orchestration Privacy and Ethics, User Controls granular/local-only bullets and Testing Strategy | Independent sharing/learning; queued deletion; no global local-only switch authorised |
+| S18 | Cloud-sync plan §8 "Later C2/C4 contracts" and D223 allocation, §9 retained deletion-cache rules and D228 legacy-cache paragraphs; Cloud plan §1 D223, D226 and D228 rows and §8 D220 note | Legacy-cache completion is transition-qualified non-servability (D229, §9); authenticated invalidation calls and fresh uncached absence stay required; legacy provider bytes may remain |
 
 ## 14. Traceability matrix
 
@@ -699,3 +792,12 @@ The test-run-marker question is answered. Its later implementation and behaviour
 proof remain undelivered by this prose slice; physical acceptance remains separate.
 No runtime, live cloud or operator-gate evidence is created here.
 The C3 auth surface, E7 bounds and tombstone schema remain later contract gates.
+
+Legacy-cache completion after a qualified transition is non-servability,
+not erasure (D229, §9). Legacy provider cache bytes may remain
+indefinitely, and an uncached response already in flight may finish after
+a cache acknowledgement; no retention deadline or response duration is
+chosen. Rollback to an unqualified ISR-era version, an old deployment URL
+that still serves roast data or undrained legacy producers would defeat
+that criterion, so G5 and G6 qualification must exclude them before
+activation. This is separate from edge and third-party copies.
