@@ -502,6 +502,76 @@ future merge is performed or authorised. G1-G6 remain operator-only and
 unperformed, and the feature stays off. C3 implementation needs this merged
 amendment and a fresh ratified contract.
 
+**Approved C3B uncached public rendering direction (D228, 7 Nov 2026).**
+The operator approved this design direction for the C3 deletion-cache work
+(C3B) on 7 Nov 2026, recorded as
+[D228](roastpilot-cloud/plan.md#1-decisions-this-drill-down) and linked to
+roastpilot-cloud#576 and roastpilot-agent#955. It approves this Plan
+amendment and the later detailed contracts only, including replacement of
+the existing public-page ISR rule; it is not an implementation contract,
+publication approval or live activation. D220-D223 and D226 are retained,
+not reopened, and the paragraphs of this section above still hold except
+where this direction narrowly replaces a caching rule.
+
+**Uncached server rendering.** The public `/r/[slug]` roast page, its
+preview image and the roast, review and rating data readers they use render
+on the server from uncached reads, instead of ISR and service-controlled
+content caching. Rendering stays on the server and does not move to client
+fetching. Anonymous access, stable unlisted links without discovery, curated
+public data, slug-shape validation, the existing two secure views and the
+PUBLIC_WEB boundary of two secure views plus `SUBMIT_REVIEW` are unchanged,
+with no new PUBLIC grant. The authenticated C3 reviews-read API is
+unchanged.
+
+**Accepted unmeasured trade-off.** Uncached rendering adds Snowflake reads
+for page and preview requests, with additional latency, warehouse load and
+potential cost. The operator accepted these as unmeasured trade-offs. No
+numeric request, timeout, throughput, latency or spending budget is
+selected, and no replacement content or negative cache, edge rule or
+limiter change is chosen. The existing layered abuse controls and the
+Snowflake backstop in Cloud plan §16 are retained and still need runtime
+qualification.
+
+**Legacy caches and transition.** Uncached rendering alone is not proof that
+content cached before the transition has been removed. C3B still needs
+D223's authenticated, service-controlled invalidation of legacy page,
+preview-image and data-cache entries, plus an uncached absence confirmation
+through the existing view path, before any cache acknowledgement. Fresh
+detailed contracts and operator qualification must cover entries cached and
+producers still in flight from before the deployment transition.
+Unsupported, failed or unverifiable transition or invalidation outcomes
+remain pending, and a permanently pending stub is not delivery. E3 keeps the
+server acknowledgement and E7 the cache acknowledgement, E6 shows deletion
+pending until both, C4 qualifies the end-to-end failure and retry path, and
+edge and third-party copies remain residuals (§15).
+
+**Narrow supersession of caching text.** Historical text is preserved. For
+the public roast page, its preview image and their data readers only, this
+direction replaces the ISR, ISR-cached and served-from-cache meanings in
+Cloud plan §3 (the public-surface bullet and the architecture sketch), §6
+(`GET /r/[slug]`), §8 (the slug-regeneration ISR revalidation, already
+deferred), §9 (the repository layout comment), §11 (the C4 Public page epic
+row), §15 (the cost table, usage model and cost control 3) and §16 (Layer 0
+and the warehouse-split note), and the negative-caching retention earlier in
+this section to the extent it relies on those reader caches. The existing
+page cache named earlier in this section, in §8 "Later C2/C4 contracts" and
+in D223 is now the legacy cache to invalidate, not a retained cache. The
+later fresh C3B implementation contract owns the matching correction of the
+Cloud repository's ISR stack rule and layout comment, with its applicable
+protected-path security review before any source write; this amendment
+changes no Cloud or Agent file.
+
+**Direction boundaries.** This direction chooses no source algorithm, cache API
+or protocol, endpoint wire grammar, store, principal, secret, credential
+consumer, numeric budget or deployment procedure. Static prose proves no
+runtime, concurrency, cache-miss or legacy-removal behaviour. No credential,
+account, grant or setting is changed, and no live cache or Snowflake
+operation, deployment, private upload, hardware action, provider API spend,
+implementation before ratification or future merge is performed or
+authorised. G1-G6 remain operator-only and unperformed, and the feature
+stays off. Full cloud sync remains incomplete; C3B implementation needs
+this merged amendment and a fresh ratified contract.
+
 ## 10. Roast-control non-interference and references (B6)
 
 Admit cloud work only while idle. Bound background process and HTTP lifetimes;
