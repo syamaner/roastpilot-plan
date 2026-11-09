@@ -1,0 +1,170 @@
+# D230 — Prepared story bodies and delivery order
+
+9 November 2026. Local issue-body drafts, not published issues or delegation contracts.
+[Decision and authority](fc-protection-d230.md). Issue numbers are unassigned.
+The owner ratified product direction; exact issue context and each story-planner
+contract still require their normal authority and provenance checks.
+
+## Common story requirements
+
+All stories inherit the eight clauses, source bases and architectural boundaries
+in D230. Formal planning binds maintainer identity, issue body hash, comments and
+revision watermark, Plan SHA and implementation base. Refresh before delegation.
+Tests must fail causally when the corresponding guard is removed or inverted.
+No controller or transport behaviour is proved by document preparation.
+
+Safety/controller/recovery/runtime capability changes take SAFETY_CRITICAL:
+full unfiltered native validation, statics, boundary contracts, mandatory independent
+safety review and other triggered lenses. Gate-machinery changes additionally
+require the exhaustive witness. Preserve protected checks and current-head review.
+Reviewers do not edit implementation; the parent independently adjudicates findings.
+
+## Prepared issue bodies
+
+### M: Exact-session fixed-zero containment
+
+Repository: coffee-roaster-mcp.
+
+Scope and PR plan: One coherent 250–400 logic-line slice; explicit driver capability, strict request/response grammar, reservation and stale-completion handling.
+
+Dependencies: Ratified Plan and new MCP story; existing #237 is dependency context, not this capability.
+
+Acceptance: common requirements and criteria 1–3, 7–8, 11–12. Reviewers: Safety, security, MCP/downstream compatibility; QA when triggered.
+
+### A1: Human-mode protection, dispatch and recovery
+
+Repository: roastpilot-agent.
+
+Scope and PR plan: One coherent 350–500 logic-line slice; fresh-reading eligibility, config, typed safety, endpoint latch, actual-dispatch fences, containment consumer and operator disposition.
+
+Dependencies: M source/contract; stays non-admitted until A2 and C.
+
+Acceptance: common requirements and criteria 4–5, 7–8, 10–12. Reviewers: Safety, security, MCP contract, simulation; UI/QA when triggered.
+
+### A2: Bounded persistence and visible uncertainty
+
+Repository: roastpilot-agent.
+
+Scope and PR plan: One coherent 350–500 logic-line slice; whole-turn budget, all-writer inventory, connection quarantine, bounded pending work and durability projection.
+
+Dependencies: A1; does not alter endpoint ownership.
+
+Acceptance: common requirements and criteria 5–8, 11–12. Reviewers: Safety, simulation; security, UI and QA as capabilities/coverage trigger.
+
+### C: Mock human-FC consumer admission
+
+Repository: roastpilot-agent.
+
+Scope and PR plan: One coherent 250–400 logic-line slice; authority config isolation, current-child manual/v1 handshake, capture validation, Start uncertainty, human-mark reconciliation and shadow observation preservation.
+
+Dependencies: M, A1, A2 and merged MCP #237/#238. Mock only.
+
+Acceptance: common requirements and criteria 8–12. Reviewers: Safety, security, MCP contract, simulation; UI/QA when triggered.
+
+### L: Candidate and later live-admission qualification
+
+Repository: cross-repository.
+
+Scope and PR plan: Later contract; size and PR split require concrete candidate and evidence scope. No live operation is authorised by this draft.
+
+Dependencies: M/A1/A2/C, strict diagnostic collector interpretation, exact installed candidate and fresh qualification.
+
+Acceptance: common requirements and criteria All integrated obligations plus the L-specific requirements below.. Reviewers: Safety, driver/contract and independent evidence review; other lenses by scope.
+
+### L-specific acceptance
+
+Bind exact installed Agent/MCP/SDK artifacts and effective configuration. Demonstrate
+sensor freshness, target-storage budget, transport ownership and command disposition
+using software/cold evidence before supervised hardware admission. Bind actual room
+probe reading, placement and age with BT/ET; a remembered room temperature is not a
+measurement. Agree the manual/shadow interval, actual hop, recording continuity,
+identity and durability interpretation separately. Legacy zero inference counters
+are not timing proof. Preserve operator presence and independent physical stop.
+No mock pass, RPC acknowledgement or commanded actuator bit proves physical effect.
+D227 acceptance does not transfer automatically. Immediate physical GO stays separate.
+
+## Outcome semantics for formal contract selection
+
+The formal contract must select exact wire names/version; the semantic grammar
+below is the proposed closed set, not a currently implemented API.
+
+| Semantic outcome | Evidence needed | Permitted follow-up |
+| --- | --- | --- |
+| Known non-dispatch: reservation conflict | Server-owned pre-driver refusal for the exact session, with no invocation | No automatic retry in the initial proposal: no demonstrably transient typed producer exists yet |
+| Known non-dispatch: permanent incompatibility or identity failure | Unsupported capability/driver/protocol, wrong/stopped/replaced session, malformed request | No automatic retry or fallback; admission/recovery failure |
+| Invoked, returned valid command-state evidence | Driver invocation and typed result tied to reservation/session | Record command state, not physical heat removal; no automatic repeat |
+| Invoked, result missing/invalid or exception | Invocation known but reliable applied-state evidence absent | Unknown outcome, retain latch; no automatic retry |
+| Local timeout/cancellation or missing response | Remote invocation/settlement not proven | Unknown outcome even if the local task ended; no routine/containment retry |
+| Superseded by independent emergency/lifecycle action | Exact owner/generation evidence | New owner governs; stale completion cannot release latch or update newer run |
+
+The earlier transient-retry proposal is withdrawn. A future automatic retry
+requires a closed typed outcome, a reachable transient producer and causal tests
+under a separate ratified contract. Do not add an operation-nonce journal merely
+to enable automatic continuation: conservative unknown-until-explicit-reconciliation
+is the initial recommendation. This is not permission to spin, clear another
+owner's reservation, reconnect or infer settlement. Independent
+emergency admission is preserved in all rows; its dispatch constraints remain
+honestly visible. Existing MCP stale-completion emergency fallback is unchanged.
+
+## Numbered behavioural acceptance criteria
+
+1. M rejects missing/malformed/unknown support and wrong/stopped/replaced session
+   before driver invocation; no generic set_heat/e-stop substitution on refusal.
+2. M commands only heat zero and preserves fan/drum/solenoid/cooling absent an
+   independently admitted lifecycle/emergency action. Driver contract tests start
+   from partial-drop command state; tests use fakes/injected transports only.
+3. M's outcome grammar proves pre-call refusal, invocation uncertainty and stale
+   completion separately. Preserve existing emergency fallback and bind its record.
+4. A handles below/equal/above threshold, charge/phase/freshness combinations and
+   same-tick confirmed charge without storage ahead of urgent action. Calling
+   current `_apply_phase_rules` first is insufficient because it awaits storage.
+   Include accepted-temperature stalls while session time/raw packet counts
+   advance, counter resets/wrong types and ignored/error/unit-invalid readings.
+5. A fences every queued/new routine heat/fan/drop path, joins operator/legacy
+   endpoint requests, preserves emergency admission and records in-flight intervals.
+6. A's persistence budget covers prior-turn history, queue audit and all controller
+   sink awaits. Block each boundary, test late commit and cancellation suppression;
+   no stale continuation actuates or clears recovery. No unbounded task/backlog.
+7. A treats MCP local timeout as remote-unknown. Selected-SDK real-stdio tests
+   reproduce sync blockage and async controls; no false preemption/settlement claim.
+8. A/C perform no automatic retry from the unproven reservation-conflict category;
+   no unknown-result retry or automatic redrop. Resolve interaction with existing
+   safety heat-off retries explicitly before implementation. Emergency remains callable; remote
+   service/physical success are separate claims.
+9. C validates strict manual authority, manual/v1, mock driver/audio/override and
+   requested capture settings before Start/initial actuation. Missing readback,
+   old child, truthy strings, stale generation or rejected ack never downgrade.
+   Absent readback fields rely only on the reviewed child's explicit contract,
+   not fabricated effective configuration evidence.
+   Pin/strip/admit inherited authority keys in both modes; unknown Start outcome
+   enters recovery without another Start. Preserve validated shadow-observation
+   evidence for the separate qualification collector. Malformed diagnostic-only
+   metadata invalidates diagnostic qualification, not canonical human FC or
+   independently valid control telemetry; actual control/transport faults retain
+   their safety handling. Pre-Start protocol admission stays strict.
+10. C preserves canonical accepted human timestamps after lost response for the
+    exact retained session; changed/evicted/ambiguous session stays unresolved.
+    Post-endpoint new notes never change phase/DTR; model detections never do so.
+11. Restart/fault/recovery cannot replay heat/drop or auto-resume. UI projects
+    server authority, unknown durability/actuation and operator intervention,
+    without asserting physical cooling from command-state fields.
+    Operator disposition must not require heating resume or bypass exact-session,
+    charge and prior-command reconciliation. Test blocked restart persistence.
+12. Preserve automatic-mode behaviour and existing MCP mock-only restrictions.
+    Record BT/ET/measured ambient validity/placement, command timeline, human FC,
+    recording continuity and outcome for the later baseline. No recipe-success
+    or hardware-ready claim is made by a mock pass.
+
+For every changed guard, formal planning must map removal/inversion to a causal
+test. Safety changes require full native validation and risk-routed independent
+reviews; implementation completion and hardware qualification remain distinct.
+
+## Scope control
+
+These are preparation units, not a demand for artificial code splits. Formal
+story-planner may refine coherent PR plans within ratified scope; material policy,
+architecture or authority changes return to the owner. Any materially larger unit
+needs a reviewability rationale. Tests over 600 changed lines require QA review.
+No existing #954 acceptance issue or closed #237 silently authorises these features.
+Do not publish these bodies, share a new provider packet, implement or enable live
+mode merely because this local preparation is complete.
