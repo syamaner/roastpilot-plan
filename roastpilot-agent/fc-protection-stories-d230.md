@@ -69,7 +69,22 @@ Scope and PR plan: Later contract; size and PR split require concrete candidate 
 
 Dependencies: M/A1/A2/C, strict diagnostic collector interpretation, exact installed candidate and fresh qualification.
 
-Acceptance: common requirements and criteria All integrated obligations plus the L-specific requirements below.. Reviewers: Safety, driver/contract and independent evidence review; other lenses by scope.
+Acceptance: all integrated obligations plus the L-specific requirements below. Reviewers: Safety, driver/contract and independent evidence review; other lenses by scope.
+
+### Issue coverage and ambient limitation
+
+The roast agent's read-only coverage check on 9 November found no existing
+active-session fixed-zero containment story. M remains separate from MCP #230
+(stopped-fault exact-session recovery). Closed #237 is mock-only; #227 cold
+projection is context, not authority for M.
+
+MCP #199 is an open ambient non-finite-value boundary issue (reported revision:
+2026-08-11T06:48:59Z; zero comments). The roast agent reports that `_current_value`
+still checks the sentinel then converts to float without rejecting non-finite
+values. Its issue describes independent Agent triad guards; those guards were
+not freshly reverified by that coverage check. L must resolve or explicitly
+qualify this ambient-validity limitation against its exact candidate. This is
+not evidence of a current Agent control bypass and does not expand M's scope.
 
 ### L-specific acceptance
 
