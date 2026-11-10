@@ -1,6 +1,6 @@
 # D230 — Prepared story bodies and delivery order
 
-9 November 2026. Local issue-body drafts, not published issues or delegation contracts.
+10 November 2026. Revised local issue-body drafts, not published issues or delegation contracts.
 [Decision and authority](fc-protection-d230.md). Issue numbers are unassigned.
 The owner ratified product direction; exact issue context and each story-planner
 contract still require their normal authority and provenance checks.
@@ -97,6 +97,8 @@ identity and durability interpretation separately. Legacy zero inference counter
 are not timing proof. Preserve operator presence and independent physical stop.
 No mock pass, RPC acknowledgement or commanded actuator bit proves physical effect.
 D227 acceptance does not transfer automatically. Immediate physical GO stays separate.
+Before L starts, name the delivery owner and contract for the strict diagnostic
+collector prerequisite; its implementation is not silently assigned to C or L.
 
 ## Outcome semantics for formal contract selection
 
@@ -105,7 +107,7 @@ below is the proposed closed set, not a currently implemented API.
 
 | Semantic outcome | Evidence needed | Permitted follow-up |
 | --- | --- | --- |
-| Known non-dispatch: reservation conflict | Server-owned pre-driver refusal for the exact session, with no invocation | No automatic retry in the initial proposal: no demonstrably transient typed producer exists yet |
+| Known non-dispatch: reservation conflict | Server-owned pre-driver refusal for the exact session, with no invocation | No automatic retry in the initial capability (D230 clause 4), including reservation conflicts |
 | Known non-dispatch: permanent incompatibility or identity failure | Unsupported capability/driver/protocol, wrong/stopped/replaced session, malformed request | No automatic retry or fallback; admission/recovery failure |
 | Invoked, returned valid command-state evidence | Driver invocation and typed result tied to reservation/session | Record command state, not physical heat removal; no automatic repeat |
 | Invoked, result missing/invalid or exception | Invocation known but reliable applied-state evidence absent | Unknown outcome, retain latch; no automatic retry |
@@ -121,6 +123,18 @@ owner's reservation, reconnect or infer settlement. Independent
 emergency admission is preserved in all rows; its dispatch constraints remain
 honestly visible. Existing MCP stale-completion emergency fallback is unchanged.
 
+## Criterion ownership
+
+M owns producer criteria 1–3, plus an explicit no-retry rule for the new server
+capability and preservation of existing MCP behaviour. Criteria 7–8 and 11 in
+M's mapping are integration context: M supplies typed identity, refusal,
+invocation and uncertainty evidence; Agent orchestration remains A1/A2/C work.
+A1 owns protection, dispatch, endpoint latch and operator recovery in 4–5, 7–8
+and 11. A2 owns persistence criterion 6 and proves its integration cannot bypass
+A1 fences. C owns authority/capture/reconciliation criteria 9–10. A1 supports
+criterion 10's latch boundary; C owns human-event reconciliation. Criterion 12
+applies within each story's scope, with real-candidate qualification deferred to L.
+
 ## Numbered behavioural acceptance criteria
 
 1. M rejects missing/malformed/unknown support and wrong/stopped/replaced session
@@ -128,21 +142,40 @@ honestly visible. Existing MCP stale-completion emergency fallback is unchanged.
 2. M commands only heat zero and preserves fan/drum/solenoid/cooling absent an
    independently admitted lifecycle/emergency action. Driver contract tests start
    from partial-drop command state; tests use fakes/injected transports only.
-3. M's outcome grammar proves pre-call refusal, invocation uncertainty and stale
-   completion separately. Preserve existing emergency fallback and bind its record.
-4. A handles below/equal/above threshold, charge/phase/freshness combinations and
+3. M performs no automatic retry, including reservation-conflict refusal.
+   Test zero calls on refusal and no resend after conflict release. M's outcome
+   grammar proves pre-call refusal, invocation uncertainty and stale
+   completion separately. A stale completion cannot release a newer owner's
+   reservation or update its session. Preserve legitimate matching-owner cleanup
+   and emergency fallback; cleanup alone never proves remote command settlement.
+   Bind the fallback record.
+4. A1 handles below/equal/above threshold, charge/phase/freshness combinations and
    same-tick confirmed charge without storage ahead of urgent action. Calling
    current `_apply_phase_rules` first is insufficient because it awaits storage.
    Include accepted-temperature stalls while session time/raw packet counts
    advance, counter resets/wrong types and ignored/error/unit-invalid readings.
-5. A fences every queued/new routine heat/fan/drop path, joins operator/legacy
+   With valid eligibility, admit one safety-evaluated compound drop with no
+   model/DTR/advisor/dwell gate; record interrupted/unmet target, not success.
+   Each gate independence and one-dispatch guard needs a causal mutation test.
+   Invalid/stale temperature evidence inhibits routine heat/fan and enters recovery;
+   it cannot admit a new endpoint. Existing endpoint latch and no-heating-resume
+   persist. If freshness fails before actual drop dispatch, withhold it and show
+   operator intervention/reconciliation. Freshness restoration alone cannot dispatch
+   the pending drop. Test stale-before-admission, stale-between-admission-and-dispatch,
+   recovered-freshness, issued/unknown drop, and the separately eligible operator
+   disposition. Never retry an issued/unknown drop. Fixed-zero remains subject to
+   clause 4; independent emergency intent remains available.
+5. A1 fences every queued/new routine heat/fan/drop path, joins operator/legacy
    endpoint requests, preserves emergency admission and records in-flight intervals.
-6. A's persistence budget covers prior-turn history, queue audit and all controller
+6. A2's persistence budget covers prior-turn history, queue audit and all controller
    sink awaits. Block each boundary, test late commit and cancellation suppression;
    no stale continuation actuates or clears recovery. No unbounded task/backlog.
-7. A treats MCP local timeout as remote-unknown. Selected-SDK real-stdio tests
+   Storage failure/overrun alone causes zero automatic drop dispatches: inhibit
+   routine control and enter containment/recovery. A concurrent independent valid
+   protection trigger is tested separately; database failure cannot erase it.
+7. A1 treats MCP local timeout as remote-unknown. Selected-SDK real-stdio tests
    reproduce sync blockage and async controls; no false preemption/settlement claim.
-8. A/C perform no automatic retry from the unproven reservation-conflict category;
+8. A1/C perform no automatic retry from the unproven reservation-conflict category;
    no unknown-result retry or automatic redrop. Resolve interaction with existing
    safety heat-off retries explicitly before implementation. Emergency remains callable; remote
    service/physical success are separate claims.
@@ -151,24 +184,34 @@ honestly visible. Existing MCP stale-completion emergency fallback is unchanged.
    old child, truthy strings, stale generation or rejected ack never downgrade.
    Absent readback fields rely only on the reviewed child's explicit contract,
    not fabricated effective configuration evidence.
-   Pin/strip/admit inherited authority keys in both modes; unknown Start outcome
+   Isolate inherited human-authority keys so they cannot leak into automatic mode;
+   prove automatic-mode configuration and runtime parity. C requires independently
+   proven mock-producer freshness semantics under shared contract tests; Hottop
+   evidence alone cannot admit it. Unknown Start outcome
    enters recovery without another Start. Preserve validated shadow-observation
    evidence for the separate qualification collector. Malformed diagnostic-only
    metadata invalidates diagnostic qualification, not canonical human FC or
    independently valid control telemetry; actual control/transport faults retain
    their safety handling. Pre-Start protocol admission stays strict.
 10. C preserves canonical accepted human timestamps after lost response for the
-    exact retained session; changed/evicted/ambiguous session stays unresolved.
-    Post-endpoint new notes never change phase/DTR; model detections never do so.
+    exact retained child and session; changed/evicted/ambiguous identity stays unresolved.
+    Post-endpoint new notes never change phase/DTR or cancel protection; model detections never do so.
 11. Restart/fault/recovery cannot replay heat/drop or auto-resume. UI projects
     server authority, unknown durability/actuation and operator intervention,
     without asserting physical cooling from command-state fields.
     Operator disposition must not require heating resume or bypass exact-session,
     charge and prior-command reconciliation. Test blocked restart persistence.
+    An unknown possible prior drop refuses another software drop, exposes unknown
+    outcome and requires physical operator intervention/reconciliation. Show that
+    existing emergency fallbacks may stop the drum and close the chute; never
+    present emergency admission or RPC completion as physical evacuation proof.
 12. Preserve automatic-mode behaviour and existing MCP mock-only restrictions.
-    Record BT/ET/measured ambient validity/placement, command timeline, human FC,
+    Record BT/ET/measured ambient validity/age/placement, batch and initial thermal
+    state, command timeline, human FC,
     recording continuity and outcome for the later baseline. No recipe-success
-    or hardware-ready claim is made by a mock pass.
+    or hardware-ready claim is made by a mock pass. Invalid/non-finite ambient is
+    recorded as invalid, never a valid measurement. #199 remains L qualification
+    context, not a scope expansion of M.
 
 For every changed guard, formal planning must map removal/inversion to a causal
 test. Safety changes require full native validation and risk-routed independent
