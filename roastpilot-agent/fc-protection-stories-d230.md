@@ -131,7 +131,9 @@ M's mapping are integration context: M supplies typed identity, refusal,
 invocation and uncertainty evidence; Agent orchestration remains A1/A2/C work.
 A1 owns protection, dispatch, endpoint latch and operator recovery in 4–5, 7–8
 and 11. A2 owns persistence criterion 6 and proves its integration cannot bypass
-A1 fences. C owns authority/capture/reconciliation criteria 9–10. A1 supports
+A1 fences. A2 mappings to criteria 7–8 mean that expired or late storage work
+cannot trigger retries or bypass A1 ownership; A1/C own transport orchestration.
+C owns authority/capture/reconciliation criteria 9–10. A1 supports
 criterion 10's latch boundary; C owns human-event reconciliation. Criterion 12
 applies within each story's scope, with real-candidate qualification deferred to L.
 
@@ -154,22 +156,33 @@ applies within each story's scope, with real-candidate qualification deferred to
    current `_apply_phase_rules` first is insufficient because it awaits storage.
    Include accepted-temperature stalls while session time/raw packet counts
    advance, counter resets/wrong types and ignored/error/unit-invalid readings.
+   Non-finite BT or ET is invalid and cannot count as fresh evidence.
    With valid eligibility, admit one safety-evaluated compound drop with no
    model/DTR/advisor/dwell gate; record interrupted/unmet target, not success.
    Each gate independence and one-dispatch guard needs a causal mutation test.
    Invalid/stale temperature evidence inhibits routine heat/fan and enters recovery;
-   it cannot admit a new endpoint. Existing endpoint latch and no-heating-resume
+   it cannot admit a new protective drop. Existing endpoint latch and no-heating-resume
    persist. If freshness fails before actual drop dispatch, withhold it and show
    operator intervention/reconciliation. Freshness restoration alone cannot dispatch
    the pending drop. Test stale-before-admission, stale-between-admission-and-dispatch,
    recovered-freshness, issued/unknown drop, and the separately eligible operator
    disposition. Never retry an issued/unknown drop. Fixed-zero remains subject to
    clause 4; independent emergency intent remains available.
+   If no endpoint was admitted before freshness loss, recovered readings alone
+   neither resume routine heat/fan nor admit an automatic drop from recovery.
+   Require explicit operator reconciliation through safety. For an eligible
+   continued roast, restore the control phase only through that action and evaluate
+   fresh BT >=196°C protection before any routine heat/fan dispatch. Unknown
+   command disposition or endpoint history blocks continuation. Test fresh recovery
+   below/equal/above 196°C, no operator action, failed reconciliation, and independent
+   emergency intent. An admitted-endpoint latch continues to forbid heating resume.
 5. A1 fences every queued/new routine heat/fan/drop path, joins operator/legacy
    endpoint requests, preserves emergency admission and records in-flight intervals.
 6. A2's persistence budget covers prior-turn history, queue audit and all controller
    sink awaits. Block each boundary, test late commit and cancellation suppression;
    no stale continuation actuates or clears recovery. No unbounded task/backlog.
+   Inventory all relevant writers/connections, including recovery/background work,
+   and test their lock bounds and visible unavailable/unknown durability status.
    Storage failure/overrun alone causes zero automatic drop dispatches: inhibit
    routine control and enter containment/recovery. A concurrent independent valid
    protection trigger is tested separately; database failure cannot erase it.
@@ -177,8 +190,12 @@ applies within each story's scope, with real-candidate qualification deferred to
    reproduce sync blockage and async controls; no false preemption/settlement claim.
 8. A1/C perform no automatic retry from the unproven reservation-conflict category;
    no unknown-result retry or automatic redrop. Resolve interaction with existing
-   safety heat-off retries explicitly before implementation. Emergency remains callable; remote
-   service/physical success are separate claims.
+   safety heat-off retries explicitly before contracting. A material safety/behaviour
+   change or conflict with ratified no-resend policy returns to the owner; source
+   proof that existing independent emergency semantics remain unchanged does not
+   itself require a new product choice. Unknown drop/containment results cause
+   zero reconnect, child-restart or new-session escape attempts. Emergency remains
+   callable; remote service/physical success are separate claims.
 9. C validates strict manual authority, manual/v1, mock driver/audio/override and
    requested capture settings before Start/initial actuation. Missing readback,
    old child, truthy strings, stale generation or rejected ack never downgrade.
@@ -187,7 +204,10 @@ applies within each story's scope, with real-candidate qualification deferred to
    Isolate inherited human-authority keys so they cannot leak into automatic mode;
    prove automatic-mode configuration and runtime parity. C requires independently
    proven mock-producer freshness semantics under shared contract tests; Hottop
-   evidence alone cannot admit it. Unknown Start outcome
+   evidence alone cannot admit it. C owns this consumer-side proof against the
+   bound existing mock. Failed proof closes admission; any necessary MCP producer
+   change needs separately ratified scope and is not automatically M work.
+   Unknown Start outcome
    enters recovery without another Start. Preserve validated shadow-observation
    evidence for the separate qualification collector. Malformed diagnostic-only
    metadata invalidates diagnostic qualification, not canonical human FC or
@@ -200,7 +220,10 @@ applies within each story's scope, with real-candidate qualification deferred to
     server authority, unknown durability/actuation and operator intervention,
     without asserting physical cooling from command-state fields.
     Operator disposition must not require heating resume or bypass exact-session,
-    charge and prior-command reconciliation. Test blocked restart persistence.
+    charge, fresh evidence and known prior-drop state, all through safety evaluation.
+    In the approved stale-reading disposition path, missing fresh evidence makes
+    software operator drop unavailable; expose physical intervention/reconciliation.
+    Independent emergency authority is unchanged. Test blocked restart persistence.
     An unknown possible prior drop refuses another software drop, exposes unknown
     outcome and requires physical operator intervention/reconciliation. Show that
     existing emergency fallbacks may stop the drum and close the chute; never

@@ -1,7 +1,7 @@
 # D230 — Human-FC protection and consumer admission
 
-10 November 2026. Local revision of draft Plan PR #101; not effective.
-Published head remains `55ab0615d95dfb0f2b7af3a0efeafb6ba9762036` until separately updated.
+10 November 2026. Revision of draft Plan PR #101; not effective until exact-head
+owner approval and verified merge. Prior reviewed heads: `55ab0615` and `c860d274`.
 No implementation, hardware qualification or live admission is claimed.
 
 ## Authority and bindings
@@ -122,14 +122,43 @@ the present operator to act. This avoids claiming a new temperature-based
 irreversible action is justified by invalid evidence. It does not claim that
 waiting is physically safe or that a blocked transport will service containment.
 
+## Ratified recovery clarification before endpoint admission
+
+The owner approved this clarification after the c860d274 document review.
+Source: Career `a5f1091`, `fc-protection-document-review-c860-disposition.md`,
+proposed owner clarification section. It settles that previously unresolved
+branch and does not change either the eight clauses or the admitted-endpoint rule.
+
+When temperature evidence becomes stale before any protective endpoint was
+admitted, remain in recovery even after readings become fresh. Do not automatically
+resume routine heat/fan or automatically admit a temperature-triggered drop from
+recovery. Require an explicit operator action that passes the existing safety and
+reconciliation requirements. If continued roasting is permitted for a positively
+reconciled interruption, restore the eligible control phase only through that
+operator action and evaluate the fresh 196°C protection condition before any
+routine heat/fan dispatch. At or above that threshold, protection takes priority;
+continued heating cannot escape it. Unknown command disposition or endpoint
+history still blocks continuation. Operator drop remains a separately evaluated
+disposition with exact session, charge, fresh evidence and known prior-drop state.
+
+This clarification does not ban every positively reconciled interruption. It
+leaves the previously ratified admitted-endpoint branch unchanged: retained latch,
+no heating resume, no automatic delayed drop on freshness restoration, and no
+repeat of an issued/possibly issued drop. Clause 4 containment and independent
+emergency intent remain unchanged. The trade-off is that fresh readings alone do
+not restart control or cause a new automatic drop from recovery; operator action
+is required. This direction was explicitly ratified by the owner on 10 November 2026.
+
 ## Effectiveness and review scope
 
 Policy direction and draft publication approval do not approve this revised Plan
 head for merge. D230 becomes effective only after explicit owner approval of the
 exact final head and a verified merge. No decision effectiveness implies software
 implementation, consumer admission, installed-candidate qualification or live GO.
-The six-file document review confirmed policy fidelity at `55ab0615` and identified
-acceptance gaps; these local corrections are not a new independent review pass.
+The six-file review found policy fidelity at `55ab0615` within its disclosed
+limits. The nine-file review at `c860d274` confirmed clause and clarification
+fidelity and identified remaining acceptance gaps. These later corrections are
+not themselves a new independent review pass.
 The one-tick storage budget remains a proposed default pending target-storage
 qualification, as clause 6 requires.
 
@@ -151,7 +180,10 @@ means acceptance, not physical acquisition age. Local evidence: MCP source
 `2f0242184f0c27ddb16b0b81348df7a232bb1d556cfd313c3889add6e8ad1f6c`.
 This is local producer evidence, not a consumer contract test or physical freshness
 qualification. Mock producers need their own admitted freshness contract and the
-same behavioural tests; Hottop counter semantics do not transfer by driver shape. A newly observed counter must
+same behavioural tests; Hottop counter semantics do not transfer by driver shape.
+C owns consumer-side proof against the bound existing mock. Failure keeps admission
+closed; a required producer change needs separately ratified MCP scope, not an
+implicit expansion of M. A newly observed counter must
 not receive age zero: under valid ordered same-child history, use the previous
 observation's request-admission time as a conservative acceptance lower bound.
 Initial/reset/lost history and a long unobserved gap remain unproven; unchanged
