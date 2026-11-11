@@ -35,7 +35,9 @@ Acceptance: common requirements and criteria 1–3, 7–8, 11–12. Reviewers: S
 
 Repository: roastpilot-agent.
 
-Scope and PR plan: One coherent 350–500 logic-line slice; fresh-reading eligibility, config, typed safety, endpoint latch, actual-dispatch fences, containment consumer and operator disposition.
+Scope and PR plan: four serial review units off current main — S1 domain/safety (320–420 logic lines), S2 strict MCP consumer (320–420), S3 controller/runner/lifecycle ownership integration (550–700), S4 safety-relevant UI (150–250 TypeScript lines). S3 is one cohesive actuation-ownership unit: splitting its endpoint latch, dispatch fence and lifecycle gate would create incomplete intermediate protection. Re-estimate and bind the contract at each slice's current base; tests and separated data are excluded from these estimates.
+
+The scope remains fresh-reading eligibility, typed safety, endpoint latch, actual-dispatch and lifecycle fences, containment consumer and operator disposition. Human mode is constructor-injected for tests only; no public enablement/configuration surface is added before C. A1's one-attempt fixed-zero path preserves other actuator bits and suppresses ordinary human-mode resends; independent emergency and automatic-mode semantics remain unchanged. All four units take the safety route (S4 includes operator recovery projections). Preserve the story's required safety, security, MCP-contract and simulation lenses across the actual slices, plus UI/QA when triggered. No collector ownership or qualification/hardware completion is assigned by this refinement.
 
 Dependencies: M source/contract; stays non-admitted until A2 and C.
 
