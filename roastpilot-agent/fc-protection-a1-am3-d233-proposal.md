@@ -11,3 +11,7 @@ The exact existing emergency heat-off retry stays outside the ordinary HEAT/FAN 
 D-8 selects R: unexpected child failure still permits reads for existing hard-limit and read-failure handling, while the guarded actuation paths are blocked. D-10 selects B-corrected: selective dispatch protection, preserving emergency retry and existing cooling policy. Both selections were ratified explicitly, together with D-5 through D-12 and the lead corrections.
 
 This records software design only. S2 PR #1084 merged at `7bfd027ec5139669362d89b37cfd43215e922dc9`, tree-identical to reviewed `6e0eb5f728a90ddd36d341e4f4558168f7789e13`. It does not validate S3. After ratification, the implementation base, issue watermark and Plan bindings must be refreshed before delegation; full safety-critical validation, independent review and protected delivery remain required. No hardware, live enablement or release approval follows.
+
+## TE15 test correction ratified 15 November
+
+[Exact correction](fc-protection-a1-am3-te15-correction.md), SHA-256 `49fac6accf148efb9b41f4c559090d9b6e65cd3d02b3845fa12a7a5a4879df36`, is ratified by the [owner record](https://github.com/syamaner/roastpilot-agent/issues/1076#issuecomment-6894426652). Only GE15/TE15 is replaced: UNKNOWN refuses respawn/reopen; a separate clear-ownership case proves successful reopen without ownership mutation. Production rules and TE13 are unchanged. The historical proposed header is preserved; this record establishes approval.
