@@ -1,0 +1,15 @@
+{
+  "contract_sha256": "abafd10971ab252e8751f0c19d76ad9ebfc327f653cd7d7aaa3870485f0e6714",
+  "source_head": "e2668b643042e985737c323b3f56d4758cd652cd",
+  "production_identical_to": "f18f44c21fe5a9538f040781beac20e1dfc80c91",
+  "watermark": "b47c960be9848256ac820af6dc06b22e56ae91f04ef8779f7ef000cecd7c04c1",
+  "review": "PASS-with-lead-corrections C1-C6 adopted",
+  "secret_scan": "PASS",
+  "ratified": true,
+  "owner_comment_id": 6899582798,
+  "owner_comment_url": "https://github.com/syamaner/roastpilot-agent/issues/1076#issuecomment-6899582798",
+  "owner_comment_updated_at": "2026-11-15T18:59:09Z",
+  "posted_body_sha256": "1657223d0be3f3f27400a2741259443e1d3b86f99d5411eb15d4d135fa6da6cf",
+  "implementation_root": "/private/tmp/a1-s3-am4-implementation",
+  "fresh_provision_status": "pristine including ignored before venv"
+}
