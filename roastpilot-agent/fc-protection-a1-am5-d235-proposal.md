@@ -13,3 +13,7 @@ Evidence is synthetic and head-bound. The 2,084 focused Python tests, 314 fronte
 ## Corrected contract ready for ratification
 
 The [AM-5 contract](fc-protection-a1-am5-contract.md) is prepared at SHA-256 `9bcad75d3a9722ab7b89f2d25507a8ba3a775d39d9d24696d3657284b3aed314`. Independent safety review returned PASS with exact lead corrections, incorporated in these bytes. D-18–D-22 include cancelled-task routing, strict boolean capability, completion-persistence lifetime and the retained cooling lock. All five source-verification questions were closed at `750e8af`; issue watermark was refreshed unchanged. This is proposed contract readiness, not ratification or implementation. No Plan-main merge is authorised.
+
+## Owner ratification recorded
+
+On 15 November 2026 the owner ratified the exact AM-5 contract above, including lead corrections and D-18–D-22: [OWNER comment 6901567572](https://github.com/syamaner/roastpilot-agent/issues/1076#issuecomment-6901567572). Its source bytes and hash remain immutable. This supersedes the proposed-status descriptions above for authority only; it does not turn earlier evidence into implementation proof. Delegated S3 repair resumed in a fresh same-base clone at `750e8af`. Integration, final full gate, causal evidence and independent reviews remain outstanding.
