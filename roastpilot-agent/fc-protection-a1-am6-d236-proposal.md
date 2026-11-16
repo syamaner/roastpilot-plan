@@ -15,3 +15,9 @@ This is direction approval only. No AM-6 implementation contract is yet ratified
 The [AM-6 contract](fc-protection-a1-am6-contract.md), including lead corrections and D-23–D-30, has SHA-256 `bd804bdb6fc94a498e409df6895bd6f01a7a608707a64004334129f32062907f`. Independent safety and MCP reviews supplied final wording corrections; the lead mechanically applied their exact replacements and verified source/issue bindings. Contract ratification remains pending. Implementation has not started.
 
 Global replies use confirmed/failed; per-run replies preserve accepted/failed with an exact-session confirmation reason. HTTP responses may still await storage after dispatch/readback. No new producer API, hardware action or live admission is authorised. Other stopped-fault emergency callers remain separate readiness prerequisites.
+
+## Owner ratification — 16 November 2026
+
+The owner explicitly answered “Ratify AM-6 and proceed” for exact SHA-256 `bd804bdb6fc94a498e409df6895bd6f01a7a608707a64004334129f32062907f`, including incorporated lead corrections and D-23–D-30. Verified [OWNER comment 6915711071](https://github.com/syamaner/roastpilot-agent/issues/1076#issuecomment-6915711071) binds the immutable contract at Plan 3b60694, implementation base da3a9a5, and pre-comment issue watermark. Parent reverified posted body hash and the watermark after publication.
+
+The registered Codex repair role is implementing in a pristine same-base isolated clone; own Python/Node22 environment is verified. Full native validation, producer-backed mock tests, causal controls and independent final-head reviews remain mandatory. This is not delivered software or live readiness. Contract file bytes remain unchanged. Plan main remains unchanged.
