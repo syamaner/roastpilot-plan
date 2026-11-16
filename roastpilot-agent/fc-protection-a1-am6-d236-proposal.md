@@ -9,3 +9,9 @@ Formal AM-6 must preserve AM-5's narrow current HUMAN runner, registration and p
 Require independent safety and MCP contract review before exact owner ratification, then delegated implementation and producer-backed integration tests for both proof and persistence-barrier windows. Correct the identified TG2 cooling-on oracle and TG10 real store-failure test gap. Other unbound stopped-fault callers remain explicit readiness prerequisites pending safety disposition.
 
 This is direction approval only. No AM-6 implementation contract is yet ratified, no S3 delivery is complete, and no deployment, hardware or live admission is authorised. This branch is not Plan main.
+
+## Corrected contract ready for exact ratification
+
+The [AM-6 contract](fc-protection-a1-am6-contract.md), including lead corrections and D-23–D-30, has SHA-256 `bd804bdb6fc94a498e409df6895bd6f01a7a608707a64004334129f32062907f`. Independent safety and MCP reviews supplied final wording corrections; the lead mechanically applied their exact replacements and verified source/issue bindings. Contract ratification remains pending. Implementation has not started.
+
+Global replies use confirmed/failed; per-run replies preserve accepted/failed with an exact-session confirmation reason. HTTP responses may still await storage after dispatch/readback. No new producer API, hardware action or live admission is authorised. Other stopped-fault emergency callers remain separate readiness prerequisites.
