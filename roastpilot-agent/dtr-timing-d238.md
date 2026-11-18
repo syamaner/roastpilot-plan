@@ -1,6 +1,6 @@
 # D238 — Qualified HUMAN development timing
 
-Status: owner-approved direction, implementation and qualification pending. This prepared Plan branch is not Plan main. The owner approved the exact reviewed timing proposal SHA-256 `5cd79e500e316fcecebac4440147f837b7645c5af93477e8e246718ad1ba4b2b` on 18 November 2026 and authorised descendant contracts and implementation under standing authority. Authority relay: https://github.com/syamaner/roastpilot-agent/issues/1078#issuecomment-6991884744
+Status: owner-approved direction. T1 pure evaluator is software-complete through [Agent PR #1096](https://github.com/syamaner/roastpilot-agent/pull/1096), merged at `86ac0c86320b00e07c9ce2929d0a8994030db47b`. Producer qualification, controller integration and physical qualification remain open. The owner approved the exact reviewed timing proposal SHA-256 `5cd79e500e316fcecebac4440147f837b7645c5af93477e8e246718ad1ba4b2b` on 18 November 2026 and authorised descendant contracts and implementation under standing authority. Authority relay: https://github.com/syamaner/roastpilot-agent/issues/1078#issuecomment-6991884744
 
 D231–D237 remain separately prepared A1 amendments; D238 does not claim their publication on this base. Governing source base for this preparation: Plan `93806f4c1049b86b21c3309a5f3cba3982708b98`.
 
