@@ -25,7 +25,7 @@ Today's design treats the observed FC (audio or mark) as the moment that changes
 
 ## Design (starting hypotheses, all config)
 
-- **Estimator.** FC ETA from a least-squares slope over the last 30 s of bean samples toward `first_crack_target_bean_temp_c` (176°C), replacing the five-sample slope. Invalid or missing samples keep the previous estimate and never start control.
+- **Estimator (owner direction, 23 Nov: room temperature helps).** FC ETA from a small physical (two-node bean/environment) model whose inputs include the live room temperature from the ambient probe, plus the heat and fan actually applied. Its constants are fitted to the 15 summer roasts that recorded room temperature (23.1–31.6°C, June to August 2026), validated leave-one-out against the five-sample and 30 s slopes, and checked on the 7 Nov trace at an assumed 19.5°C. Winter (19–20°C) sits 3–4°C below the fitted range, so the first winter roast is also the first winter calibration point. If the room reading is missing or stale, or the model is unavailable, the ETA falls back to a least-squares slope over the last 30 s of bean samples toward `first_crack_target_bean_temp_c` (176°C), and the fallback is logged. Invalid or missing samples keep the previous estimate and never start control.
 - **Anchor window.** Provisional from BT ≥ 155°C with a valid ETA ≤ 120 s; frozen when ETA ≤ 45 s or BT ≥ 171°C, whichever first. Re-anchor threshold 30 s.
 - **Finish-tracking law.** Required rate r* = (BT_target − BT) / (T − t), in °C/min, recomputed each control tick. To respect thermal lag, the comparison uses BT projected forward by a lag horizon (initially 30 s, from the 25–35 s Hottop lag). Heat moves in bounded steps toward closing (RoR − r*), with a floor (25%), a ceiling (100%), a per-tick step limit and the existing rate limits. Heat may rise again after a cut, within those bounds. Fan stays at the configured base (30%) and is used only when heat is at its floor and RoR still exceeds r*; a fan rule for the cold room is not yet evidenced.
 - **Phases.** RoastPhase is unchanged. DEVELOPMENT still begins on the observed FC per `first_crack_source` (#1116), for the operator-facing phase and the recorded development clock. Finish tracking runs across pre-FC and development regardless of that phase edge.
@@ -50,7 +50,7 @@ For each replay, simulation or roast, report:
 ## Delivery plan (Agent repo, one PR per slice)
 
 1. **#1116 (in flight).** Operator-only FC source, mark plausibility floor, 196°C guard from charge under `operator_only`.
-2. **Estimator and anchor, observe-only.** 30 s slope ETA, the anchor tracker with freeze and re-anchor, logged and exposed in the trace; no actuation change. Validate on the 7 Nov trace and the summer fixtures.
+2. **Estimator and anchor, observe-only.** First an offline fit study (research output, its own PR): the room-temperature model fitted to the 15 summer roasts, leave-one-out errors against both slopes, and the 7 Nov replay. Then the chosen estimator with its 30 s slope fallback, and the anchor tracker with freeze and re-anchor, logged and exposed in the trace; no actuation change.
 3. **Finish-tracking law and temperature-led drop**, behind `finish_control.enabled`. Mandatory `safety-reviewer`.
 4. **Rehearsal.** Normal service over simulated USB/audio with the matched winter two-node simulation (sensitivity only; the model is uncalibrated), plus the summer replays, scored as above.
 
