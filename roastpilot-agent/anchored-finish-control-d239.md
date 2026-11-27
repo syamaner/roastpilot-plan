@@ -38,6 +38,8 @@ Today's design treats the observed FC (audio or mark) as the moment that changes
 - **Advisor.** While finish tracking is enabled, the advisor cannot move heat or fan; its development-phase output remains advisory text and its drop recommendation remains coherence-gated and earlier-only.
 - **Flag.** `finish_control.enabled`, default off. `roast-live.sh` gains a launch switch, and the banner prints the resolved state.
 
+- **Amended 27 Nov (D242, owner):** the anchor's default target is `fc_anchor.first_crack_bean_temp_c`, 180°C, no longer the 176°C trim trigger. The #1138 study measured a median 182°C crack on the agent's summer runs (trim schedule), and the operator's flat-burner Artisan roasts cracked at a median 178°C; the finish law holds 100% heat before the anchor, so 180°C hedges between the two. The freeze point moves with it to 175°C. A per-bean `first_crack_bean_temp_c` still wins. With the law enabled, a drop target at or above the 196°C guard keeps the law off, and the run now says so once from charge (`finish_disabled_target_at_guard`).
+
 ## Scoring every comparison
 
 For each replay, simulation or roast, report:
